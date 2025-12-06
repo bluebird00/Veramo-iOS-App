@@ -20,8 +20,11 @@ struct AutocompleteLocationField: View {
                 
                 TextField(placeholder, text: $text)
                     .font(.body)
-                    .onTapGesture { onFocus() }
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.words)
+                    .textContentType(.none) .onTapGesture { onFocus() }
                     .onChange(of: text) { _, newValue in
+                        print("Text changed to: '\(newValue)'") // Debug
                         placesService.fetchSuggestions(for: newValue)
                     }
                 
@@ -42,11 +45,10 @@ struct AutocompleteLocationField: View {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(placesService.suggestions) { suggestion in
                         Button(action: { onSelect(suggestion) }) {
-                            HStack(spacing: 12) {
-                                Image(systemName: "mappin.circle.fill")
-                                    .foregroundColor(.gray)
+                            HStack(spacing: 20) {
                                 
-                                VStack(alignment: .leading, spacing: 2) {
+                                
+                                VStack(alignment: .leading, spacing: 8) {
                                     Text(suggestion.mainText)
                                         .font(.subheadline)
                                         .fontWeight(.medium)
@@ -60,8 +62,8 @@ struct AutocompleteLocationField: View {
                                 
                                 Spacer()
                             }
-                            .padding(.vertical, 10)
-                            .padding(.horizontal, 4)
+                            .padding(.vertical, 15)
+                            .padding(.horizontal, 20)
                         }
                         
                         if suggestion != placesService.suggestions.last {

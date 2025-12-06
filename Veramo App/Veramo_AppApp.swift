@@ -11,7 +11,7 @@ import SwiftUI
 struct Veramo_AppApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RideBookingView()
         }
     }
 }
