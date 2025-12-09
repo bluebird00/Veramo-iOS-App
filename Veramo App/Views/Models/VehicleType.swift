@@ -12,4 +12,8 @@ struct VehicleType: Identifiable {
     let name: String
     let description: String
     let maxPassengers: Int
+    let imageName: String
+    let useSystemImage: Bool
+    var priceFormatted: String?
+    var priceCents: Int?
 }

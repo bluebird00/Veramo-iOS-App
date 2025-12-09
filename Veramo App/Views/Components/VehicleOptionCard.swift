@@ -9,7 +9,19 @@ struct VehicleOptionCard: View {
     var body: some View {
         Button(action: onSelect) {
             HStack(spacing: 16) {
-                
+                // Vehicle image - supports both SF Symbols and custom assets
+                Group {
+                    if vehicle.useSystemImage {
+                        Image(systemName: vehicle.imageName)
+                            .font(.system(size: 32))
+                            .foregroundColor(.black)
+                    } else {
+                        Image(vehicle.imageName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                    }
+                }
+                .frame(width: 100, height: 100)
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(vehicle.name)
@@ -27,9 +39,18 @@ struct VehicleOptionCard: View {
                 
                 Spacer()
                 
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.title2)
-                    .foregroundColor(isSelected ? .black : .gray)
+                VStack(alignment: .trailing, spacing: 4) {
+                    if let priceFormatted = vehicle.priceFormatted {
+                        Text(priceFormatted)
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                    }
+                    
+                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                        .font(.title2)
+                        .foregroundColor(isSelected ? .black : .gray)
+                }
             }
             .padding()
             .background(

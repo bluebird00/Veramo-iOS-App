@@ -9,6 +9,8 @@ import Combine
 struct RideBookingView: View {
     @State private var pickupLocation: String = ""
     @State private var destination: String = ""
+    @State private var pickupPlaceId: String? = nil
+    @State private var destinationPlaceId: String? = nil
     @State private var selectedDate: Date = Date()
     @State private var selectedTime: Date = Date()
     @State private var passengerCount: Int = 1
@@ -40,6 +42,7 @@ struct RideBookingView: View {
                             onFocus: { focusedField = .pickup },
                             onSelect: { suggestion in
                                 pickupLocation = suggestion.fullText
+                                pickupPlaceId = suggestion.placeId
                                 pickupPlacesService.clearSuggestions()
                                 focusedField = .destination
                             }
@@ -65,6 +68,7 @@ struct RideBookingView: View {
                             onFocus: { focusedField = .destination },
                             onSelect: { suggestion in
                                 destination = suggestion.fullText
+                                destinationPlaceId = suggestion.placeId
                                 destinationPlacesService.clearSuggestions()
                                 focusedField = nil
                             }
@@ -152,7 +156,9 @@ struct RideBookingView: View {
                     destination: destination,
                     date: selectedDate,
                     time: selectedTime,
-                    passengers: passengerCount
+                    passengers: passengerCount,
+                    pickupPlaceId: pickupPlaceId,
+                    destinationPlaceId: destinationPlaceId
                 )
             }
         }
