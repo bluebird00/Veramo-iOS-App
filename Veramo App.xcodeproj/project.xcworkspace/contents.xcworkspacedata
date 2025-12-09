@@ -4,4 +4,19 @@
    <FileRef
       location = "self:">
    </FileRef>
+   <FileRef
+      location = "group:PushNotificationService.swift">
+   </FileRef>
+   <FileRef
+      location = "group:AppDelegate.swift">
+   </FileRef>
+   <FileRef
+      location = "group:PUSH_NOTIFICATIONS_SETUP.md">
+   </FileRef>
+   <FileRef
+      location = "group:MolliePaymentService.swift">
+   </FileRef>
+   <FileRef
+      location = "group:MolliePaymentService 2.swift">
+   </FileRef>
 </Workspace>

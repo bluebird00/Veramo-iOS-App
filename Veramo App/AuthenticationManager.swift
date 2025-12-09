@@ -21,19 +21,32 @@ class AuthenticationManager {
     
     var sessionToken: String? {
         get {
-            UserDefaults.standard.string(forKey: sessionTokenKey)
+            let token = UserDefaults.standard.string(forKey: sessionTokenKey)
+            print("🔍 Getting sessionToken from UserDefaults: \(token != nil ? "EXISTS" : "nil")")
+            return token
         }
         set {
             if let token = newValue {
+                print("💾 Setting sessionToken in UserDefaults: \(String(token.prefix(20)))...")
                 UserDefaults.standard.set(token, forKey: sessionTokenKey)
+                UserDefaults.standard.synchronize() // Force immediate save
+                print("✅ Token saved and synchronized")
             } else {
+                print("🗑️ Removing sessionToken from UserDefaults")
                 UserDefaults.standard.removeObject(forKey: sessionTokenKey)
+                UserDefaults.standard.synchronize()
             }
         }
     }
     
     var isAuthenticated: Bool {
-        sessionToken != nil
+        let token = sessionToken
+        let isAuth = token != nil
+        print("🔑 isAuthenticated check: \(isAuth) (token exists: \(token != nil))")
+        if let token = token {
+            print("   Token preview: \(String(token.prefix(20)))...")
+        }
+        return isAuth
     }
     
     // MARK: - Customer Info
@@ -41,16 +54,24 @@ class AuthenticationManager {
     var currentCustomer: AuthenticatedCustomer? {
         get {
             guard let data = UserDefaults.standard.data(forKey: customerKey) else {
+                print("🔍 Getting currentCustomer from UserDefaults: nil")
                 return nil
             }
-            return try? JSONDecoder().decode(AuthenticatedCustomer.self, from: data)
+            let customer = try? JSONDecoder().decode(AuthenticatedCustomer.self, from: data)
+            print("🔍 Getting currentCustomer from UserDefaults: \(customer?.name ?? "decode failed")")
+            return customer
         }
         set {
             if let customer = newValue,
                let data = try? JSONEncoder().encode(customer) {
+                print("💾 Setting currentCustomer in UserDefaults: \(customer.name)")
                 UserDefaults.standard.set(data, forKey: customerKey)
+                UserDefaults.standard.synchronize() // Force immediate save
+                print("✅ Customer saved and synchronized")
             } else {
+                print("🗑️ Removing currentCustomer from UserDefaults")
                 UserDefaults.standard.removeObject(forKey: customerKey)
+                UserDefaults.standard.synchronize()
             }
         }
     }
@@ -84,14 +105,32 @@ class AuthenticationManager {
     // MARK: - Authentication Actions
     
     func saveAuthentication(customer: AuthenticatedCustomer, sessionToken: String) {
+        print("💾 Saving authentication...")
+        print("   Customer: \(customer.name)")
+        print("   Token: \(String(sessionToken.prefix(20)))...")
+        
         self.sessionToken = sessionToken
         self.currentCustomer = customer
+        
+        // Verify it was saved
+        print("✅ Saved! Verifying...")
+        print("   sessionToken in UserDefaults: \(self.sessionToken != nil)")
+        print("   currentCustomer in UserDefaults: \(self.currentCustomer != nil)")
     }
     
     func logout() {
+        print("🚪 [AUTH] Logging out user...")
+        print("   Previous token: \(sessionToken != nil ? "existed" : "none")")
+        print("   Previous customer: \(currentCustomer?.name ?? "none")")
+        
         sessionToken = nil
         currentCustomer = nil
+        
         // Optionally clear phone number on logout:
         // savedPhoneNumber = nil
+        
+        print("✅ [AUTH] Logout complete")
+        print("   sessionToken cleared: \(sessionToken == nil)")
+        print("   currentCustomer cleared: \(currentCustomer == nil)")
     }
 }

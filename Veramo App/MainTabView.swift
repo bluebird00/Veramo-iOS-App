@@ -13,6 +13,8 @@ struct MainTabView: View {
     enum Tab {
         case booking
         case trips
+        case chat
+        case profile
     }
     
     var body: some View {
@@ -28,6 +30,18 @@ struct MainTabView: View {
                     Label("My Trips", systemImage: "calendar")
                 }
                 .tag(Tab.trips)
+            
+            ChatView()
+                .tabItem {
+                    Label("Chat", systemImage: "message.fill")
+                }
+                .tag(Tab.chat)
+            
+            ProfileView()
+                .tabItem {
+                    Label("Settings", systemImage: "person.circle.fill")
+                }
+                .tag(Tab.profile)
         }
     }
 }

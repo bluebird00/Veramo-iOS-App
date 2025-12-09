@@ -31,6 +31,12 @@ struct BookingDetailsView: View {
     @State private var showErrorAlert: Bool = false
     @State private var errorMessage: String = ""
     
+    // Payment state
+    @State private var showPayment = false
+    @State private var paymentUrl: URL?
+    @State private var paymentId: String?
+    @State private var isProcessingPayment = false
+    
     @Environment(\.dismiss) private var dismiss
     
     // MARK: - Lifecycle
@@ -215,7 +221,7 @@ struct BookingDetailsView: View {
                             ProgressView()
                                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
                         }
-                        Text(isLoading ? "Sending..." : "Send Request")
+                        Text(isLoading ? "Processing..." : "Continue to Payment")
                             .font(.headline)
                             .fontWeight(.semibold)
                     }
@@ -245,6 +251,22 @@ struct BookingDetailsView: View {
             }
         }
         .disabled(isLoading)
+        .fullScreenCover(item: Binding(
+            get: { paymentUrl.map { PaymentURL(url: $0) } },
+            set: { paymentUrl = $0?.url }
+        )) { paymentURL in
+            SafariView(url: paymentURL.url) {
+                // Called when Safari is dismissed
+                checkPaymentStatus()
+            }
+            .ignoresSafeArea()
+        }
+    }
+    
+    // Helper struct for identifiable URL
+    private struct PaymentURL: Identifiable {
+        let id = UUID()
+        let url: URL
     }
     
     // MARK: - Success View
@@ -360,6 +382,93 @@ struct BookingDetailsView: View {
         // Prevent double-tap
         guard !isLoading else { return }
         
+        isLoading = true
+        
+        // First, create payment
+        Task {
+            do {
+                guard let sessionToken = AuthenticationManager.shared.sessionToken,
+                      let priceCents = vehicle.priceCents else {
+                    throw MolliePaymentError.serverError("Missing payment information")
+                }
+                
+                // Create payment
+                let (paymentId, checkoutUrl) = try await MolliePaymentService.shared.createPayment(
+                    amount: priceCents,
+                    description: "Trip from \(pickup) to \(destination)",
+                    sessionToken: sessionToken,
+                    metadata: [
+                        "pickup": pickup,
+                        "destination": destination,
+                        "date": date.formatted(date: .abbreviated, time: .omitted),
+                        "vehicle": vehicle.name
+                    ]
+                )
+                
+                // Store payment ID
+                await MainActor.run {
+                    self.paymentId = paymentId
+                    self.isLoading = false
+                    
+                    // Open payment URL
+                    if let url = URL(string: checkoutUrl) {
+                        self.paymentUrl = url
+                    }
+                }
+                
+            } catch {
+                await MainActor.run {
+                    self.isLoading = false
+                    self.errorMessage = error.localizedDescription
+                    self.showErrorAlert = true
+                }
+            }
+        }
+    }
+    
+    private func checkPaymentStatus() {
+        guard let paymentId = paymentId,
+              let sessionToken = AuthenticationManager.shared.sessionToken else {
+            return
+        }
+        
+        isProcessingPayment = true
+        
+        Task {
+            do {
+                // Check payment status
+                let status = try await MolliePaymentService.shared.checkPaymentStatus(
+                    paymentId: paymentId,
+                    sessionToken: sessionToken
+                )
+                
+                await MainActor.run {
+                    self.isProcessingPayment = false
+                    
+                    if status == "paid" {
+                        // Payment successful - now submit booking
+                        submitBooking()
+                    } else if status == "canceled" || status == "failed" || status == "expired" {
+                        self.errorMessage = "Payment \(status). Please try again."
+                        self.showErrorAlert = true
+                    } else {
+                        // Payment still pending
+                        self.errorMessage = "Payment is still processing. Please check your email for confirmation."
+                        self.showErrorAlert = true
+                    }
+                }
+                
+            } catch {
+                await MainActor.run {
+                    self.isProcessingPayment = false
+                    self.errorMessage = "Could not verify payment status"
+                    self.showErrorAlert = true
+                }
+            }
+        }
+    }
+    
+    private func submitBooking() {
         isLoading = true
         
         // Build the request
