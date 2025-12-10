@@ -31,33 +31,39 @@ class GooglePlacesService: ObservableObject {
         let placeId: String
         let mainText: String
         let secondaryText: String
+        let mainTextEnglish: String  // English version for database
+        let secondaryTextEnglish: String  // English version for database
         
         var fullText: String {
             "\(mainText), \(secondaryText)"
         }
+        
+        var fullTextEnglish: String {
+            "\(mainTextEnglish), \(secondaryTextEnglish)"
+        }
     }
     
+    // New Places API response structure
     struct AutocompleteResponse: Codable {
-        let predictions: [Prediction]
+        let suggestions: [Suggestion]
         
-        struct Prediction: Codable {
-            let placeId: String
-            let structuredFormatting: StructuredFormatting
-            
-            enum CodingKeys: String, CodingKey {
-                case placeId = "place_id"
-                case structuredFormatting = "structured_formatting"
-            }
+        struct Suggestion: Codable {
+            let placePrediction: PlacePrediction
         }
         
-        struct StructuredFormatting: Codable {
-            let mainText: String
-            let secondaryText: String?
-            
-            enum CodingKeys: String, CodingKey {
-                case mainText = "main_text"
-                case secondaryText = "secondary_text"
-            }
+        struct PlacePrediction: Codable {
+            let placeId: String
+            let text: TextContent
+            let structuredFormat: StructuredFormat
+        }
+        
+        struct TextContent: Codable {
+            let text: String
+        }
+        
+        struct StructuredFormat: Codable {
+            let mainText: TextContent
+            let secondaryText: TextContent?
         }
     }
     
@@ -72,45 +78,85 @@ class GooglePlacesService: ObservableObject {
         
         // Debounce: wait 300ms before making the API call
         debounceTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { [weak self] _ in
-            print("Timer fired, searchin fo: '\(query)'")
             self?.performSearch(query: query)
         }
     }
     
     private func performSearch(query: String) {
-        
         isLoading = true
         
-        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)?.replacingOccurrences(of: " ", with: "%20") ?? ""
-        print("Encoded query: '\(encodedQuery)'") // Debug
+        // Get user's preferred language
+        let userLanguage = Locale.current.language.languageCode?.identifier ?? "en"
         
-        let urlString = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=\(encodedQuery)&components=country:ch&language=en&key=\(apiKey)"
-        
-        print("URL: \(urlString)") // Debug
-        
-        guard let url = URL(string: urlString) else {
+        // New Places API uses POST requests
+        guard let url = URL(string: "https://places.googleapis.com/v1/places:autocomplete") else {
             isLoading = false
             return
         }
         
-        cancellable = URLSession.shared.dataTaskPublisher(for: url)
-            .map(\.data)
-            .decode(type: AutocompleteResponse.self, decoder: JSONDecoder())
+        // Create request bodies for both localized and English versions
+        let localizedBody: [String: Any] = [
+            "input": query,
+            "languageCode": userLanguage,
+            "regionCode": "ch",  // ccTLD format for Switzerland
+            "includedRegionCodes": ["CH"]  // ISO 3166-1 format
+        ]
+        
+        let englishBody: [String: Any] = [
+            "input": query,
+            "languageCode": "en",
+            "regionCode": "ch",  // ccTLD format for Switzerland
+            "includedRegionCodes": ["CH"]  // ISO 3166-1 format
+        ]
+        
+        // Create the publishers for both requests
+        let localizedPublisher = createAutocompletePublisher(url: url, body: localizedBody)
+        let englishPublisher = createAutocompletePublisher(url: url, body: englishBody)
+        
+        // Combine both requests
+        cancellable = Publishers.Zip(localizedPublisher, englishPublisher)
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 self?.isLoading = false
-                if case .failure(let error) = completion {
-                    print("Error fetching suggestions: \(error)")
-                }
-            }, receiveValue: { [weak self] response in
-                self?.suggestions = response.predictions.map { prediction in
-                    PlaceSuggestion(
+            }, receiveValue: { [weak self] localizedResponse, englishResponse in
+                // Create a dictionary to map place IDs to English versions
+                let englishMap = Dictionary(uniqueKeysWithValues: englishResponse.suggestions.map {
+                    ($0.placePrediction.placeId, $0.placePrediction.structuredFormat)
+                })
+                
+                self?.suggestions = localizedResponse.suggestions.compactMap { suggestion in
+                    let prediction = suggestion.placePrediction
+                    guard let englishVersion = englishMap[prediction.placeId] else {
+                        return nil
+                    }
+                    
+                    return PlaceSuggestion(
                         placeId: prediction.placeId,
-                        mainText: prediction.structuredFormatting.mainText,
-                        secondaryText: prediction.structuredFormatting.secondaryText ?? ""
+                        mainText: prediction.structuredFormat.mainText.text,
+                        secondaryText: prediction.structuredFormat.secondaryText?.text ?? "",
+                        mainTextEnglish: englishVersion.mainText.text,
+                        secondaryTextEnglish: englishVersion.secondaryText?.text ?? ""
                     )
                 }
             })
+    }
+    
+    private func createAutocompletePublisher(url: URL, body: [String: Any]) -> AnyPublisher<AutocompleteResponse, Error> {
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(apiKey, forHTTPHeaderField: "X-Goog-Api-Key")
+        
+        guard let httpBody = try? JSONSerialization.data(withJSONObject: body) else {
+            return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+        }
+        
+        request.httpBody = httpBody
+        
+        return URLSession.shared.dataTaskPublisher(for: request)
+            .map(\.data)
+            .decode(type: AutocompleteResponse.self, decoder: JSONDecoder())
+            .eraseToAnyPublisher()
     }
     
     func clearSuggestions() {

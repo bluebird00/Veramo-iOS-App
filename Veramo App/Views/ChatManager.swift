@@ -30,7 +30,6 @@ class ChatManager: ObservableObject {
         
         chatClient = ChatClient(config: config)
         
-        print("✅ Stream Chat client initialized successfully")
     }
     
     func connectUser(customer: AuthenticatedCustomer, token: String) {
@@ -50,11 +49,9 @@ class ChatManager: ObservableObject {
                 if let error = error {
                     self?.isConnected = false
                     self?.connectionError = error.localizedDescription
-                    print("❌ Stream Chat connection error: \(error)")
                 } else {
                     self?.isConnected = true
                     self?.connectionError = nil
-                    print("✅ Stream Chat connected successfully")
                 }
             }
         }

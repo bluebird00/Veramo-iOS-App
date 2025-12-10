@@ -42,10 +42,6 @@ struct ProfileView: View {
                                     Text(customer.name)
                                         .font(.title3)
                                         .fontWeight(.semibold)
-                                    
-                                    Text("Customer ID: \(customer.id)")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
                                 }
                                 
                                 Spacer()
@@ -111,7 +107,7 @@ struct ProfileView: View {
                     Text("About")
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle("Account")
             .alert("Logout", isPresented: $showLogoutConfirmation) {
                 Button("Cancel", role: .cancel) { }
                 Button("Logout", role: .destructive) {

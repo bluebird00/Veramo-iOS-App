@@ -42,7 +42,6 @@ struct VehicleOptionCard: View {
                 VStack(alignment: .trailing, spacing: 4) {
                     if let priceFormatted = vehicle.priceFormatted {
                         Text(priceFormatted)
-                            .font(.title3)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
                     }

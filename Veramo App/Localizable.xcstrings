@@ -1,0 +1,481 @@
+{
+  "sourceLanguage" : "de",
+  "strings" : {
+    "" : {
+
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%lld" : {
+
+    },
+    "+14155551234" : {
+
+    },
+    "+41791234567" : {
+
+    },
+    "🐛 Debug Options" : {
+
+    },
+    "🛠️ Debug Menu" : {
+
+    },
+    "1.0.0" : {
+
+    },
+    "111111 - Always valid in dev mode" : {
+
+    },
+    "About" : {
+
+    },
+    "Account" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto"
+          }
+        }
+      }
+    },
+    "Are you sure you want to logout?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sind Sie sicher, dass Sie sich abmelden möchten?"
+          }
+        }
+      }
+    },
+    "Authentication Error" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentifizierungsfehler"
+          }
+        }
+      }
+    },
+    "Authentication Method" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentifizierungsmethode"
+          }
+        }
+      }
+    },
+    "Book" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buchen"
+          }
+        }
+      }
+    },
+    "Book a Ride" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plane deine Fahrt"
+          }
+        }
+      }
+    },
+    "Book your first ride to see it here" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buchen Sie Ihre erste Fahrt, um diese hier zu sehen"
+          }
+        }
+      }
+    },
+    "Booking Details" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buchungsdetails"
+          }
+        }
+      }
+    },
+    "Booking Overview" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buchungsübersicht"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        }
+      }
+    },
+    "Change number" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nummer ändern"
+          }
+        }
+      }
+    },
+    "Chat" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat"
+          }
+        }
+      }
+    },
+    "Chat with Support" : {
+
+    },
+    "Check your email for the magic link!" : {
+
+    },
+    "Choose how you'd like to sign in" : {
+
+    },
+    "Clear All Data" : {
+
+    },
+    "Click Me!" : {
+
+    },
+    "Close" : {
+
+    },
+    "Connecting to customer support..." : {
+
+    },
+    "Connection Error" : {
+
+    },
+    "Contact Information" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Continue to Payment" : {
+
+    },
+    "Current State:" : {
+
+    },
+    "Date" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datum"
+          }
+        }
+      }
+    },
+    "Debug Authentication" : {
+
+    },
+    "Destination" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zielort"
+          }
+        }
+      }
+    },
+    "Done" : {
+
+    },
+    "Email" : {
+
+    },
+    "Email Address" : {
+
+    },
+    "Enter pickup location" : {
+
+    },
+    "Enter verification code" : {
+
+    },
+    "Enter your email to get started" : {
+
+    },
+    "Enter Your Name" : {
+
+    },
+    "Enter your phone number" : {
+
+    },
+    "Error" : {
+
+    },
+    "Error loading chat" : {
+
+    },
+    "Failed to load pricing" : {
+
+    },
+    "First" : {
+
+    },
+    "Flight: %@" : {
+
+    },
+    "Get help with your bookings" : {
+
+    },
+    "Get Started" : {
+
+    },
+    "Has Seen Welcome: %@" : {
+
+    },
+    "Home" : {
+
+    },
+    "How can we help?" : {
+
+    },
+    "Important Information" : {
+
+    },
+    "Important information about the transport operator" : {
+
+    },
+    "Is Authenticated: %@" : {
+
+    },
+    "Last" : {
+
+    },
+    "Loading chat..." : {
+
+    },
+    "Loading your trips..." : {
+
+    },
+    "Log In" : {
+
+    },
+    "Log Out" : {
+
+    },
+    "Login as Test User" : {
+
+    },
+    "Logout" : {
+
+    },
+    "My Trips" : {
+
+    },
+    "No Past Trips" : {
+
+    },
+    "No Upcoming Trips" : {
+
+    },
+    "OK" : {
+
+    },
+    "Our support team is here to assist you with any questions about your bookings." : {
+
+    },
+    "Past (%lld)" : {
+
+    },
+    "Payment Failed" : {
+
+    },
+    "Phone number" : {
+
+    },
+    "Phone Number" : {
+
+    },
+    "Pickup location" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abholort"
+          }
+        }
+      }
+    },
+    "Processing..." : {
+
+    },
+    "Profile" : {
+
+    },
+    "Refresh" : {
+
+    },
+    "Request Failed" : {
+
+    },
+    "Request ID: #%lld" : {
+
+    },
+    "Request Sent!" : {
+
+    },
+    "Resend code" : {
+
+    },
+    "Resend in %llds" : {
+
+    },
+    "Reset & Restart App" : {
+
+    },
+    "Reset Welcome Screen" : {
+
+    },
+    "Reset Welcome Screen?" : {
+
+    },
+    "Retry" : {
+
+    },
+    "Search country" : {
+
+    },
+    "Search Rides" : {
+
+    },
+    "Select Country" : {
+
+    },
+    "Send Code" : {
+
+    },
+    "Send Magic Link" : {
+
+    },
+    "Sending..." : {
+
+    },
+    "Skip" : {
+
+    },
+    "Support" : {
+
+    },
+    "Support Chat" : {
+
+    },
+    "Test API Endpoints" : {
+
+    },
+    "Test Codes" : {
+
+    },
+    "Test Phone Numbers" : {
+
+    },
+    "The transportation contract is concluded between you and the independent partner.\n\nVeramo itself is not a transportation service provider and acts solely as an intermediary between you and the independent partner." : {
+
+    },
+    "This will reset the welcome screen. You may need to restart the app to see it again." : {
+
+    },
+    "Time" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uhrzeit"
+          }
+        }
+      }
+    },
+    "Total Price" : {
+
+    },
+    "Trip Type" : {
+
+    },
+    "Try Again" : {
+
+    },
+    "Type a message..." : {
+
+    },
+    "Up to %lld passengers" : {
+
+    },
+    "Upcoming (%lld)" : {
+
+    },
+    "User: %@" : {
+
+    },
+    "Veramo" : {
+
+    },
+    "VERAMO" : {
+
+    },
+    "Verifying..." : {
+
+    },
+    "Version" : {
+
+    },
+    "We sent a 6-digit code to" : {
+
+    },
+    "Welcome to Veramo" : {
+
+    },
+    "You clicked: %lld times" : {
+
+    },
+    "Your completed trips will appear here" : {
+
+    },
+    "Your trip request has been submitted successfully." : {
+
+    }
+  },
+  "version" : "1.1"
+}

@@ -10,6 +10,8 @@ import SwiftUI
 struct BookingDetailsView: View {
     let pickup: String
     let destination: String
+    let pickupEnglish: String  // For database/backend
+    let destinationEnglish: String  // For database/backend
     let date: Date
     let time: Date
     let passengers: Int
@@ -41,9 +43,11 @@ struct BookingDetailsView: View {
     
     // MARK: - Lifecycle
     
-    init(pickup: String, destination: String, date: Date, time: Date, passengers: Int, vehicle: VehicleType, pickupPlaceId: String? = nil, destinationPlaceId: String? = nil) {
+    init(pickup: String, destination: String, pickupEnglish: String, destinationEnglish: String, date: Date, time: Date, passengers: Int, vehicle: VehicleType, pickupPlaceId: String? = nil, destinationPlaceId: String? = nil) {
         self.pickup = pickup
         self.destination = destination
+        self.pickupEnglish = pickupEnglish
+        self.destinationEnglish = destinationEnglish
         self.date = date
         self.time = time
         self.passengers = passengers
@@ -77,7 +81,7 @@ struct BookingDetailsView: View {
     }
     
     var isFormValid: Bool {
-        !firstName.isEmpty && !lastName.isEmpty && !email.isEmpty && !phoneNumber.isEmpty
+        !firstName.isEmpty && !lastName.isEmpty
     }
     
     var body: some View {
@@ -103,58 +107,28 @@ struct BookingDetailsView: View {
     private var bookingFormView: some View {
         ScrollView {
             VStack(spacing: 24) {
-                // Booking Overview
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Booking Overview")
-                        .font(.headline)
-                    
-                    // Route
+                // Date and Time card (reusing the same style)
+                HStack {
+                    Label(date.formatted(date: .abbreviated, time: .omitted), systemImage: "calendar")
+                    Spacer()
+                    Label(time.formatted(date: .omitted, time: .shortened), systemImage: "clock")
+                }
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(16)
+                .padding(.horizontal)
+                
+                // Vehicle card
+                VStack(alignment: .leading, spacing: 12) {
                     HStack(spacing: 12) {
-                        VStack(spacing: 4) {
-                            Circle()
-                                .fill(Color.black)
-                                .frame(width: 10, height: 10)
-                            Rectangle()
-                                .fill(Color.gray.opacity(0.5))
-                                .frame(width: 2, height: 20)
-                            Circle()
-                                .fill(Color.black)
-                                .frame(width: 10, height: 10)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text(pickup)
-                                .font(.subheadline)
-                                .lineLimit(2)
-                            Text(destination)
-                                .font(.subheadline)
-                                .lineLimit(2)
-                        }
-                    }
-                    
-                    Divider()
-                    
-                    // Date, Time, Passengers
-                    HStack {
-                        Label(date.formatted(date: .abbreviated, time: .omitted), systemImage: "calendar")
-                        Spacer()
-                        Label(time.formatted(date: .omitted, time: .shortened), systemImage: "clock")
-                        Spacer()
-                        Label("\(passengers)", systemImage: "person.fill")
-                    }
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    
-                    Divider()
-                    
-                    // Vehicle
-                    HStack(spacing: 12) {
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: 4) {
                             Text(vehicle.name)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
+                                .font(.headline)
+                                .fontWeight(.semibold)
                             Text(vehicle.description)
-                                .font(.caption)
+                                .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
                         
@@ -162,57 +136,46 @@ struct BookingDetailsView: View {
                         
                         if let price = vehicle.priceFormatted {
                             Text(price)
-                                .font(.headline)
-                                .fontWeight(.semibold)
+                                .font(.title3)
+                                .fontWeight(.bold)
                         }
                     }
                 }
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(16)
+                .padding(.horizontal)
                 
-                // Contact Details
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Contact Details")
-                        .font(.headline)
-                    
-                    VStack(spacing: 12) {
-                        FormTextField(
-                            placeholder: "First Name",
-                            text: $firstName,
-                            icon: "person.fill",
-                            keyboardType: .default,
-                            textContentType: .givenName
-                        )
+                // Contact Details - Name only
+                VStack(spacing: 0) {
+                    // Name Row - Side by Side
+                    HStack(spacing: 0) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "person.fill")
+                                .foregroundColor(.gray)
+                                .frame(width: 20)
+                            
+                            TextField("First", text: $firstName)
+                                .textContentType(.givenName)
+                                .autocorrectionDisabled()
+                        }
                         
-                        FormTextField(
-                            placeholder: "Last Name",
-                            text: $lastName,
-                            icon: "person.fill",
-                            keyboardType: .default,
-                            textContentType: .familyName
-                        )
+                        Divider()
+                            .frame(height: 20)
+                            .padding(.horizontal, 8)
                         
-                        FormTextField(
-                            placeholder: "Email",
-                            text: $email,
-                            icon: "envelope.fill",
-                            keyboardType: .emailAddress,
-                            textContentType: .emailAddress
-                        )
-                        
-                        FormTextField(
-                            placeholder: "Phone Number",
-                            text: $phoneNumber,
-                            icon: "phone.fill",
-                            keyboardType: .phonePad,
-                            textContentType: .telephoneNumber
-                        )
+                        TextField("Last", text: $lastName)
+                            .textContentType(.familyName)
+                            .autocorrectionDisabled()
                     }
                 }
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(16)
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(.systemBackground))
+                        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+                )
+                .padding(.horizontal)
                 
                 // Send Request Button
                 Button(action: sendRequest) {
@@ -376,6 +339,25 @@ struct BookingDetailsView: View {
         .navigationBarBackButtonHidden(true)
     }
     
+    // MARK: - Helpers
+    
+    private func localizedPaymentDescription() -> String {
+        let languageCode = Locale.current.language.languageCode?.identifier ?? "en"
+        
+        switch languageCode {
+        case "de":
+            return "Fahrt von \(pickup) nach \(destination)"
+        case "fr":
+            return "Voyage de \(pickup) à \(destination)"
+        case "it":
+            return "Viaggio da \(pickup) a \(destination)"
+        case "es":
+            return "Viaje desde \(pickup) hasta \(destination)"
+        default:
+            return "Trip from \(pickup) to \(destination)"
+        }
+    }
+    
     // MARK: - API Call
     
     private func sendRequest() {
@@ -395,7 +377,7 @@ struct BookingDetailsView: View {
                 // Create payment
                 let (paymentId, checkoutUrl) = try await MolliePaymentService.shared.createPayment(
                     amount: priceCents,
-                    description: "Trip from \(pickup) to \(destination)",
+                    description: localizedPaymentDescription(),
                     sessionToken: sessionToken,
                     metadata: [
                         "pickup": pickup,
@@ -479,12 +461,12 @@ struct BookingDetailsView: View {
         )
         
         let pickupLocation = Location(
-            description: pickup,
+            description: pickupEnglish,  // Use English version for database
             place_id: pickupPlaceId
         )
         
         let destinationLocation = Location(
-            description: destination,
+            description: destinationEnglish,  // Use English version for database
             place_id: destinationPlaceId
         )
         

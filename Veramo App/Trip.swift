@@ -71,6 +71,7 @@ struct CustomerTrip: Codable, Identifiable {
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
         formatter.timeZone = TimeZone(identifier: "Europe/Zurich")
+        formatter.locale = Locale.autoupdatingCurrent
         return formatter.string(from: date)
     }
     
@@ -81,6 +82,7 @@ struct CustomerTrip: Codable, Identifiable {
         formatter.dateStyle = .none
         formatter.timeStyle = .short
         formatter.timeZone = TimeZone(identifier: "Europe/Zurich")
+        formatter.locale = Locale.autoupdatingCurrent
         return formatter.string(from: date)
     }
     
@@ -91,6 +93,7 @@ struct CustomerTrip: Codable, Identifiable {
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         formatter.timeZone = TimeZone(identifier: "Europe/Zurich")
+        formatter.locale = Locale.autoupdatingCurrent
         return formatter.string(from: date)
     }
     

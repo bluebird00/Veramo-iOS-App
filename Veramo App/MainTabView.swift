@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @State private var selectedTab: Tab = .booking
+    @State private var selectedTab: Tab = .home
     
     enum Tab {
-        case booking
+        case home
         case trips
         case chat
         case profile
@@ -19,11 +19,11 @@ struct MainTabView: View {
     
     var body: some View {
         TabView(selection: $selectedTab) {
-            RideBookingView()
+            HomeView()
                 .tabItem {
-                    Label("Book", systemImage: "car.fill")
+                    Label("Home", systemImage: "house.fill")
                 }
-                .tag(Tab.booking)
+                .tag(Tab.home)
             
             TripsView()
                 .tabItem {
@@ -39,7 +39,7 @@ struct MainTabView: View {
             
             ProfileView()
                 .tabItem {
-                    Label("Settings", systemImage: "person.circle.fill")
+                    Label("Account", systemImage: "person.circle.fill")
                 }
                 .tag(Tab.profile)
         }

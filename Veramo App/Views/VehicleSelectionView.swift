@@ -10,6 +10,8 @@ import SwiftUI
 struct VehicleSelectionView: View {
     let pickup: String
     let destination: String
+    let pickupEnglish: String  // For database/backend
+    let destinationEnglish: String  // For database/backend
     let date: Date
     let time: Date
     let passengers: Int
@@ -23,6 +25,21 @@ struct VehicleSelectionView: View {
     @State private var isLoadingPricing = false
     @State private var pricingError: String?
     @State private var pricingResponse: PricingResponse?
+    
+    @Binding var showVehicleSelection: Bool  // To control parent view state
+    
+    // Payment and name state
+    @State private var showNameModal = false
+    @State private var showLegalModal = false
+    @State private var firstName: String = ""
+    @State private var lastName: String = ""
+    @State private var email: String = ""
+    @State private var phoneNumber: String = ""
+    @State private var isProcessingPayment = false
+    @State private var paymentUrl: URL?
+    @State private var paymentId: String?
+    @State private var showErrorAlert = false
+    @State private var errorMessage: String = ""
     
     private let vehicleTypes: [VehicleType] = [
         VehicleType(
@@ -47,6 +64,43 @@ struct VehicleSelectionView: View {
             useSystemImage: false
         )
     ]
+    
+    init(pickup: String, destination: String, pickupEnglish: String, destinationEnglish: String, date: Date, time: Date, passengers: Int, pickupPlaceId: String? = nil, destinationPlaceId: String? = nil, showVehicleSelection: Binding<Bool>) {
+        self.pickup = pickup
+        self.destination = destination
+        self.pickupEnglish = pickupEnglish
+        self.destinationEnglish = destinationEnglish
+        self.date = date
+        self.time = time
+        self.passengers = passengers
+        self.pickupPlaceId = pickupPlaceId
+        self.destinationPlaceId = destinationPlaceId
+        self._showVehicleSelection = showVehicleSelection
+        
+        // Pre-fill customer data if available
+        if let customer = AuthenticationManager.shared.currentCustomer {
+            _email = State(initialValue: customer.email)
+            
+            // Split name into first and last name
+            let nameComponents = customer.name.components(separatedBy: " ")
+            if nameComponents.count >= 2 {
+                _firstName = State(initialValue: nameComponents.first ?? "")
+                _lastName = State(initialValue: nameComponents.dropFirst().joined(separator: " "))
+            } else {
+                _firstName = State(initialValue: customer.name)
+            }
+            
+            // Pre-fill phone if available from customer or saved preference
+            if let phone = customer.phone {
+                _phoneNumber = State(initialValue: phone)
+            } else if let savedPhone = AuthenticationManager.shared.savedPhoneNumber {
+                _phoneNumber = State(initialValue: savedPhone)
+            }
+        } else if let savedPhone = AuthenticationManager.shared.savedPhoneNumber {
+            // Even if not authenticated, use saved phone
+            _phoneNumber = State(initialValue: savedPhone)
+        }
+    }
     
     // Filter vehicles based on passenger count and add pricing
     private var availableVehicles: [VehicleType] {
@@ -77,44 +131,16 @@ struct VehicleSelectionView: View {
     }
     
     var body: some View {
+        // Vehicle Selection
         VStack(spacing: 0) {
-            // Trip summary
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 12) {
-                    VStack(spacing: 4) {
-                        Circle()
-                            .fill(Color.black)
-                            .frame(width: 10, height: 10)
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.5))
-                            .frame(width: 2, height: 20)
-                        Circle()
-                            .fill(Color.black)
-                            .frame(width: 10, height: 10)
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text(pickup)
-                            .font(.subheadline)
-                            .lineLimit(1)
-                        Text(destination)
-                            .font(.subheadline)
-                            .lineLimit(1)
-                    }
-                }
-                
-                Divider()
-                
-                HStack {
-                    Label(date.formatted(date: .abbreviated, time: .omitted), systemImage: "calendar")
-                    Spacer()
-                    Label(time.formatted(date: .omitted, time: .shortened), systemImage: "clock")
-                    Spacer()
-                    Label("\(passengers)", systemImage: "person.fill")
-                }
-                .font(.caption)
-                .foregroundColor(.secondary)
+            // Trip summary - only date and time
+            HStack {
+                Label(date.formatted(date: .abbreviated, time: .omitted), systemImage: "calendar")
+                Spacer()
+                Label(time.formatted(date: .omitted, time: .shortened), systemImage: "clock")
             }
+            .font(.subheadline)
+            .foregroundColor(.secondary)
             .padding()
             .background(Color(.systemGray6))
             .cornerRadius(16)
@@ -128,9 +154,6 @@ struct VehicleSelectionView: View {
                         VStack(spacing: 16) {
                             ProgressView()
                                 .scaleEffect(1.5)
-                            Text("Calculating pricing...")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 40)
@@ -165,42 +188,6 @@ struct VehicleSelectionView: View {
                                 onSelect: { selectedVehicle = vehicle }
                             )
                         }
-                        
-                        // Trip info from pricing response
-                        if let pricingResponse = pricingResponse {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Trip Details")
-                                    .font(.headline)
-                                    .padding(.top, 8)
-                                
-                                HStack {
-                                    Label("\(String(format: "%.1f", pricingResponse.distanceKm)) km", systemImage: "map")
-                                    Spacer()
-                                    Label("\(pricingResponse.durationMinutes) min", systemImage: "clock")
-                                }
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                
-                                if pricingResponse.pickup.totalAdjustmentPercent != 0 {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: pricingResponse.pickup.totalAdjustmentPercent > 0 ? "arrow.up.circle.fill" : "arrow.down.circle.fill")
-                                            .foregroundColor(pricingResponse.pickup.totalAdjustmentPercent > 0 ? .orange : .green)
-                                        Text("\(abs(pricingResponse.pickup.totalAdjustmentPercent))% \(pricingResponse.pickup.totalAdjustmentPercent > 0 ? "surcharge" : "discount")")
-                                        if pricingResponse.pickup.isWeekend {
-                                            Text("• Weekend")
-                                        }
-                                        if pricingResponse.pickup.isNight {
-                                            Text("• Night")
-                                        }
-                                    }
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                }
-                            }
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .cornerRadius(12)
-                        }
                     }
                 }
                 .padding(.horizontal)
@@ -208,9 +195,116 @@ struct VehicleSelectionView: View {
             
             Spacer()
             
-            // Confirm button
-            Button(action: confirmBooking) {
-                Text("Confirm Booking")
+            // Continue to Payment button
+            Button(action: continueToPayment) {
+                HStack(spacing: 8) {
+                    if isProcessingPayment {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    }
+                    Text(isProcessingPayment ? "Processing..." : "Continue to Payment")
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(
+                    LinearGradient(
+                        colors: [.black, Color(.darkGray)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(12)
+            }
+            .disabled(selectedVehicle == nil || isProcessingPayment)
+            .opacity(selectedVehicle != nil && !isProcessingPayment ? 1 : 0.5)
+            .padding()
+        }
+        .task {
+            await fetchPricing()
+        }
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    showVehicleSelection = false
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.backward")
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showNameModal) {
+            nameInputModal
+        }
+        .sheet(isPresented: $showLegalModal) {
+            legalDisclaimerModal
+        }
+        .alert("Payment Failed", isPresented: $showErrorAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage)
+        }
+        .fullScreenCover(item: Binding(
+            get: { paymentUrl.map { PaymentURL(url: $0) } },
+            set: { paymentUrl = $0?.url }
+        )) { paymentURL in
+            SafariView(url: paymentURL.url) {
+                // Called when Safari is dismissed
+                // You can add payment status checking here if needed
+            }
+            .ignoresSafeArea()
+        }
+    }
+    
+    // Helper struct for identifiable URL
+    private struct PaymentURL: Identifiable {
+        let id = UUID()
+        let url: URL
+    }
+    
+    // Name input modal
+    private var nameInputModal: some View {
+        VStack(spacing: 24) {
+            Text("Enter Your Name")
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            VStack(spacing: 0) {
+                HStack(spacing: 0) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "person.fill")
+                            .foregroundColor(.gray)
+                            .frame(width: 20)
+                        
+                        TextField("First", text: $firstName)
+                            .textContentType(.givenName)
+                            .autocorrectionDisabled()
+                    }
+                    
+                    Divider()
+                        .frame(height: 20)
+                        .padding(.horizontal, 8)
+                    
+                    TextField("Last", text: $lastName)
+                        .textContentType(.familyName)
+                        .autocorrectionDisabled()
+                }
+            }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemGray6))
+            )
+            
+            Button(action: {
+                showNameModal = false
+                showLegalModal = true
+            }) {
+                Text("Continue")
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(.white)
@@ -225,36 +319,108 @@ struct VehicleSelectionView: View {
                     )
                     .cornerRadius(12)
             }
-            .disabled(selectedVehicle == nil)
-            .opacity(selectedVehicle == nil ? 0.5 : 1)
-            .padding()
+            .disabled(firstName.isEmpty || lastName.isEmpty)
+            .opacity(firstName.isEmpty || lastName.isEmpty ? 0.5 : 1)
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("Select Vehicle")
-                    .font(.title2)
-                    .fontWeight(.bold)
+        .padding()
+        .presentationDetents([.height(280)])
+    }
+    
+    // Legal disclaimer modal
+    private var legalDisclaimerModal: some View {
+        VStack(spacing: 24) {
+            Text("Important Information")
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Important information about the transport operator")
+                    .font(.headline)
+                
+                Text("The transportation contract is concluded between you and the independent partner.\n\nVeramo itself is not a transportation service provider and acts solely as an intermediary between you and the independent partner.")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+            }
+            .padding()
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
+            
+            Button(action: {
+                showLegalModal = false
+                initiatePayment()
+            }) {
+                Text("Continue")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        LinearGradient(
+                            colors: [.black, Color(.darkGray)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(12)
             }
         }
-        .task {
-            await fetchPricing()
-        }
-        .navigationDestination(isPresented: $showBookingDetails) {
-            BookingDetailsView(
-                pickup: pickup,
-                destination: destination,
-                date: date, time: time,
-                passengers: passengers,
-                vehicle: selectedVehicle ?? vehicleTypes[0],
-                pickupPlaceId: pickupPlaceId,
-                destinationPlaceId: destinationPlaceId
-            )
+        .padding()
+        .presentationDetents([.height(400)])
+    }
+    
+    private func continueToPayment() {
+        // Check if we have first and last name
+        if firstName.isEmpty || lastName.isEmpty {
+            showNameModal = true
+        } else {
+            // Show legal disclaimer before payment
+            showLegalModal = true
         }
     }
     
-    private func confirmBooking() {
-        showBookingDetails = true
+    private func initiatePayment() {
+        guard let selectedVehicle = selectedVehicle,
+              let priceCents = selectedVehicle.priceCents,
+              let sessionToken = AuthenticationManager.shared.sessionToken else {
+            errorMessage = "Missing payment information"
+            showErrorAlert = true
+            return
+        }
+        
+        isProcessingPayment = true
+        
+        Task {
+            do {
+                let (paymentId, checkoutUrl) = try await MolliePaymentService.shared.createPayment(
+                    amount: priceCents,
+                    description: "Trip from \(pickup) to \(destination)",
+                    sessionToken: sessionToken,
+                    metadata: [
+                        "pickup": pickup,
+                        "destination": destination,
+                        "date": date.formatted(date: .abbreviated, time: .omitted),
+                        "vehicle": selectedVehicle.name
+                    ]
+                )
+                
+                await MainActor.run {
+                    self.paymentId = paymentId
+                    self.isProcessingPayment = false
+                    
+                    if let url = URL(string: checkoutUrl) {
+                        self.paymentUrl = url
+                        // Open payment URL (you'll need to add SafariView handling)
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    self.isProcessingPayment = false
+                    self.errorMessage = error.localizedDescription
+                    self.showErrorAlert = true
+                }
+            }
+        }
     }
     
     private func fetchPricing() async {
@@ -310,14 +476,5 @@ struct VehicleSelectionView: View {
     
 }
 
-// MARK: - Preview
-#Preview {
-    VehicleSelectionView(
-        pickup: "kulm",
-        destination: "zrh",
-        date: Date(timeIntervalSince1970: 1788825600),
-        time: Date(timeIntervalSince1970: 1788825600),
-        passengers: 3
-    )
-}
+
 

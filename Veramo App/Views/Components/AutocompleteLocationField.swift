@@ -3,7 +3,7 @@ import SwiftUI
 struct AutocompleteLocationField: View {
     let icon: String
     let iconColor: Color
-    let placeholder: String
+    let placeholder: LocalizedStringKey
     @Binding var text: String
     @ObservedObject var placesService: GooglePlacesService
     let isFocused: Bool
@@ -24,7 +24,6 @@ struct AutocompleteLocationField: View {
                     .textInputAutocapitalization(.words)
                     .textContentType(.none) .onTapGesture { onFocus() }
                     .onChange(of: text) { _, newValue in
-                        print("Text changed to: '\(newValue)'") // Debug
                         placesService.fetchSuggestions(for: newValue)
                     }
                 

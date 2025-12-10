@@ -22,12 +22,10 @@ class AuthenticationManager {
     var sessionToken: String? {
         get {
             let token = UserDefaults.standard.string(forKey: sessionTokenKey)
-            print("🔍 Getting sessionToken from UserDefaults: \(token != nil ? "EXISTS" : "nil")")
             return token
         }
         set {
             if let token = newValue {
-                print("💾 Setting sessionToken in UserDefaults: \(String(token.prefix(20)))...")
                 UserDefaults.standard.set(token, forKey: sessionTokenKey)
                 UserDefaults.standard.synchronize() // Force immediate save
                 print("✅ Token saved and synchronized")

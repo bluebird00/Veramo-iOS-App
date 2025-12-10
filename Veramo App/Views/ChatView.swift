@@ -45,7 +45,7 @@ struct ChatView: View {
         VStack(spacing: 20) {
             ProgressView()
                 .scaleEffect(1.5)
-            Text("Connecting to support...")
+            Text("Connecting to customer support...")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         }
@@ -94,7 +94,7 @@ struct ChatView: View {
                         chatManager.connectUser(customer: customer, token: streamToken)
                     }
                 } catch {
-                    print("❌ Failed to fetch Stream token: \(error.localizedDescription)")
+                    
                     
                     // Show error
                     await MainActor.run {
@@ -344,10 +344,8 @@ class CustomChannelViewModel: ObservableObject {
                     self?.isLoading = false
                     if let syncError = syncError {
                         self?.error = "Unable to connect to support chat. Please try again later."
-                        print("❌ Channel sync error: \(syncError)")
                     } else {
                         self?.loadMessages()
-                        print("✅ Channel synced successfully with veramo-admin")
                     }
                 }
             }
@@ -355,7 +353,6 @@ class CustomChannelViewModel: ObservableObject {
             DispatchQueue.main.async { [weak self] in
                 self?.isLoading = false
                 self?.error = "Failed to initialize chat channel"
-                print("❌ Channel initialization error: \(error)")
             }
         }
     }
@@ -374,7 +371,6 @@ class CustomChannelViewModel: ObservableObject {
         
         channelController?.createNewMessage(text: text) { result in
             if case .failure(let error) = result {
-                print("❌ Error sending message: \(error)")
             }
         }
     }

@@ -10,6 +10,7 @@ import Combine
 
 struct SMSLoginView: View {
     @Environment(AppState.self) private var appState
+    @State private var selectedCountry = CountryCodeData.shared.getDefaultCountryCode()
     @State private var phoneNumber: String = ""
     @State private var verificationCode: String = ""
     @State private var isLoading: Bool = false
@@ -20,12 +21,14 @@ struct SMSLoginView: View {
     
     private let countdownTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
-    var isPhoneValid: Bool {
-        PhoneNumberFormatter.isValid(phoneNumber)
+    var fullPhoneNumber: String {
+        "\(selectedCountry.dialCode)\(phoneNumber.filter { $0.isNumber })"
     }
     
-    var cleanedPhoneNumber: String {
-        PhoneNumberFormatter.clean(phoneNumber)
+    var isPhoneValid: Bool {
+        let digitsOnly = phoneNumber.filter { $0.isNumber }
+        // Basic validation: at least 7 digits (can be adjusted per country)
+        return digitsOnly.count >= 7 && digitsOnly.count <= 15
     }
     
     var isCodeValid: Bool {
@@ -61,12 +64,9 @@ struct SMSLoginView: View {
                         .font(.headline)
                         .foregroundColor(.primary)
                     
-                    FormTextField(
-                        placeholder: "+41 79 123 45 67",
-                        text: $phoneNumber,
-                        icon: "phone.fill",
-                        keyboardType: .phonePad,
-                        textContentType: .telephoneNumber
+                    PhoneNumberInputView(
+                        countryCode: $selectedCountry,
+                        phoneNumber: $phoneNumber
                     )
                 }
                 .padding(.horizontal)
@@ -77,7 +77,7 @@ struct SMSLoginView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     
-                    Text(phoneNumber)
+                    Text("\(selectedCountry.dialCode) \(phoneNumber)")
                         .font(.headline)
                         .foregroundColor(.primary)
                     
@@ -166,16 +166,17 @@ struct SMSLoginView: View {
         guard !isLoading else { return }
         
         print("📲 [UI] User tapped 'Send Code'")
+        print("📲 [UI] Country: \(selectedCountry.country) (\(selectedCountry.dialCode))")
         print("📲 [UI] Phone number entered: \(phoneNumber)")
-        print("📲 [UI] Cleaned phone number: \(cleanedPhoneNumber)")
+        print("📲 [UI] Full phone number: \(fullPhoneNumber)")
         
         isLoading = true
         
         Task {
             do {
-                // Send the cleaned phone number to the API
+                // Send the full phone number to the API
                 print("📲 [UI] Calling requestSMSCode API...")
-                let response = try await VeramoAuthService.shared.requestSMSCode(phone: cleanedPhoneNumber)
+                let response = try await VeramoAuthService.shared.requestSMSCode(phone: fullPhoneNumber)
                 
                 await MainActor.run {
                     print("✅ [UI] SMS code sent successfully!")
@@ -202,9 +203,10 @@ struct SMSLoginView: View {
     private func verifyCode() {
         guard !isLoading else { return }
         
-        print("🔑 [UI] User tapped 'Verify Code'")
+        print("🔑 [UI] Auto-verify triggered")
+        print("🔑 [UI] Country: \(selectedCountry.country) (\(selectedCountry.dialCode))")
         print("🔑 [UI] Phone number: \(phoneNumber)")
-        print("🔑 [UI] Cleaned phone number: \(cleanedPhoneNumber)")
+        print("🔑 [UI] Full phone number: \(fullPhoneNumber)")
         print("🔑 [UI] Code entered: \(verificationCode)")
         
         isLoading = true
@@ -213,7 +215,7 @@ struct SMSLoginView: View {
             do {
                 print("🔑 [UI] Calling verifySMSCode API...")
                 let (customer, sessionToken) = try await VeramoAuthService.shared.verifySMSCode(
-                    phone: cleanedPhoneNumber,
+                    phone: fullPhoneNumber,
                     code: verificationCode
                 )
                 

@@ -24,16 +24,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     
     // Called when APNs successfully registers the device
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        print("✅ Device token received: \(deviceToken.hexString)")
         
         // Register device token with Stream
         PushNotificationService.shared.registerDeviceToken(deviceToken)
     }
     
-    // Called when registration fails
-    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print("❌ Failed to register for remote notifications: \(error)")
-    }
+    
 }
 
 // MARK: - UNUserNotificationCenterDelegate
@@ -53,9 +49,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let userInfo = response.notification.request.content.userInfo
         
         // Check if this is a Stream chat notification
-        if let channelId = userInfo["channel_id"] as? String {
-            print("📬 User tapped notification for channel: \(channelId)")
-            
+        if let channelId = userInfo["channel_id"] as? String {            
             // Post notification to open chat
             NotificationCenter.default.post(
                 name: NSNotification.Name("OpenChatChannel"),

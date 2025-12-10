@@ -2,7 +2,7 @@ import SwiftUI
 
 
 struct DatePickerCard: View {
-    let title: String
+    let title: LocalizedStringKey
     let icon: String
     @Binding var date: Date
     let displayedComponents: DatePickerComponents
