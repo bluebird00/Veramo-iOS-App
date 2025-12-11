@@ -5,14 +5,31 @@ import MapKit
 // MARK: - Vehicle Type Model
 
 struct RideBookingView: View {
+    // Swiss timezone constant
+    private static let swissTimeZone = TimeZone(identifier: "Europe/Zurich") ?? .current
+    
     @State private var pickupLocation: String = ""
     @State private var destination: String = ""
     @State private var pickupLocationEnglish: String = ""  // For database
     @State private var destinationEnglish: String = ""  // For database
     @State private var pickupPlaceId: String? = nil
     @State private var destinationPlaceId: String? = nil
-    @State private var selectedDate: Date = Date()
-    @State private var selectedTime: Date = Date()
+    @State private var selectedDate: Date = {
+        // Create a date that's 4 hours in the future in Swiss timezone
+        var calendar = Calendar.current
+        calendar.timeZone = swissTimeZone
+        let futureDate = calendar.date(byAdding: .hour, value: 4, to: Date()) ?? Date()
+        print("📅 Default date set to: \(futureDate) (Swiss TZ)")
+        return futureDate
+    }()
+    @State private var selectedTime: Date = {
+        // Create a time that's 4 hours in the future in Swiss timezone
+        var calendar = Calendar.current
+        calendar.timeZone = swissTimeZone
+        let futureTime = calendar.date(byAdding: .hour, value: 4, to: Date()) ?? Date()
+        print("⏰ Default time set to: \(futureTime) (Swiss TZ)")
+        return futureTime
+    }()
     @State private var passengerCount: Int = 1
     @State private var showVehicleSelection = false
     
@@ -253,14 +270,16 @@ struct RideBookingView: View {
                                             title: "Date",
                                             icon: "calendar",
                                             date: $selectedDate,
-                                            displayedComponents: .date
+                                            displayedComponents: .date,
+                                            timeZone: Self.swissTimeZone
                                         )
                                         
                                         DatePickerCard(
                                             title: "Time",
                                             icon: "clock",
                                             date: $selectedTime,
-                                            displayedComponents: .hourAndMinute
+                                            displayedComponents: .hourAndMinute,
+                                            timeZone: Self.swissTimeZone
                                         )
                                     }
                                     .padding(.horizontal)

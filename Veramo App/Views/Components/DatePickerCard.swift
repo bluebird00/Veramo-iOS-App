@@ -6,6 +6,9 @@ struct DatePickerCard: View {
     let icon: String
     @Binding var date: Date
     let displayedComponents: DatePickerComponents
+    var timeZone: TimeZone = .current  // Add optional timezone parameter
+    
+    @Environment(\.calendar) private var calendar
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -19,6 +22,7 @@ struct DatePickerCard: View {
                 displayedComponents: displayedComponents
             )
             .labelsHidden()
+            .environment(\.timeZone, timeZone)  // Set the timezone for display
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()

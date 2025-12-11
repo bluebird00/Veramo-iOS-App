@@ -65,6 +65,7 @@ struct MagicLinkVerifyResponse: Codable {
 
 struct SMSCodeRequest: Codable {
     let phone: String
+    let language: String?  // Optional language code (e.g., "de", "en", "fr", "it")
 }
 
 struct SMSCodeSendResponse: Codable {
@@ -181,9 +182,16 @@ class VeramoAuthService {
     // MARK: - SMS Code Authentication
     
     /// Sends a verification code to the user's phone via SMS
-    func requestSMSCode(phone: String) async throws -> SMSCodeSendResponse {
+    /// - Parameters:
+    ///   - phone: The phone number in E.164 format (e.g., "+41791234567")
+    ///   - language: Optional language code (e.g., "de", "en", "fr", "it"). If nil, uses device language or defaults to "de"
+    func requestSMSCode(phone: String, language: String? = nil) async throws -> SMSCodeSendResponse {
         print("📱 [SMS-SEND] Starting SMS code request")
         print("📱 [SMS-SEND] Phone number: \(phone)")
+        
+        // Determine language to use
+        let smsLanguage = language ?? Locale.current.language.languageCode?.identifier ?? "de"
+        print("📱 [SMS-SEND] Language: \(smsLanguage)")
         
         guard let url = URL(string: "\(baseURL)/sms-code-send") else {
             print("❌ [SMS-SEND] Invalid URL")
@@ -196,7 +204,7 @@ class VeramoAuthService {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let body = SMSCodeRequest(phone: phone)
+        let body = SMSCodeRequest(phone: phone, language: smsLanguage)
         request.httpBody = try JSONEncoder().encode(body)
         
         if let bodyData = request.httpBody,
