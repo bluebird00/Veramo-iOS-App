@@ -54,6 +54,11 @@ struct RideBookingView: View {
     @StateObject private var destinationPlacesService = GooglePlacesService()
     
     @FocusState private var focusedField: Field?
+    @State private var keyboardHeight: CGFloat = 0
+    @State private var sheetOffset: CGFloat = 0
+    @State private var lastSheetOffset: CGFloat = 0
+    @State private var lastFocusedField: Field? = nil
+    @State private var isDragging: Bool = false
     
     enum Field {
         case pickup
@@ -128,6 +133,62 @@ struct RideBookingView: View {
                         .fill(Color.gray.opacity(0.3))
                         .frame(width: 40, height: 5)
                         .padding(.top, 8)
+                        .padding(.bottom, 4)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture()
+                                .onChanged { value in
+                                    isDragging = true
+                                    let translation = value.translation.height
+                                    sheetOffset = lastSheetOffset + translation
+                                    
+                                    // If dragging down, dismiss keyboard
+                                    if translation > 10 {
+                                        focusedField = nil
+                                    }
+                                }
+                                .onEnded { value in
+                                    isDragging = false
+                                    let translation = value.translation.height
+                                    let velocity = value.predictedEndTranslation.height - value.translation.height
+                                    
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                        // Dismiss keyboard if dragged down significantly
+                                        if translation > 50 || velocity > 100 {
+                                            focusedField = nil
+                                            sheetOffset = 0
+                                            lastSheetOffset = 0
+                                        } else if translation < -50 || velocity < -100 {
+                                            // Expand sheet upward and focus last field
+                                            sheetOffset = -100
+                                            lastSheetOffset = -100
+                                            
+                                            // Delay focus to let keyboard and sheet resize happen
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                                // Focus the last used field or default to pickup
+                                                if let lastField = lastFocusedField {
+                                                    focusedField = lastField
+                                                } else if pickupLocation.isEmpty {
+                                                    focusedField = .pickup
+                                                } else if destination.isEmpty {
+                                                    focusedField = .destination
+                                                } else {
+                                                    focusedField = .destination // Default to destination if both filled
+                                                }
+                                            }
+                                        } else {
+                                            // Snap back
+                                            if lastSheetOffset > -50 {
+                                                sheetOffset = 0
+                                                lastSheetOffset = 0
+                                            } else {
+                                                sheetOffset = -100
+                                                lastSheetOffset = -100
+                                            }
+                                        }
+                                    }
+                                }
+                        )
                     
                     if !showVehicleSelection {
                         // Booking form
@@ -312,6 +373,7 @@ struct RideBookingView: View {
                                 .padding(.top, 16)
                                 .padding(.bottom, 24)
                             }
+                            .scrollDismissesKeyboard(.interactively)
                         }
                     } else {
                         // Vehicle selection
@@ -329,12 +391,68 @@ struct RideBookingView: View {
                         )
                     }
                 }
-                .frame(maxWidth: .infinity, maxHeight: geometry.size.height * 0.5)
+                .frame(maxWidth: .infinity, maxHeight: keyboardHeight > 0 ? geometry.size.height * 0.8 : geometry.size.height * 0.5)
                 .background(
                     RoundedRectangle(cornerRadius: 20)
                         .fill(Color(.systemBackground))
                         .shadow(color: .black.opacity(0.1), radius: 10, y: -5)
                         .ignoresSafeArea(edges: .bottom)
+                )
+                .offset(y: sheetOffset)
+                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: keyboardHeight)
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            isDragging = true
+                            let translation = value.translation.height
+                            
+                            if translation > 0 {
+                                // Dragging down
+                                sheetOffset = translation
+                                // Dismiss keyboard when dragging down
+                                if translation > 20 {
+                                    focusedField = nil
+                                }
+                            } else if translation < 0 {
+                                // Dragging up
+                                sheetOffset = max(translation, -100)
+                            }
+                        }
+                        .onEnded { value in
+                            isDragging = false
+                            let translation = value.translation.height
+                            
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                if translation > 50 {
+                                    // Dragged down - close
+                                    sheetOffset = 0
+                                    lastSheetOffset = 0
+                                    focusedField = nil
+                                } else if translation < -50 {
+                                    // Dragged up - expand and focus
+                                    sheetOffset = -100
+                                    lastSheetOffset = -100
+                                    
+                                    // Delay focus to let keyboard and sheet resize happen
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                        // Focus the last used field or default intelligently
+                                        if let lastField = lastFocusedField {
+                                            focusedField = lastField
+                                        } else if pickupLocation.isEmpty {
+                                            focusedField = .pickup
+                                        } else if destination.isEmpty {
+                                            focusedField = .destination
+                                        } else {
+                                            focusedField = .destination
+                                        }
+                                    }
+                                } else {
+                                    // Snap back to previous position
+                                    sheetOffset = 0
+                                    lastSheetOffset = 0
+                                }
+                            }
+                        }
                 )
             }
         }
@@ -347,6 +465,37 @@ struct RideBookingView: View {
                         focusedField = .pickup
                     }
                 }
+            }
+            .onChange(of: focusedField) { oldValue, newValue in
+                // Track the last focused field
+                if let newValue = newValue {
+                    lastFocusedField = newValue
+                }
+                
+                // Only reset sheet offset if not currently dragging
+                if !isDragging && newValue == nil {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        sheetOffset = 0
+                        lastSheetOffset = 0
+                    }
+                }
+            }
+            .onChange(of: keyboardHeight) { oldValue, newValue in
+                // When keyboard dismisses and we're not dragging, reset sheet position
+                if newValue == 0 && !isDragging {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        sheetOffset = 0
+                        lastSheetOffset = 0
+                    }
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { notification in
+                if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                    keyboardHeight = keyboardFrame.height
+                }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+                keyboardHeight = 0
             }
     }
     
