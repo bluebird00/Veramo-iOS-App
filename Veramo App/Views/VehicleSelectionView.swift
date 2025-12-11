@@ -208,7 +208,7 @@ struct VehicleSelectionView: View {
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                .padding(.vertical, 18)
                 .background(
                     LinearGradient(
                         colors: [.black, Color(.darkGray)],
@@ -216,11 +216,13 @@ struct VehicleSelectionView: View {
                         endPoint: .trailing
                     )
                 )
-                .cornerRadius(12)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
             .disabled(selectedVehicle == nil || isProcessingPayment)
             .opacity(selectedVehicle != nil && !isProcessingPayment ? 1 : 0.5)
-            .padding()
+            .padding(.horizontal, 28)
+            .padding(.top, 32)
+            .padding(.bottom, 5)
         }
         .task {
             await fetchPricing()

@@ -47,21 +47,24 @@ struct AutocompleteLocationField: View {
                             HStack(spacing: 20) {
                                 
                                 
-                                VStack(alignment: .leading, spacing: 8) {
+                                VStack(alignment: .leading, spacing: 4) {
                                     Text(suggestion.mainText)
                                         .font(.subheadline)
                                         .fontWeight(.medium)
                                         .foregroundColor(.primary)
+                                        .lineLimit(1)
+                                        .truncationMode(.tail)
                                     
                                     Text(suggestion.secondaryText)
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                         .lineLimit(1)
+                                        .truncationMode(.tail)
                                 }
                                 
                                 Spacer()
                             }
-                            .padding(.vertical, 15)
+                            .padding(.vertical, 12)
                             .padding(.horizontal, 20)
                         }
                         

@@ -160,30 +160,28 @@ struct RideBookingView: View {
                                             lastSheetOffset = 0
                                         } else if translation < -50 || velocity < -100 {
                                             // Expand sheet upward and focus last field
-                                            sheetOffset = -100
-                                            lastSheetOffset = -100
+                                            sheetOffset = 0
+                                            lastSheetOffset = 0
                                             
-                                            // Delay focus to let keyboard and sheet resize happen
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                                // Focus the last used field or default to pickup
-                                                if let lastField = lastFocusedField {
-                                                    focusedField = lastField
-                                                } else if pickupLocation.isEmpty {
-                                                    focusedField = .pickup
-                                                } else if destination.isEmpty {
-                                                    focusedField = .destination
-                                                } else {
-                                                    focusedField = .destination // Default to destination if both filled
-                                                }
+                                            // Immediately focus to trigger keyboard
+                                            // Focus the last used field or default to pickup
+                                            if let lastField = lastFocusedField {
+                                                focusedField = lastField
+                                            } else if pickupLocation.isEmpty {
+                                                focusedField = .pickup
+                                            } else if destination.isEmpty {
+                                                focusedField = .destination
+                                            } else {
+                                                focusedField = .destination // Default to destination if both filled
                                             }
                                         } else {
                                             // Snap back
-                                            if lastSheetOffset > -50 {
+                                            if lastSheetOffset > -30 {
                                                 sheetOffset = 0
                                                 lastSheetOffset = 0
                                             } else {
-                                                sheetOffset = -100
-                                                lastSheetOffset = -100
+                                                sheetOffset = 0
+                                                lastSheetOffset = 0
                                             }
                                         }
                                     }
@@ -356,7 +354,7 @@ struct RideBookingView: View {
                                         }
                                         .foregroundColor(.white)
                                         .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 16)
+                                        .padding(.vertical, 18)
                                         .background(
                                             LinearGradient(
                                                 colors: [.black, Color(.darkGray)],
@@ -364,14 +362,14 @@ struct RideBookingView: View {
                                                 endPoint: .trailing
                                             )
                                         )
-                                        .cornerRadius(12)
+                                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                                     }
                                     .disabled(pickupLocation.isEmpty || destination.isEmpty)
                                     .opacity(pickupLocation.isEmpty || destination.isEmpty ? 0.5 : 1)
-                                    .padding(.horizontal)
+                                    .padding(.horizontal, 28)
                                 }
                                 .padding(.top, 16)
-                                .padding(.bottom, 24)
+                                .padding(.bottom, 20)
                             }
                             .scrollDismissesKeyboard(.interactively)
                         }
@@ -391,7 +389,7 @@ struct RideBookingView: View {
                         )
                     }
                 }
-                .frame(maxWidth: .infinity, maxHeight: keyboardHeight > 0 ? geometry.size.height * 0.8 : geometry.size.height * 0.5)
+                .frame(maxWidth: .infinity, maxHeight: keyboardHeight > 0 ? geometry.size.height * 0.84 : geometry.size.height * 0.54)
                 .background(
                     RoundedRectangle(cornerRadius: 20)
                         .fill(Color(.systemBackground))
@@ -414,42 +412,42 @@ struct RideBookingView: View {
                                     focusedField = nil
                                 }
                             } else if translation < 0 {
-                                // Dragging up
-                                sheetOffset = max(translation, -100)
+                                // Dragging up - no artificial limit, let it follow
+                                sheetOffset = translation
                             }
                         }
                         .onEnded { value in
                             isDragging = false
                             let translation = value.translation.height
                             
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
                                 if translation > 50 {
                                     // Dragged down - close
                                     sheetOffset = 0
                                     lastSheetOffset = 0
                                     focusedField = nil
-                                } else if translation < -50 {
-                                    // Dragged up - expand and focus
-                                    sheetOffset = -100
-                                    lastSheetOffset = -100
-                                    
-                                    // Delay focus to let keyboard and sheet resize happen
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                                        // Focus the last used field or default intelligently
-                                        if let lastField = lastFocusedField {
-                                            focusedField = lastField
-                                        } else if pickupLocation.isEmpty {
-                                            focusedField = .pickup
-                                        } else if destination.isEmpty {
-                                            focusedField = .destination
-                                        } else {
-                                            focusedField = .destination
-                                        }
-                                    }
+                                } else if translation < -20 {
+                                    // Dragged up - expand and focus (very easy threshold!)
+                                    sheetOffset = 0
+                                    lastSheetOffset = 0
                                 } else {
                                     // Snap back to previous position
                                     sheetOffset = 0
                                     lastSheetOffset = 0
+                                }
+                            }
+                            
+                            // Trigger focus immediately after animation starts for swipe up
+                            if translation < -20 {
+                                // Focus the last used field or default intelligently
+                                if let lastField = lastFocusedField {
+                                    focusedField = lastField
+                                } else if pickupLocation.isEmpty {
+                                    focusedField = .pickup
+                                } else if destination.isEmpty {
+                                    focusedField = .destination
+                                } else {
+                                    focusedField = .destination
                                 }
                             }
                         }
