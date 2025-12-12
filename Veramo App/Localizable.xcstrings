@@ -29,9 +29,6 @@
     "🐛 Debug Options" : {
 
     },
-    "🛠️ Debug Menu" : {
-
-    },
     "1.0.0" : {
 
     },
@@ -39,7 +36,14 @@
 
     },
     "About" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über"
+          }
+        }
+      }
     },
     "Account" : {
       "localizations" : {
@@ -164,7 +168,14 @@
       }
     },
     "Chat with Support" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit dem Support chatten"
+          }
+        }
+      }
     },
     "Check your email for the magic link!" : {
 
@@ -173,31 +184,77 @@
 
     },
     "Clear All Data" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Daten löschen"
+          }
+        }
+      }
     },
     "Click Me!" : {
 
     },
     "Close" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen"
+          }
+        }
+      }
     },
     "Connecting to customer support..." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindung zum Kundensupport wird hergestellt…"
+          }
+        }
+      }
     },
     "Connection Error" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindungsfehler"
+          }
+        }
+      }
     },
     "Contact Information" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontaktinformationen"
+          }
+        }
+      }
     },
     "Continue" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter"
+          }
+        }
+      }
     },
     "Continue to Payment" : {
-
-    },
-    "Current State:" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter zur Uahlung"
+          }
+        }
+      }
     },
     "Date" : {
       "localizations" : {
@@ -226,34 +283,101 @@
 
     },
     "Email" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email"
+          }
+        }
+      }
     },
     "Email Address" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email-Adresse"
+          }
+        }
+      }
     },
     "Enter pickup location" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abholort eingeben"
+          }
+        }
+      }
     },
     "Enter verification code" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verifizierungscode eingeben"
+          }
+        }
+      }
     },
     "Enter your email to get started" : {
 
     },
     "Enter Your Name" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie Ihren Namen ein"
+          }
+        }
+      }
     },
     "Enter your phone number" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie Ihren Telefonnummer ein"
+          }
+        }
+      }
+    },
+    "Enter your phone number to continue" : {
 
     },
     "Error" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler"
+          }
+        }
+      }
     },
     "Error loading chat" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler beim Laden des Chats"
+          }
+        }
+      }
     },
     "Failed to load pricing" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler beim Laden der Preise"
+          }
+        }
+      }
     },
     "First" : {
 
@@ -262,82 +386,230 @@
 
     },
     "Get help with your bookings" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilfe mit Ihren Buchungen"
+          }
+        }
+      }
     },
     "Get Started" : {
-
-    },
-    "Has Seen Welcome: %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt starten"
+          }
+        }
+      }
     },
     "Home" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Startseite"
+          }
+        }
+      }
     },
     "Hour" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stunde"
+          }
+        }
+      }
     },
     "How can we help?" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie können wir Ihnen helfen?"
+          }
+        }
+      }
     },
     "Important Information" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wichtige Information"
+          }
+        }
+      }
     },
     "Important information about the transport operator" : {
-
-    },
-    "Is Authenticated: %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wichtige Information zum Transportunternehmer"
+          }
+        }
+      }
     },
     "Last" : {
 
     },
     "Loading chat..." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat wird geladen…"
+          }
+        }
+      }
     },
     "Loading your trips..." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre Fahrten werden geladen…"
+          }
+        }
+      }
     },
     "Log In" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmelden"
+          }
+        }
+      }
     },
     "Log Out" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abmelden"
+          }
+        }
+      }
     },
     "Login as Test User" : {
 
     },
     "Logout" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abmelden"
+          }
+        }
+      }
     },
     "Minute" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minute"
+          }
+        }
+      }
     },
     "My Trips" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meine Fahrten"
+          }
+        }
+      }
     },
     "No Past Trips" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine vergangenen Fahrten"
+          }
+        }
+      }
     },
     "No Upcoming Trips" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine bevorstehenden Fahrten"
+          }
+        }
+      }
     },
     "OK" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
     },
     "Our support team is here to assist you with any questions about your bookings." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unser Support-Team steht Ihnen bei allen Fragen zu Ihren Buchungen gerne zur Verfügung."
+          }
+        }
+      }
     },
     "Past (%lld)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vergangene (%lld)"
+          }
+        }
+      }
     },
     "Payment Failed" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung fehlgeschlagen"
+          }
+        }
+      }
     },
     "Phone number" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefonnummer"
+          }
+        }
+      }
     },
     "Phone Number" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefonnummer"
+          }
+        }
+      }
     },
     "Pickup location" : {
       "localizations" : {
@@ -350,67 +622,183 @@
       }
     },
     "Processing..." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Bearbeitung…"
+          }
+        }
+      }
     },
     "Profile" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profil"
+          }
+        }
+      }
     },
     "Refresh" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktualisieren"
+          }
+        }
+      }
     },
     "Request Failed" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anfrage fehlgeschlagen"
+          }
+        }
+      }
     },
     "Request ID: #%lld" : {
 
     },
     "Request Sent!" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anfrage gesendet!"
+          }
+        }
+      }
     },
     "Resend code" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code erneut senden"
+          }
+        }
+      }
     },
     "Resend in %llds" : {
-
-    },
-    "Reset & Restart App" : {
-
-    },
-    "Reset Welcome Screen" : {
-
-    },
-    "Reset Welcome Screen?" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut senden in %llds"
+          }
+        }
+      }
     },
     "Retry" : {
 
     },
     "Search country" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Land suchen"
+          }
+        }
+      }
     },
     "Search Rides" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrten suchen"
+          }
+        }
+      }
+    },
+    "Select %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wählen"
+          }
+        }
+      }
     },
     "Select Country" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Land auswählen"
+          }
+        }
+      }
+    },
+    "Select Vehicle" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrzeug auswählen"
+          }
+        }
+      }
     },
     "Send Code" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code senden"
+          }
+        }
+      }
     },
     "Send Magic Link" : {
 
     },
     "Sending..." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Senden…"
+          }
+        }
+      }
     },
     "Skip" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überspringen"
+          }
+        }
+      }
     },
     "Support" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kundendienst"
+          }
+        }
+      }
     },
     "Support Chat" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kundendienst-Chat"
+          }
+        }
+      }
     },
     "Test API Endpoints" : {
 
@@ -422,10 +810,14 @@
 
     },
     "The transportation contract is concluded between you and the independent partner.\n\nVeramo itself is not a transportation service provider and acts solely as an intermediary between you and the independent partner." : {
-
-    },
-    "This will reset the welcome screen. You may need to restart the app to see it again." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Beförderungsvertrag wird zwischen Ihnen und dem unabhängigen Partner abgeschlossen.\nVeramo selbst ist kein Transportdienstleister und wird ausschließlich als Vermittler zwischen Ihnen und dem unabhängigen Partner tätig."
+          }
+        }
+      }
     },
     "Time" : {
       "localizations" : {
@@ -438,40 +830,118 @@
       }
     },
     "Total Price" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesamtpreis"
+          }
+        }
+      }
     },
     "Trip Type" : {
 
     },
     "Try Again" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut versuchen"
+          }
+        }
+      }
     },
     "Type a message..." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Nachricht eingeben…"
+          }
+        }
+      }
     },
     "Up to %lld passengers" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bis zu %lld Passagiere"
+          }
+        }
+      }
     },
     "Upcoming (%lld)" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bevorstehend (%lld)"
+          }
+        }
+      }
     },
     "User: %@" : {
-
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzer: %@"
+          }
+        }
+      }
     },
     "Veramo" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veramo"
+          }
+        }
+      }
     },
     "VERAMO" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veramo…"
+          }
+        }
+      }
     },
     "Verifying..." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verifizierung…"
+          }
+        }
+      }
     },
     "Version" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
+          }
+        }
+      }
     },
     "We sent a 6-digit code to" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der 6-stellige Code wurde gesendet an"
+          }
+        }
+      }
     },
     "Welcome to Veramo" : {
 
@@ -480,7 +950,14 @@
 
     },
     "Your completed trips will appear here" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre abgeschlossenen Fahrten werden hier angezeigt."
+          }
+        }
+      }
     },
     "Your trip request has been submitted successfully." : {
 

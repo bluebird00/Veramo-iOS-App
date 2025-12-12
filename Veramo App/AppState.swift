@@ -25,4 +25,15 @@ class AppState {
         AuthenticationManager.shared.logout()
         isAuthenticated = false
     }
+    
+    /// Call this method when you receive a 401 Unauthorized response from the API
+    func handleAuthenticationError() {
+        print("⚠️ Session expired - logging out user")
+        logout()
+    }
+    
+    /// Refresh authentication state from persistent storage
+    func refreshAuthenticationState() {
+        isAuthenticated = AuthenticationManager.shared.isAuthenticated
+    }
 }

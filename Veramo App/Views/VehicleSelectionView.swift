@@ -102,6 +102,27 @@ struct VehicleSelectionView: View {
         }
     }
     
+    // Swiss timezone constant
+    private static let swissTimeZone = TimeZone(identifier: "Europe/Zurich") ?? .current
+    
+    // Formatted date in Swiss timezone
+    private var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        formatter.timeZone = Self.swissTimeZone
+        return formatter.string(from: date)
+    }
+    
+    // Formatted time in Swiss timezone
+    private var formattedTime: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .none
+        formatter.timeStyle = .short
+        formatter.timeZone = Self.swissTimeZone
+        return formatter.string(from: time)
+    }
+    
     // Filter vehicles based on passenger count and add pricing
     private var availableVehicles: [VehicleType] {
         vehicleTypes.filter { vehicle in
@@ -130,14 +151,25 @@ struct VehicleSelectionView: View {
         }
     }
     
+    // Dynamic button text based on selected vehicle
+    private var buttonText: String {
+        if isProcessingPayment {
+            return String(localized: "Processing...")
+        } else if let vehicle = selectedVehicle {
+            return String(localized: "Select \(vehicle.name)")
+        } else {
+            return String(localized: "Select Vehicle")
+        }
+    }
+    
     var body: some View {
         // Vehicle Selection
         VStack(spacing: 0) {
             // Trip summary - only date and time
             HStack {
-                Label(date.formatted(date: .abbreviated, time: .omitted), systemImage: "calendar")
+                Label(formattedDate, systemImage: "calendar")
                 Spacer()
-                Label(time.formatted(date: .omitted, time: .shortened), systemImage: "clock")
+                Label(formattedTime, systemImage: "clock")
             }
             .font(.subheadline)
             .foregroundColor(.secondary)
@@ -195,14 +227,14 @@ struct VehicleSelectionView: View {
             
             Spacer()
             
-            // Continue to Payment button
+            // Select vehicle button
             Button(action: continueToPayment) {
                 HStack(spacing: 8) {
                     if isProcessingPayment {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                     }
-                    Text(isProcessingPayment ? "Processing..." : "Continue to Payment")
+                    Text(buttonText)
                         .font(.headline)
                         .fontWeight(.semibold)
                 }

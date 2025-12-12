@@ -41,6 +41,13 @@ struct Veramo_AppApp: App {
                 } message: {
                     Text(errorMessage)
                 }
+                .onReceive(NotificationCenter.default.publisher(for: .userDidBecomeUnauthenticated)) { _ in
+                    // Handle authentication error notification
+                    print("🔔 Received userDidBecomeUnauthenticated notification")
+                    appState.logout()
+                    errorMessage = "Your session has expired. Please log in again."
+                    showError = true
+                }
                 
                 // Welcome screen overlay - only show if BOTH conditions are true:
                 // 1. User hasn't seen welcome before
@@ -62,18 +69,7 @@ struct Veramo_AppApp: App {
                     }
                 }
                 
-                // DEBUG ONLY: Remove before production!
-                #if DEBUG
-                DebugButton(hasSeenWelcome: $hasSeenWelcome)
-                    .zIndex(999)
-                
-                // SMS Debug overlay (bottom-right ladybug button)
-                if !appState.isAuthenticated {
-                    SMSDebugView()
-                        .environment(appState)
-                        .zIndex(998)
-                }
-                #endif
+               
             }
             .onChange(of: hasSeenWelcome) { oldValue, newValue in
                 // Save the preference when it changes

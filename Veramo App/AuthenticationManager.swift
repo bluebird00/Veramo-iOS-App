@@ -39,8 +39,9 @@ class AuthenticationManager {
     
     var isAuthenticated: Bool {
         let token = sessionToken
-        let isAuth = token != nil
-        print("🔑 isAuthenticated check: \(isAuth) (token exists: \(token != nil))")
+        let customer = currentCustomer
+        let isAuth = token != nil && customer != nil
+        print("🔑 isAuthenticated check: \(isAuth) (token exists: \(token != nil), customer exists: \(customer != nil))")
         if let token = token {
             print("   Token preview: \(String(token.prefix(20)))...")
         }

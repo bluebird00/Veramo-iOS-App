@@ -51,7 +51,7 @@ struct SMSLoginView: View {
                     .font(.title)
                     .fontWeight(.bold)
                 
-                Text(codeSent ? "Enter verification code" : "Enter your phone number")
+                Text(codeSent ? "Enter verification code" : "Enter your phone number to continue")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }

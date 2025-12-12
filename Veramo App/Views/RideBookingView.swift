@@ -32,6 +32,8 @@ struct RideBookingView: View {
     }()
     @State private var passengerCount: Int = 1
     @State private var showVehicleSelection = false
+    @State private var showingTimePicker = false  // Track time picker modal state
+    @State private var showingDatePicker = false  // Unused, but needed for DatePickerCard signature
     
     var autoFocusPickup: Bool = false  // New parameter for auto-focus
     
@@ -69,389 +71,15 @@ struct RideBookingView: View {
         GeometryReader { geometry in
             ZStack(alignment: .bottom) {
                 // Map on top
-                Map(position: $cameraPosition) {
-                    // Pickup marker
-                    if let pickupCoordinate {
-                        Annotation("Pickup", coordinate: pickupCoordinate) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.white)
-                                    .frame(width: 14, height: 14)
-                                
-                                Circle()
-                                    .fill(Color.black)
-                                    .frame(width: 10, height: 10)
-                            }
-                        }
-                    }
-                    
-                    // Destination marker
-                    if let destinationCoordinate {
-                        Annotation("Destination", coordinate: destinationCoordinate) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.white)
-                                    .frame(width: 14, height: 14)
-                                
-                                Circle()
-                                    .fill(Color.black)
-                                    .frame(width: 10, height: 10)
-                            }
-                        }
-                    }
-                    
-                    // Animated marker traveling along route
-                    if let animatedMarkerCoordinate {
-                        Annotation("", coordinate: animatedMarkerCoordinate) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.black)
-                                    .frame(width: 16, height: 16)
-                                    .shadow(color: .black.opacity(0.5), radius: 4)
-                                
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 2)
-                                    .frame(width: 16, height: 16)
-                            }
-                            .opacity(markerOpacity)
-                        }
-                    }
-                    
-                    // Route polyline
-                    if let route {
-                        MapPolyline(route.polyline)
-                            .stroke(Color.black, lineWidth: 3)
-                    }
-                }
-                .mapStyle(.standard(elevation: .flat, pointsOfInterest: .excludingAll, showsTraffic: false))
-                .ignoresSafeArea()
+                mapView
                 
                 // Bottom sheet content that switches between booking form and vehicle selection
-                VStack(spacing: 0) {
-                    // Draggable handle
-                    Capsule()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: 40, height: 5)
-                        .padding(.top, 8)
-                        .padding(.bottom, 4)
-                        .contentShape(Rectangle())
-                        .gesture(
-                            DragGesture()
-                                .onChanged { value in
-                                    isDragging = true
-                                    let translation = value.translation.height
-                                    sheetOffset = lastSheetOffset + translation
-                                    
-                                    // If dragging down, dismiss keyboard
-                                    if translation > 10 {
-                                        focusedField = nil
-                                    }
-                                }
-                                .onEnded { value in
-                                    isDragging = false
-                                    let translation = value.translation.height
-                                    let velocity = value.predictedEndTranslation.height - value.translation.height
-                                    
-                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                        // Dismiss keyboard if dragged down significantly
-                                        if translation > 50 || velocity > 100 {
-                                            focusedField = nil
-                                            sheetOffset = 0
-                                            lastSheetOffset = 0
-                                        } else if translation < -50 || velocity < -100 {
-                                            // Expand sheet upward and focus last field
-                                            sheetOffset = 0
-                                            lastSheetOffset = 0
-                                            
-                                            // Immediately focus to trigger keyboard
-                                            // Focus the last used field or default to pickup
-                                            if let lastField = lastFocusedField {
-                                                focusedField = lastField
-                                            } else if pickupLocation.isEmpty {
-                                                focusedField = .pickup
-                                            } else if destination.isEmpty {
-                                                focusedField = .destination
-                                            } else {
-                                                focusedField = .destination // Default to destination if both filled
-                                            }
-                                        } else {
-                                            // Snap back
-                                            if lastSheetOffset > -30 {
-                                                sheetOffset = 0
-                                                lastSheetOffset = 0
-                                            } else {
-                                                sheetOffset = 0
-                                                lastSheetOffset = 0
-                                            }
-                                        }
-                                    }
-                                }
-                        )
-                    
-                    if !showVehicleSelection {
-                        // Booking form
-                        VStack(spacing: 0) {
-                            // Title
-                            Text("Book a Ride")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .padding(.horizontal, 20)
-                                .padding(.top, 12)
-                                .padding(.bottom, 8)
-                            
-                            ScrollView {
-                                VStack(spacing: 24) {
-                                    // Location inputs
-                                    VStack(spacing: 0) {
-                                        AutocompleteLocationField(
-                                            icon: "circle.fill",
-                                            iconColor: .black,
-                                            placeholder: "Pickup location",
-                                            text: $pickupLocation,
-                                            placesService: pickupPlacesService,
-                                            isFocused: focusedField == .pickup,
-                                            onFocus: { focusedField = .pickup },
-                                            onSelect: { suggestion in
-                                                pickupLocation = suggestion.fullText
-                                                pickupLocationEnglish = suggestion.fullTextEnglish
-                                                pickupPlaceId = suggestion.placeId
-                                                pickupPlacesService.clearSuggestions()
-                                                
-                                                // Only auto-focus destination if it's empty
-                                                if destination.isEmpty {
-                                                    focusedField = .destination
-                                                } else {
-                                                    focusedField = nil
-                                                }
-                                                
-                                                // Geocode and update map
-                                                geocodeLocation(suggestion.fullText) { coordinate in
-                                                    pickupCoordinate = coordinate
-                                                    updateMapCamera()
-                                                    
-                                                    // Recalculate route if destination already exists
-                                                    if destinationCoordinate != nil {
-                                                        calculateRoute()
-                                                    }
-                                                }
-                                            }
-                                        )
-                                        .focused($focusedField, equals: .pickup)
-                                        .onChange(of: pickupLocation) { oldValue, newValue in
-                                            // If pickup is cleared, reset its coordinate and route
-                                            if newValue.isEmpty {
-                                                pickupCoordinate = nil
-                                                pickupLocationEnglish = ""
-                                                pickupPlaceId = nil
-                                                route = nil
-                                                animatedMarkerCoordinate = nil
-                                                animationProgress = 0.0
-                                                animationTimer?.invalidate()
-                                                animationTimer = nil
-                                                markerOpacity = 1.0
-                                                
-                                                // If destination still exists, zoom to it
-                                                if destinationCoordinate != nil {
-                                                    updateMapCamera()
-                                                }
-                                            }
-                                        }
-                                        
-                                        // Connector line with divider
-                                        HStack(spacing: 0) {
-                                            // Vertical connector
-                                            Rectangle()
-                                                .fill(Color.gray.opacity(0.6))
-                                                .frame(width: 2, height: 20)
-                                                .padding(.leading, 8)
-                                            
-                                            // Horizontal divider (doesn't extend to left edge)
-                                            Rectangle()
-                                                .fill(Color.gray.opacity(0.3))
-                                                .frame(height: 1)
-                                                .padding(.leading, 30)
-                                        }
-                                        
-                                        AutocompleteLocationField(
-                                            icon: "circle.fill",
-                                            iconColor: .black,
-                                            placeholder: "Destination",
-                                            text: $destination,
-                                            placesService: destinationPlacesService,
-                                            isFocused: focusedField == .destination,
-                                            onFocus: { focusedField = .destination },
-                                            onSelect: { suggestion in
-                                                destination = suggestion.fullText
-                                                destinationEnglish = suggestion.fullTextEnglish
-                                                destinationPlaceId = suggestion.placeId
-                                                destinationPlacesService.clearSuggestions()
-                                                focusedField = nil
-                                                
-                                                // Geocode and calculate route
-                                                geocodeLocation(suggestion.fullText) { coordinate in
-                                                    destinationCoordinate = coordinate
-                                                    updateMapCamera()
-                                                    calculateRoute()
-                                                }
-                                            }
-                                        )
-                                        .focused($focusedField, equals: .destination)
-                                        .onChange(of: destination) { oldValue, newValue in
-                                            // If destination is cleared, reset its coordinate and route
-                                            if newValue.isEmpty {
-                                                destinationCoordinate = nil
-                                                destinationEnglish = ""
-                                                destinationPlaceId = nil
-                                                route = nil
-                                                animatedMarkerCoordinate = nil
-                                                animationProgress = 0.0
-                                                animationTimer?.invalidate()
-                                                animationTimer = nil
-                                                markerOpacity = 1.0
-                                                
-                                                // If pickup still exists, zoom to it
-                                                if pickupCoordinate != nil {
-                                                    updateMapCamera()
-                                                }
-                                            }
-                                        }
-                                    }
-                                    .padding(.vertical, 16)
-                                    .padding(.horizontal, 20)
-                                    .background(Color(.systemGray6))
-                                    .cornerRadius(16)
-                                    .padding(.horizontal, 20)
-                                    
-                                    // Date and Time pickers
-                                    HStack(spacing: 12) {
-                                        DatePickerCard(
-                                            title: "Date",
-                                            icon: "calendar",
-                                            date: $selectedDate,
-                                            displayedComponents: .date,
-                                            timeZone: Self.swissTimeZone
-                                        )
-                                        
-                                        DatePickerCard(
-                                            title: "Time",
-                                            icon: "clock",
-                                            date: $selectedTime,
-                                            displayedComponents: .hourAndMinute,
-                                            timeZone: Self.swissTimeZone
-                                        )
-                                    }
-                                    .padding(.horizontal)
-                                    
-                                    // Search button
-                                    Button(action: searchRides) {
-                                        HStack {
-                                            Image(systemName: "magnifyingglass")
-                                                .font(.headline)
-                                            Text("Search Rides")
-                                                .font(.headline)
-                                                .fontWeight(.semibold)
-                                        }
-                                        .foregroundColor(.white)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 18)
-                                        .background(
-                                            LinearGradient(
-                                                colors: [.black, Color(.darkGray)],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                    }
-                                    .disabled(pickupLocation.isEmpty || destination.isEmpty)
-                                    .opacity(pickupLocation.isEmpty || destination.isEmpty ? 0.5 : 1)
-                                    .padding(.horizontal, 28)
-                                }
-                                .padding(.top, 16)
-                                .padding(.bottom, 20)
-                            }
-                            .scrollDismissesKeyboard(.interactively)
-                        }
-                    } else {
-                        // Vehicle selection
-                        VehicleSelectionView(
-                            pickup: pickupLocation,
-                            destination: destination,
-                            pickupEnglish: pickupLocationEnglish,
-                            destinationEnglish: destinationEnglish,
-                            date: selectedDate,
-                            time: selectedTime,
-                            passengers: passengerCount,
-                            pickupPlaceId: pickupPlaceId,
-                            destinationPlaceId: destinationPlaceId,
-                            showVehicleSelection: $showVehicleSelection
-                        )
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: keyboardHeight > 0 ? geometry.size.height * 0.84 : geometry.size.height * 0.54)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(.systemBackground))
-                        .shadow(color: .black.opacity(0.1), radius: 10, y: -5)
-                        .ignoresSafeArea(edges: .bottom)
-                )
-                .offset(y: sheetOffset)
-                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: keyboardHeight)
-                .gesture(
-                    DragGesture()
-                        .onChanged { value in
-                            isDragging = true
-                            let translation = value.translation.height
-                            
-                            if translation > 0 {
-                                // Dragging down
-                                sheetOffset = translation
-                                // Dismiss keyboard when dragging down
-                                if translation > 20 {
-                                    focusedField = nil
-                                }
-                            } else if translation < 0 {
-                                // Dragging up - no artificial limit, let it follow
-                                sheetOffset = translation
-                            }
-                        }
-                        .onEnded { value in
-                            isDragging = false
-                            let translation = value.translation.height
-                            
-                            withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                                if translation > 50 {
-                                    // Dragged down - close
-                                    sheetOffset = 0
-                                    lastSheetOffset = 0
-                                    focusedField = nil
-                                } else if translation < -20 {
-                                    // Dragged up - expand and focus (very easy threshold!)
-                                    sheetOffset = 0
-                                    lastSheetOffset = 0
-                                } else {
-                                    // Snap back to previous position
-                                    sheetOffset = 0
-                                    lastSheetOffset = 0
-                                }
-                            }
-                            
-                            // Trigger focus immediately after animation starts for swipe up
-                            if translation < -20 {
-                                // Focus the last used field or default intelligently
-                                if let lastField = lastFocusedField {
-                                    focusedField = lastField
-                                } else if pickupLocation.isEmpty {
-                                    focusedField = .pickup
-                                } else if destination.isEmpty {
-                                    focusedField = .destination
-                                } else {
-                                    focusedField = .destination
-                                }
-                            }
-                        }
-                )
+                bottomSheetContent
+                    .frame(maxWidth: .infinity, maxHeight: keyboardHeight > 0 ? geometry.size.height * 0.84 : geometry.size.height * 0.54)
+                    .background(bottomSheetBackground)
+                    .offset(y: sheetOffset)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: keyboardHeight)
+                    .gesture(sheetDragGesture)
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -487,6 +115,16 @@ struct RideBookingView: View {
                     }
                 }
             }
+            .overlay {
+                // Time picker modal at top level
+                if showingTimePicker {
+                    TimePickerModal(
+                        showingPicker: $showingTimePicker,
+                        date: $selectedTime,
+                        timeZone: Self.swissTimeZone
+                    )
+                }
+            }
             .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { notification in
                 if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
                     keyboardHeight = keyboardFrame.height
@@ -496,6 +134,425 @@ struct RideBookingView: View {
                 keyboardHeight = 0
             }
     }
+    
+    // MARK: - View Components
+    
+    private var mapView: some View {
+        Map(position: $cameraPosition) {
+            // Pickup marker
+            if let pickupCoordinate {
+                Annotation(pickupLocation.isEmpty ? "Pickup" : pickupLocation.components(separatedBy: ",").first ?? pickupLocation, coordinate: pickupCoordinate) {
+                    mapMarkerView(color: .white, innerColor: .black)
+                }
+            }
+            
+            // Destination marker
+            if let destinationCoordinate {
+                Annotation(destination.isEmpty ? "Destination" : destination.components(separatedBy: ",").first ?? destination, coordinate: destinationCoordinate) {
+                    mapMarkerView(color: .white, innerColor: .black)
+                }
+            }
+            
+            // Animated marker traveling along route
+            if let animatedMarkerCoordinate {
+                Annotation("", coordinate: animatedMarkerCoordinate) {
+                    animatedMarkerView
+                }
+            }
+            
+            // Route polyline
+            if let route {
+                MapPolyline(route.polyline)
+                    .stroke(Color.black, lineWidth: 3)
+            }
+        }
+        .mapStyle(.standard(elevation: .flat, pointsOfInterest: .excludingAll, showsTraffic: false))
+        .ignoresSafeArea()
+    }
+    
+    private func mapMarkerView(color: Color, innerColor: Color) -> some View {
+        ZStack {
+            Circle()
+                .fill(color)
+                .frame(width: 14, height: 14)
+            
+            Circle()
+                .fill(innerColor)
+                .frame(width: 10, height: 10)
+        }
+    }
+    
+    private var animatedMarkerView: some View {
+        ZStack {
+            Circle()
+                .fill(Color.black)
+                .frame(width: 16, height: 16)
+                .shadow(color: .black.opacity(0.5), radius: 4)
+            
+            Circle()
+                .stroke(Color.white, lineWidth: 2)
+                .frame(width: 16, height: 16)
+        }
+        .opacity(markerOpacity)
+    }
+    
+    @ViewBuilder
+    private var bottomSheetContent: some View {
+        VStack(spacing: 0) {
+            draggableHandle
+            
+            if !showVehicleSelection {
+                bookingFormView
+            } else {
+                vehicleSelectionView
+            }
+        }
+    }
+    
+    private var draggableHandle: some View {
+        Capsule()
+            .fill(Color.gray.opacity(0.3))
+            .frame(width: 40, height: 5)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+            .contentShape(Rectangle())
+            .gesture(handleDragGesture)
+    }
+    
+    private var handleDragGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                isDragging = true
+                let translation = value.translation.height
+                sheetOffset = lastSheetOffset + translation
+                
+                // If dragging down, dismiss keyboard
+                if translation > 10 {
+                    focusedField = nil
+                }
+            }
+            .onEnded { value in
+                isDragging = false
+                let translation = value.translation.height
+                let velocity = value.predictedEndTranslation.height - value.translation.height
+                
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    // Dismiss keyboard if dragged down significantly
+                    if translation > 50 || velocity > 100 {
+                        focusedField = nil
+                        sheetOffset = 0
+                        lastSheetOffset = 0
+                    } else if translation < -50 || velocity < -100 {
+                        // Expand sheet upward and focus last field
+                        sheetOffset = 0
+                        lastSheetOffset = 0
+                        
+                        // Immediately focus to trigger keyboard
+                        // Focus the last used field or default to pickup
+                        if let lastField = lastFocusedField {
+                            focusedField = lastField
+                        } else if pickupLocation.isEmpty {
+                            focusedField = .pickup
+                        } else if destination.isEmpty {
+                            focusedField = .destination
+                        } else {
+                            focusedField = .destination // Default to destination if both filled
+                        }
+                    } else {
+                        // Snap back
+                        if lastSheetOffset > -30 {
+                            sheetOffset = 0
+                            lastSheetOffset = 0
+                        } else {
+                            sheetOffset = 0
+                            lastSheetOffset = 0
+                        }
+                    }
+                }
+            }
+    }
+    
+    private var bookingFormView: some View {
+        VStack(spacing: 0) {
+            // Title
+            Text("Book a Ride")
+                .font(.title2)
+                .fontWeight(.bold)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
+                .padding(.bottom, 8)
+            
+            ScrollView {
+                VStack(spacing: 24) {
+                    locationInputsView
+                    dateTimePickersView
+                    searchButtonView
+                }
+                .padding(.top, 16)
+                .padding(.bottom, 20)
+            }
+            .scrollDismissesKeyboard(.interactively)
+        }
+    }
+    
+    private var locationInputsView: some View {
+        VStack(spacing: 0) {
+            pickupLocationField
+            
+            // Connector line with divider
+            HStack(spacing: 0) {
+                // Vertical connector
+                Rectangle()
+                    .fill(Color.gray.opacity(0.6))
+                    .frame(width: 2, height: 20)
+                    .padding(.leading, 8)
+                
+                // Horizontal divider (doesn't extend to left edge)
+                Rectangle()
+                    .fill(Color.gray.opacity(0.3))
+                    .frame(height: 1)
+                    .padding(.leading, 30)
+            }
+            
+            destinationLocationField
+        }
+        .padding(.vertical, 16)
+        .padding(.horizontal, 20)
+        .background(Color(.systemGray6))
+        .cornerRadius(16)
+        .padding(.horizontal, 20)
+    }
+    
+    private var pickupLocationField: some View {
+        AutocompleteLocationField(
+            icon: "circle.fill",
+            iconColor: .black,
+            placeholder: "Pickup location",
+            text: $pickupLocation,
+            placesService: pickupPlacesService,
+            isFocused: focusedField == .pickup,
+            onFocus: { focusedField = .pickup },
+            onSelect: { suggestion in
+                pickupLocation = suggestion.fullText
+                pickupLocationEnglish = suggestion.fullTextEnglish
+                pickupPlaceId = suggestion.placeId
+                pickupPlacesService.clearSuggestions()
+                
+                // Only auto-focus destination if it's empty
+                if destination.isEmpty {
+                    focusedField = .destination
+                } else {
+                    focusedField = nil
+                }
+                
+                // Geocode and update map
+                geocodeLocation(suggestion.fullText) { coordinate in
+                    pickupCoordinate = coordinate
+                    updateMapCamera()
+                    
+                    // Recalculate route if destination already exists
+                    if destinationCoordinate != nil {
+                        calculateRoute()
+                    }
+                }
+            }
+        )
+        .focused($focusedField, equals: .pickup)
+        .onChange(of: pickupLocation) { oldValue, newValue in
+            // If pickup is cleared, reset its coordinate and route
+            if newValue.isEmpty {
+                pickupCoordinate = nil
+                pickupLocationEnglish = ""
+                pickupPlaceId = nil
+                route = nil
+                animatedMarkerCoordinate = nil
+                animationProgress = 0.0
+                animationTimer?.invalidate()
+                animationTimer = nil
+                markerOpacity = 1.0
+                
+                // If destination still exists, zoom to it
+                if destinationCoordinate != nil {
+                    updateMapCamera()
+                }
+            }
+        }
+    }
+    
+    private var destinationLocationField: some View {
+        AutocompleteLocationField(
+            icon: "circle.fill",
+            iconColor: .black,
+            placeholder: "Destination",
+            text: $destination,
+            placesService: destinationPlacesService,
+            isFocused: focusedField == .destination,
+            onFocus: { focusedField = .destination },
+            onSelect: { suggestion in
+                destination = suggestion.fullText
+                destinationEnglish = suggestion.fullTextEnglish
+                destinationPlaceId = suggestion.placeId
+                destinationPlacesService.clearSuggestions()
+                focusedField = nil
+                
+                // Geocode and calculate route
+                geocodeLocation(suggestion.fullText) { coordinate in
+                    destinationCoordinate = coordinate
+                    updateMapCamera()
+                    calculateRoute()
+                }
+            }
+        )
+        .focused($focusedField, equals: .destination)
+        .onChange(of: destination) { oldValue, newValue in
+            // If destination is cleared, reset its coordinate and route
+            if newValue.isEmpty {
+                destinationCoordinate = nil
+                destinationEnglish = ""
+                destinationPlaceId = nil
+                route = nil
+                animatedMarkerCoordinate = nil
+                animationProgress = 0.0
+                animationTimer?.invalidate()
+                animationTimer = nil
+                markerOpacity = 1.0
+                
+                // If pickup still exists, zoom to it
+                if pickupCoordinate != nil {
+                    updateMapCamera()
+                }
+            }
+        }
+    }
+    
+    private var dateTimePickersView: some View {
+        HStack(spacing: 12) {
+            DatePickerCard(
+                title: "Date",
+                icon: "calendar",
+                date: $selectedDate,
+                displayedComponents: .date,
+                timeZone: Self.swissTimeZone,
+                showingTimePicker: $showingDatePicker
+            )
+            
+            DatePickerCard(
+                title: "Time",
+                icon: "clock",
+                date: $selectedTime,
+                displayedComponents: .hourAndMinute,
+                timeZone: Self.swissTimeZone,
+                showingTimePicker: $showingTimePicker
+            )
+        }
+        .padding(.horizontal)
+    }
+    
+    private var searchButtonView: some View {
+        Button(action: searchRides) {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .font(.headline)
+                Text("Search Rides")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 18)
+            .background(
+                LinearGradient(
+                    colors: [.black, Color(.darkGray)],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
+        .disabled(pickupLocation.isEmpty || destination.isEmpty)
+        .opacity(pickupLocation.isEmpty || destination.isEmpty ? 0.5 : 1)
+        .padding(.horizontal, 28)
+    }
+    
+    private var vehicleSelectionView: some View {
+        VehicleSelectionView(
+            pickup: pickupLocation,
+            destination: destination,
+            pickupEnglish: pickupLocationEnglish,
+            destinationEnglish: destinationEnglish,
+            date: selectedDate,
+            time: selectedTime,
+            passengers: passengerCount,
+            pickupPlaceId: pickupPlaceId,
+            destinationPlaceId: destinationPlaceId,
+            showVehicleSelection: $showVehicleSelection
+        )
+    }
+    
+    private var bottomSheetBackground: some View {
+        RoundedRectangle(cornerRadius: 20)
+            .fill(Color(.systemBackground))
+            .shadow(color: .black.opacity(0.1), radius: 10, y: -5)
+            .ignoresSafeArea(edges: .bottom)
+    }
+    
+    private var sheetDragGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                isDragging = true
+                let translation = value.translation.height
+                
+                if translation > 0 {
+                    // Dragging down
+                    sheetOffset = translation
+                    // Dismiss keyboard when dragging down
+                    if translation > 20 {
+                        focusedField = nil
+                    }
+                } else if translation < 0 {
+                    // Dragging up - no artificial limit, let it follow
+                    sheetOffset = translation
+                }
+            }
+            .onEnded { value in
+                isDragging = false
+                let translation = value.translation.height
+                
+                withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
+                    if translation > 50 {
+                        // Dragged down - close
+                        sheetOffset = 0
+                        lastSheetOffset = 0
+                        focusedField = nil
+                    } else if translation < -20 {
+                        // Dragged up - expand and focus (very easy threshold!)
+                        sheetOffset = 0
+                        lastSheetOffset = 0
+                    } else {
+                        // Snap back to previous position
+                        sheetOffset = 0
+                        lastSheetOffset = 0
+                    }
+                }
+                
+                // Trigger focus immediately after animation starts for swipe up
+                if translation < -20 {
+                    // Focus the last used field or default intelligently
+                    if let lastField = lastFocusedField {
+                        focusedField = lastField
+                    } else if pickupLocation.isEmpty {
+                        focusedField = .pickup
+                    } else if destination.isEmpty {
+                        focusedField = .destination
+                    } else {
+                        focusedField = .destination
+                    }
+                }
+            }
+    }
+    
+    // MARK: - Actions
     
     private func searchRides() {
         showVehicleSelection = true

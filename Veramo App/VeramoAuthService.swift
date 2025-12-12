@@ -13,6 +13,7 @@ enum AuthError: Error, LocalizedError {
     case networkError(Error)
     case decodingError
     case serverError(String)
+    case unauthorized  // 401 - Session expired
     
     var errorDescription: String? {
         switch self {
@@ -26,6 +27,8 @@ enum AuthError: Error, LocalizedError {
             return "Failed to parse server response"
         case .serverError(let message):
             return message
+        case .unauthorized:
+            return "Your session has expired. Please log in again."
         }
     }
 }
