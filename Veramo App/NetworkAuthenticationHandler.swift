@@ -56,12 +56,8 @@ class NetworkAuthenticationHandler {
         print("⚠️ [AUTH] 401 Unauthorized detected - logging out user")
         
         // Post a notification that other parts of the app can observe
+        // The app will handle the actual logout via the notification observer
         NotificationCenter.default.post(name: .userDidBecomeUnauthenticated, object: nil)
-        
-        // Clear authentication on the main thread
-        Task { @MainActor in
-            AuthenticationManager.shared.logout()
-        }
     }
     
     /// Check response and handle authentication errors automatically

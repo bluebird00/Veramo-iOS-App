@@ -9,6 +9,11 @@ import SwiftUI
 import StreamChat
 import StreamChatSwiftUI
 
+// MARK: - Notification Names
+extension Notification.Name {
+    static let paymentReturnDetected = Notification.Name("paymentReturnDetected")
+}
+
 @main
 struct Veramo_AppApp: App {
     @State private var appState = AppState()
@@ -31,22 +36,36 @@ struct Veramo_AppApp: App {
                     if appState.isAuthenticated {
                         MainTabView()
                             .environment(appState)
+                            .id("authenticated-\(appState.isAuthenticated)")
                     } else {
                         SMSLoginView()
                             .environment(appState)
+                            .id("login-\(appState.isAuthenticated)")
                     }
                 }
+                .animation(.easeInOut, value: appState.isAuthenticated)
                 .alert("Authentication Error", isPresented: $showError) {
-                    Button("OK", role: .cancel) { }
+                    Button("OK", role: .cancel) {
+                        // Force view refresh after alert dismissal
+                        print("✅ Alert dismissed, ensuring logout state is applied")
+                        appState.refreshAuthenticationState()
+                    }
                 } message: {
                     Text(errorMessage)
                 }
                 .onReceive(NotificationCenter.default.publisher(for: .userDidBecomeUnauthenticated)) { _ in
                     // Handle authentication error notification
                     print("🔔 Received userDidBecomeUnauthenticated notification")
-                    appState.logout()
-                    errorMessage = "Your session has expired. Please log in again."
-                    showError = true
+                    
+                    // Logout on main thread to ensure UI updates
+                    Task { @MainActor in
+                        appState.logout()
+                        errorMessage = "Your session has expired. Please log in again."
+                        showError = true
+                        
+                        // Force immediate view update
+                        print("🔄 Forcing view refresh after logout")
+                    }
                 }
                 
                 // Welcome screen overlay - only show if BOTH conditions are true:
@@ -108,6 +127,21 @@ struct Veramo_AppApp: App {
         // Handle deep link (veramo://auth?token=...)
         if url.scheme == "veramo" && url.host == "auth" {
             handleMagicLink(url: url)
+            return
+        }
+        
+        // Handle booking confirmation (veramo://booking-confirmed?ref=...)
+        if url.scheme == "veramo" && url.host == "booking-confirmed" {
+            print("✅ Booking confirmation deep link detected")
+            print("   URL will be handled by MainTabView")
+            // Let this pass through - MainTabView will handle it
+            return
+        }
+        
+        // Handle payment return (veramo://payment-return)
+        if url.scheme == "veramo" && url.host == "payment-return" {
+            print("💳 Payment return detected - posting notification")
+            NotificationCenter.default.post(name: .paymentReturnDetected, object: nil)
             return
         }
         

@@ -393,7 +393,7 @@ struct VehicleSelectionView: View {
                 // Determine vehicle class
                 let vehicleClass = selectedVehicle.name.toVehicleClass
                 
-                // Create booking
+                // Create booking with redirect URL for deep linking
                 let response = try await BookingService.shared.createBooking(
                     pickupPlaceId: pickupPlaceId,
                     pickupDescription: pickup,
@@ -403,6 +403,7 @@ struct VehicleSelectionView: View {
                     passengers: passengers,
                     vehicleClass: vehicleClass,
                     flightNumber: flightNumber.isEmpty ? nil : flightNumber,
+                    redirectUrl: "veramo://booking-confirmed",  // Deep link back to app after payment
                     sessionToken: sessionToken
                 )
                 

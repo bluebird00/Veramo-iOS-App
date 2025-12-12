@@ -112,9 +112,6 @@
         }
       }
     },
-    "Book Now" : {
-
-    },
     "Book your first ride to see it here" : {
       "localizations" : {
         "de" : {
@@ -125,7 +122,11 @@
         }
       }
     },
+    "Booking Confirmed!" : {
+
+    },
     "Booking Details" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -259,6 +260,7 @@
       }
     },
     "Continue to Payment" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -392,9 +394,6 @@
         }
       }
     },
-    "First" : {
-
-    },
     "Flight number (optional)" : {
 
     },
@@ -472,9 +471,6 @@
           }
         }
       }
-    },
-    "Last" : {
-
     },
     "Loading chat..." : {
       "localizations" : {
@@ -663,6 +659,9 @@
         }
       }
     },
+    "Reference: %@" : {
+
+    },
     "Refresh" : {
       "localizations" : {
         "de" : {
@@ -674,6 +673,7 @@
       }
     },
     "Request Failed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -683,10 +683,8 @@
         }
       }
     },
-    "Request ID: #%lld" : {
-
-    },
     "Request Sent!" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -738,6 +736,9 @@
           }
         }
       }
+    },
+    "See Upcoming Trips" : {
+
     },
     "Select %@" : {
       "extractionState" : "stale",
@@ -806,6 +807,9 @@
         }
       }
     },
+    "Success" : {
+
+    },
     "Support" : {
       "localizations" : {
         "de" : {
@@ -870,6 +874,7 @@
 
     },
     "Try Again" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -973,6 +978,9 @@
     "Welcome to Veramo" : {
 
     },
+    "What's Next?" : {
+
+    },
     "You clicked: %lld times" : {
 
     },
@@ -987,9 +995,6 @@
       }
     },
     "Your session has expired. Please log in again to continue." : {
-
-    },
-    "Your trip request has been submitted successfully." : {
 
     }
   },

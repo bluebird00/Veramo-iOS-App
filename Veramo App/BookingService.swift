@@ -16,9 +16,10 @@ struct BookingRequest: Codable {
     let passengers: Int?
     let vehicleClass: String  // "business", "first", or "xl"
     let flightNumber: String?
+    let redirectUrl: String?  // Deep link URL for post-payment redirect (e.g., "veramo://booking-confirmed")
     
     enum CodingKeys: String, CodingKey {
-        case pickup, destination, dateTime, passengers, vehicleClass, flightNumber
+        case pickup, destination, dateTime, passengers, vehicleClass, flightNumber, redirectUrl
     }
 }
 
@@ -114,6 +115,7 @@ class BookingService {
     ///   - passengers: Number of passengers (optional, defaults to 1)
     ///   - vehicleClass: One of "business", "first", or "xl"
     ///   - flightNumber: Flight number (optional)
+    ///   - redirectUrl: Deep link URL for post-payment redirect (e.g., "veramo://booking-confirmed")
     ///   - sessionToken: Authentication session token (valid for 7 days)
     /// - Returns: BookingResponse with checkout URL and booking details
     func createBooking(
@@ -125,6 +127,7 @@ class BookingService {
         passengers: Int? = nil,
         vehicleClass: String,
         flightNumber: String? = nil,
+        redirectUrl: String? = nil,
         sessionToken: String
     ) async throws -> BookingResponse {
         
@@ -163,7 +166,8 @@ class BookingService {
             dateTime: dateTimeString,
             passengers: passengers,
             vehicleClass: vehicleClass,
-            flightNumber: flightNumber
+            flightNumber: flightNumber,
+            redirectUrl: redirectUrl
         )
         
         // Configure HTTP request
