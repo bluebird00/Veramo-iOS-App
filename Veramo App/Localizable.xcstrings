@@ -29,6 +29,9 @@
     "🐛 Debug Options" : {
 
     },
+    "🧪 Test Confirmation (Debug)" : {
+
+    },
     "1.0.0" : {
 
     },
@@ -383,6 +386,9 @@
           }
         }
       }
+    },
+    "Error: No booking reference" : {
+
     },
     "Failed to load pricing" : {
       "localizations" : {

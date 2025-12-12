@@ -35,6 +35,7 @@ struct VehicleSelectionView: View {
     @State private var showErrorAlert = false
     @State private var errorMessage: String = ""
     @State private var showSessionExpiredAlert = false
+    @State private var showBookingConfirmed = false
     
     // Optional flight number
     @State private var flightNumber: String = ""
@@ -235,30 +236,43 @@ struct VehicleSelectionView: View {
             }
             
             // Book now button
-            Button(action: createBooking) {
-                HStack(spacing: 8) {
-                    if isProcessingBooking {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+            VStack(spacing: 8) {
+                Button(action: createBooking) {
+                    HStack(spacing: 8) {
+                        if isProcessingBooking {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        }
+                        Text(buttonText)
+                            .font(.headline)
+                            .fontWeight(.semibold)
                     }
-                    Text(buttonText)
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                }
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 18)
-                .background(
-                    LinearGradient(
-                        colors: [.black, Color(.darkGray)],
-                        startPoint: .leading,
-                        endPoint: .trailing
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 18)
+                    .background(
+                        LinearGradient(
+                            colors: [.black, Color(.darkGray)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
                     )
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                }
+                .disabled(selectedVehicle == nil || isProcessingBooking)
+                .opacity(selectedVehicle != nil && !isProcessingBooking ? 1 : 0.5)
+                
+                #if DEBUG
+                // Debug button to test confirmation view without payment
+                Button(action: testBookingConfirmation) {
+                    Text("🧪 Test Confirmation (Debug)")
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                }
+                .disabled(selectedVehicle == nil)
+                .opacity(selectedVehicle != nil ? 1 : 0.5)
+                #endif
             }
-            .disabled(selectedVehicle == nil || isProcessingBooking)
-            .opacity(selectedVehicle != nil && !isProcessingBooking ? 1 : 0.5)
             .padding(.horizontal, 28)
             .padding(.top, 8)
             .padding(.bottom, 5)
@@ -301,10 +315,46 @@ struct VehicleSelectionView: View {
                 print("📱 [BOOKING] Payment browser dismissed")
                 print("📱 [BOOKING] Booking reference: \(checkout.reference ?? "N/A")")
                 
-                // Navigate back to home after payment flow
-                showVehicleSelection = false
+                // Show booking confirmation
+                showBookingConfirmed = true
             }
             .ignoresSafeArea()
+        }
+        .sheet(isPresented: $showBookingConfirmed) {
+            // When confirmation is dismissed, navigate back to home
+            showVehicleSelection = false
+        } content: {
+            if let reference = bookingReference {
+                BookingConfirmedViewContent(
+                    reference: reference,
+                    onDismiss: {
+                        showBookingConfirmed = false
+                        showVehicleSelection = false
+                    }
+                )
+                .onAppear {
+                    print("✅ [DEBUG] BookingConfirmedViewContent appeared with reference: \(reference)")
+                }
+            } else {
+                // Fallback if reference is nil
+                VStack(spacing: 20) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 60))
+                        .foregroundStyle(.orange)
+                    Text("Error: No booking reference")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+                    Button("Close") {
+                        showBookingConfirmed = false
+                    }
+                    .buttonStyle(.bordered)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color(.systemBackground))
+                .onAppear {
+                    print("❌ [DEBUG] ERROR: Showing fallback - bookingReference is nil!")
+                }
+            }
         }
     }
     
@@ -412,11 +462,13 @@ struct VehicleSelectionView: View {
                     
                     if let checkoutUrlString = response.checkoutUrl,
                        let url = URL(string: checkoutUrlString) {
-                        bookingReference = response.quoteReference
+                        // Save the booking reference
+                        let reference = response.quoteReference ?? "UNKNOWN"
+                        bookingReference = reference
                         checkoutUrl = url
                         
                         print("✅ [BOOKING] Booking created successfully!")
-                        print("   • Reference: \(response.quoteReference ?? "N/A")")
+                        print("   • Reference: \(reference)")
                         print("   • Opening checkout URL...")
                     } else {
                         errorMessage = "Booking created but no payment URL was provided"
@@ -444,6 +496,28 @@ struct VehicleSelectionView: View {
             }
         }
     }
+    
+    // MARK: - Debug Testing
+    
+    #if DEBUG
+    /// Test function to simulate a successful booking without actual payment
+    private func testBookingConfirmation() {
+        // Generate a fake booking reference
+        let testReference = "TEST-\(Int.random(in: 1000...9999))-\(Int.random(in: 1000...9999))"
+        
+        print("🧪 [DEBUG] Simulating booking confirmation with reference: \(testReference)")
+        
+        // Set the reference and show confirmation
+        bookingReference = testReference
+        
+        // Small delay to ensure state is set
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            print("🧪 [DEBUG] bookingReference is now: \(self.bookingReference ?? "nil")")
+            print("🧪 [DEBUG] About to show booking confirmed sheet")
+            self.showBookingConfirmed = true
+        }
+    }
+    #endif
     
     private func fetchPricing() async {
         isLoadingPricing = true

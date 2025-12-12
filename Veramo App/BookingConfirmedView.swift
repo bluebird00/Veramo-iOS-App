@@ -14,6 +14,29 @@ struct BookingConfirmedView: View {
     
     var body: some View {
         NavigationStack {
+            BookingConfirmedViewContent(
+                reference: reference,
+                onSeeTrips: {
+                    selectedTab = .trips
+                    dismiss()
+                },
+                onDismiss: {
+                    dismiss()
+                }
+            )
+        }
+    }
+}
+
+// MARK: - Content View (reusable)
+
+struct BookingConfirmedViewContent: View {
+    let reference: String
+    var onSeeTrips: (() -> Void)? = nil
+    var onDismiss: () -> Void
+    
+    var body: some View {
+        NavigationStack {
             VStack(spacing: 32) {
                 Spacer()
                 
@@ -70,27 +93,27 @@ struct BookingConfirmedView: View {
                 
                 // Action Buttons
                 VStack(spacing: 12) {
-                    // Primary Button - See Upcoming Trips
-                    Button {
-                        selectedTab = .trips  // Switch to trips tab
-                        dismiss()
-                    } label: {
-                        Label("See Upcoming Trips", systemImage: "calendar")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(Color.accentColor)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    // Primary Button - See Upcoming Trips (if available)
+                    if let onSeeTrips = onSeeTrips {
+                        Button {
+                            onSeeTrips()
+                        } label: {
+                            Label("See Upcoming Trips", systemImage: "calendar")
+                                .font(.headline)
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Color.accentColor)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
                     }
                     
                     // Secondary Button - Done
                     Button {
-                        dismiss()
+                        onDismiss()
                     } label: {
                         Text("Done")
                             .font(.headline)
-                        
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
                             .background(Color(.systemGray6))
@@ -99,9 +122,15 @@ struct BookingConfirmedView: View {
                 }
             }
             .padding(24)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(.systemBackground))
             .navigationTitle("Success")
             .navigationBarTitleDisplayMode(.inline)
             .interactiveDismissDisabled()  // Prevent accidental dismissal
+            .onAppear {
+                print("📱 [VIEW] BookingConfirmedViewContent body rendered")
+                print("📱 [VIEW] Reference: \(reference)")
+            }
         }
     }
 }

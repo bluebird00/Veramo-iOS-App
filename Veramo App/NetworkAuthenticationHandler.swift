@@ -52,22 +52,28 @@ class NetworkAuthenticationHandler {
     private init() {}
     
     /// Call this method when you receive a 401 response from any API
-    func handleUnauthorizedResponse() {
-        print("⚠️ [AUTH] 401 Unauthorized detected - logging out user")
+    func handleUnauthorizedResponse(endpoint: String? = nil) {
+        let endpointInfo = endpoint.map { " from endpoint: \($0)" } ?? ""
+        print("⚠️ [AUTH] 401 Unauthorized detected\(endpointInfo)")
+        print("   • Time: \(Date())")
+        print("   • Action: Posting userDidBecomeUnauthenticated notification")
+        print("   • Next: App will log out user and show login screen")
         
         // Post a notification that other parts of the app can observe
         // The app will handle the actual logout via the notification observer
         NotificationCenter.default.post(name: .userDidBecomeUnauthenticated, object: nil)
+        
+        print("   ✅ Notification posted successfully")
     }
     
     /// Check response and handle authentication errors automatically
-    func checkResponse(_ response: URLResponse) throws {
+    func checkResponse(_ response: URLResponse, endpoint: String? = nil) throws {
         guard let httpResponse = response as? HTTPURLResponse else {
             return
         }
         
         if httpResponse.statusCode == 401 {
-            handleUnauthorizedResponse()
+            handleUnauthorizedResponse(endpoint: endpoint)
             throw AuthError.unauthorized
         }
     }

@@ -263,11 +263,11 @@ class BookingService {
                 
             case 401:
                 // Session expired
-                print("❌ [BOOKING] Session expired (401)")
+                print("❌ [BOOKING] Session expired (401) - handling via NetworkAuthenticationHandler")
                 print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
                 
-                // Clear stored session
-                AuthenticationManager.shared.logout()
+                // Use centralized authentication handler
+                NetworkAuthenticationHandler.shared.handleUnauthorizedResponse(endpoint: "app-book")
                 
                 throw BookingError.unauthorized
                 
