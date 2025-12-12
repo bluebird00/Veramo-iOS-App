@@ -28,18 +28,17 @@ struct VehicleSelectionView: View {
     
     @Binding var showVehicleSelection: Bool  // To control parent view state
     
-    // Payment and name state
-    @State private var showNameModal = false
-    @State private var showLegalModal = false
-    @State private var firstName: String = ""
-    @State private var lastName: String = ""
-    @State private var email: String = ""
-    @State private var phoneNumber: String = ""
-    @State private var isProcessingPayment = false
-    @State private var paymentUrl: URL?
-    @State private var paymentId: String?
+    // Booking state
+    @State private var isProcessingBooking = false
+    @State private var checkoutUrl: URL?
+    @State private var bookingReference: String?
     @State private var showErrorAlert = false
     @State private var errorMessage: String = ""
+    @State private var showSessionExpiredAlert = false
+    
+    // Optional flight number
+    @State private var flightNumber: String = ""
+    @State private var showFlightNumberInput = false
     
     private let vehicleTypes: [VehicleType] = [
         VehicleType(
@@ -76,30 +75,6 @@ struct VehicleSelectionView: View {
         self.pickupPlaceId = pickupPlaceId
         self.destinationPlaceId = destinationPlaceId
         self._showVehicleSelection = showVehicleSelection
-        
-        // Pre-fill customer data if available
-        if let customer = AuthenticationManager.shared.currentCustomer {
-            _email = State(initialValue: customer.email)
-            
-            // Split name into first and last name
-            let nameComponents = customer.name.components(separatedBy: " ")
-            if nameComponents.count >= 2 {
-                _firstName = State(initialValue: nameComponents.first ?? "")
-                _lastName = State(initialValue: nameComponents.dropFirst().joined(separator: " "))
-            } else {
-                _firstName = State(initialValue: customer.name)
-            }
-            
-            // Pre-fill phone if available from customer or saved preference
-            if let phone = customer.phone {
-                _phoneNumber = State(initialValue: phone)
-            } else if let savedPhone = AuthenticationManager.shared.savedPhoneNumber {
-                _phoneNumber = State(initialValue: savedPhone)
-            }
-        } else if let savedPhone = AuthenticationManager.shared.savedPhoneNumber {
-            // Even if not authenticated, use saved phone
-            _phoneNumber = State(initialValue: savedPhone)
-        }
     }
     
     // Swiss timezone constant
@@ -153,10 +128,10 @@ struct VehicleSelectionView: View {
     
     // Dynamic button text based on selected vehicle
     private var buttonText: String {
-        if isProcessingPayment {
+        if isProcessingBooking {
             return String(localized: "Processing...")
         } else if let vehicle = selectedVehicle {
-            return String(localized: "Select \(vehicle.name)")
+            return String(localized: "Book \(vehicle.name)")
         } else {
             return String(localized: "Select Vehicle")
         }
@@ -227,10 +202,42 @@ struct VehicleSelectionView: View {
             
             Spacer()
             
-            // Select vehicle button
-            Button(action: continueToPayment) {
+            // Optional flight number input
+            if showFlightNumberInput {
                 HStack(spacing: 8) {
-                    if isProcessingPayment {
+                    Image(systemName: "airplane")
+                        .foregroundColor(.gray)
+                        .frame(width: 20)
+                    
+                    TextField("Flight number (optional)", text: $flightNumber)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
+                }
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(.systemGray6))
+                )
+                .padding(.horizontal, 28)
+                .padding(.bottom, 8)
+            } else {
+                Button(action: { showFlightNumberInput = true }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "airplane")
+                            .font(.footnote)
+                        Text("Add flight number")
+                            .font(.footnote)
+                    }
+                    .foregroundColor(.blue)
+                }
+                .padding(.horizontal, 28)
+                .padding(.bottom, 8)
+            }
+            
+            // Book now button
+            Button(action: createBooking) {
+                HStack(spacing: 8) {
+                    if isProcessingBooking {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                     }
@@ -250,10 +257,10 @@ struct VehicleSelectionView: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
-            .disabled(selectedVehicle == nil || isProcessingPayment)
-            .opacity(selectedVehicle != nil && !isProcessingPayment ? 1 : 0.5)
+            .disabled(selectedVehicle == nil || isProcessingBooking)
+            .opacity(selectedVehicle != nil && !isProcessingBooking ? 1 : 0.5)
             .padding(.horizontal, 28)
-            .padding(.top, 32)
+            .padding(.top, 8)
             .padding(.bottom, 5)
         }
         .task {
@@ -271,187 +278,167 @@ struct VehicleSelectionView: View {
                 }
             }
         }
-        .sheet(isPresented: $showNameModal) {
-            nameInputModal
-        }
-        .sheet(isPresented: $showLegalModal) {
-            legalDisclaimerModal
-        }
-        .alert("Payment Failed", isPresented: $showErrorAlert) {
+        .alert("Booking Error", isPresented: $showErrorAlert) {
             Button("OK", role: .cancel) { }
         } message: {
             Text(errorMessage)
         }
+        .alert("Session Expired", isPresented: $showSessionExpiredAlert) {
+            Button("Log In Again", role: .cancel) {
+                // Navigate back and trigger re-authentication
+                showVehicleSelection = false
+            }
+        } message: {
+            Text("Your session has expired. Please log in again to continue.")
+        }
         .fullScreenCover(item: Binding(
-            get: { paymentUrl.map { PaymentURL(url: $0) } },
-            set: { paymentUrl = $0?.url }
-        )) { paymentURL in
-            SafariView(url: paymentURL.url) {
+            get: { checkoutUrl.map { CheckoutURL(url: $0, reference: bookingReference) } },
+            set: { checkoutUrl = $0?.url }
+        )) { checkout in
+            SafariView(url: checkout.url) {
                 // Called when Safari is dismissed
-                // You can add payment status checking here if needed
+                // The booking is confirmed automatically once payment completes
+                print("📱 [BOOKING] Payment browser dismissed")
+                print("📱 [BOOKING] Booking reference: \(checkout.reference ?? "N/A")")
+                
+                // Navigate back to home after payment flow
+                showVehicleSelection = false
             }
             .ignoresSafeArea()
         }
     }
     
-    // Helper struct for identifiable URL
-    private struct PaymentURL: Identifiable {
+    // Helper struct for identifiable URL with reference
+    private struct CheckoutURL: Identifiable {
         let id = UUID()
         let url: URL
+        let reference: String?
     }
     
-    // Name input modal
-    private var nameInputModal: some View {
-        VStack(spacing: 24) {
-            Text("Enter Your Name")
-                .font(.title2)
-                .fontWeight(.bold)
-            
-            VStack(spacing: 0) {
-                HStack(spacing: 0) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "person.fill")
-                            .foregroundColor(.gray)
-                            .frame(width: 20)
-                        
-                        TextField("First", text: $firstName)
-                            .textContentType(.givenName)
-                            .autocorrectionDisabled()
-                    }
-                    
-                    Divider()
-                        .frame(height: 20)
-                        .padding(.horizontal, 8)
-                    
-                    TextField("Last", text: $lastName)
-                        .textContentType(.familyName)
-                        .autocorrectionDisabled()
-                }
-            }
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemGray6))
-            )
-            
-            Button(action: {
-                showNameModal = false
-                showLegalModal = true
-            }) {
-                Text("Continue")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        LinearGradient(
-                            colors: [.black, Color(.darkGray)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(12)
-            }
-            .disabled(firstName.isEmpty || lastName.isEmpty)
-            .opacity(firstName.isEmpty || lastName.isEmpty ? 0.5 : 1)
+    // MARK: - Booking Action
+    
+    private func createBooking() {
+        guard let selectedVehicle = selectedVehicle else {
+            return
         }
-        .padding()
-        .presentationDetents([.height(280)])
-    }
-    
-    // Legal disclaimer modal
-    private var legalDisclaimerModal: some View {
-        VStack(spacing: 24) {
-            Text("Important Information")
-                .font(.title2)
-                .fontWeight(.bold)
-            
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Important information about the transport operator")
-                    .font(.headline)
-                
-                Text("The transportation contract is concluded between you and the independent partner.\n\nVeramo itself is not a transportation service provider and acts solely as an intermediary between you and the independent partner.")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-            }
-            .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(12)
-            
-            Button(action: {
-                showLegalModal = false
-                initiatePayment()
-            }) {
-                Text("Continue")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        LinearGradient(
-                            colors: [.black, Color(.darkGray)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(12)
-            }
-        }
-        .padding()
-        .presentationDetents([.height(400)])
-    }
-    
-    private func continueToPayment() {
-        // Check if we have first and last name
-        if firstName.isEmpty || lastName.isEmpty {
-            showNameModal = true
-        } else {
-            // Show legal disclaimer before payment
-            showLegalModal = true
-        }
-    }
-    
-    private func initiatePayment() {
-        guard let selectedVehicle = selectedVehicle,
-              let priceCents = selectedVehicle.priceCents,
-              let sessionToken = AuthenticationManager.shared.sessionToken else {
-            errorMessage = "Missing payment information"
+        
+        // Validate we have place IDs
+        guard let pickupPlaceId = pickupPlaceId,
+              let destinationPlaceId = destinationPlaceId else {
+            errorMessage = "Location information is missing. Please go back and select locations again."
             showErrorAlert = true
             return
         }
         
-        isProcessingPayment = true
+        // Validate we have a session token
+        guard let sessionToken = AuthenticationManager.shared.sessionToken else {
+            errorMessage = "You are not logged in. Please log in to continue."
+            showErrorAlert = true
+            return
+        }
+        
+        isProcessingBooking = true
         
         Task {
             do {
-                let (paymentId, checkoutUrl) = try await MolliePaymentService.shared.createPayment(
-                    amount: priceCents,
-                    description: "Trip from \(pickup) to \(destination)",
-                    sessionToken: sessionToken,
-                    metadata: [
-                        "pickup": pickup,
-                        "destination": destination,
-                        "date": date.formatted(date: .abbreviated, time: .omitted),
-                        "vehicle": selectedVehicle.name
-                    ]
+                // Combine date and time into a single datetime in Switzerland timezone
+                let swissTimeZone = TimeZone(identifier: "Europe/Zurich")!
+                
+                // IMPORTANT: Extract components in the SWISS timezone, not local device timezone
+                // This ensures the user's selected date/time is interpreted correctly
+                var swissCalendar = Calendar.current
+                swissCalendar.timeZone = swissTimeZone
+                
+                let dateComponents = swissCalendar.dateComponents([.year, .month, .day], from: date)
+                let timeComponents = swissCalendar.dateComponents([.hour, .minute], from: time)
+                
+                var combinedComponents = DateComponents()
+                combinedComponents.year = dateComponents.year
+                combinedComponents.month = dateComponents.month
+                combinedComponents.day = dateComponents.day
+                combinedComponents.hour = timeComponents.hour
+                combinedComponents.minute = timeComponents.minute
+                combinedComponents.second = 0
+                combinedComponents.timeZone = swissTimeZone
+                
+                guard let pickupDateTime = swissCalendar.date(from: combinedComponents) else {
+                    throw BookingError.serverError("Failed to create pickup datetime")
+                }
+                
+                // Debug: Log the datetime details
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+                formatter.timeZone = swissTimeZone
+                let swissTimeString = formatter.string(from: pickupDateTime)
+                
+                formatter.timeZone = TimeZone(identifier: "UTC")
+                let utcTimeString = formatter.string(from: pickupDateTime)
+                
+                let now = Date()
+                let hoursFromNow = pickupDateTime.timeIntervalSince(now) / 3600
+                
+                print("📅 [BOOKING] DateTime Validation:")
+                print("   • Selected date: \(date)")
+                print("   • Selected time: \(time)")
+                print("   • Combined (Swiss): \(swissTimeString)")
+                print("   • Combined (UTC): \(utcTimeString)")
+                print("   • Current time: \(formatter.string(from: now))")
+                print("   • Hours from now: \(String(format: "%.2f", hoursFromNow))")
+                
+                // Validate minimum advance time locally before sending to backend
+                if hoursFromNow < 4 {
+                    throw BookingError.validationError("Booking must be at least 4 hours in the future. Currently \(String(format: "%.1f", hoursFromNow)) hours ahead.")
+                }
+                
+                // Determine vehicle class
+                let vehicleClass = selectedVehicle.name.toVehicleClass
+                
+                // Create booking
+                let response = try await BookingService.shared.createBooking(
+                    pickupPlaceId: pickupPlaceId,
+                    pickupDescription: pickup,
+                    destinationPlaceId: destinationPlaceId,
+                    destinationDescription: destination,
+                    dateTime: pickupDateTime,
+                    passengers: passengers,
+                    vehicleClass: vehicleClass,
+                    flightNumber: flightNumber.isEmpty ? nil : flightNumber,
+                    sessionToken: sessionToken
                 )
                 
                 await MainActor.run {
-                    self.paymentId = paymentId
-                    self.isProcessingPayment = false
+                    isProcessingBooking = false
                     
-                    if let url = URL(string: checkoutUrl) {
-                        self.paymentUrl = url
-                        // Open payment URL (you'll need to add SafariView handling)
+                    if let checkoutUrlString = response.checkoutUrl,
+                       let url = URL(string: checkoutUrlString) {
+                        bookingReference = response.quoteReference
+                        checkoutUrl = url
+                        
+                        print("✅ [BOOKING] Booking created successfully!")
+                        print("   • Reference: \(response.quoteReference ?? "N/A")")
+                        print("   • Opening checkout URL...")
+                    } else {
+                        errorMessage = "Booking created but no payment URL was provided"
+                        showErrorAlert = true
+                    }
+                }
+            } catch let error as BookingError {
+                await MainActor.run {
+                    isProcessingBooking = false
+                    
+                    if case .unauthorized = error {
+                        // Session expired - show special alert
+                        showSessionExpiredAlert = true
+                    } else {
+                        errorMessage = error.localizedDescription
+                        showErrorAlert = true
                     }
                 }
             } catch {
                 await MainActor.run {
-                    self.isProcessingPayment = false
-                    self.errorMessage = error.localizedDescription
-                    self.showErrorAlert = true
+                    isProcessingBooking = false
+                    errorMessage = error.localizedDescription
+                    showErrorAlert = true
                 }
             }
         }
@@ -465,25 +452,22 @@ struct VehicleSelectionView: View {
             // Use Switzerland timezone for the final datetime
             let swissTimeZone = TimeZone(identifier: "Europe/Zurich")!
             
-            // Extract date components using LOCAL calendar (to get what user sees)
-            var localCalendar = Calendar.current
-            localCalendar.timeZone = TimeZone.current
-            
-            let dateComponents = localCalendar.dateComponents([.year, .month, .day], from: date)
-            let timeComponents = localCalendar.dateComponents([.hour, .minute], from: time)
-            
-            // Create combined components in SWITZERLAND timezone
+            // IMPORTANT: Extract date components in SWISS timezone, not local device timezone
+            // This ensures the user's selected date/time is interpreted correctly
             var swissCalendar = Calendar.current
             swissCalendar.timeZone = swissTimeZone
+            
+            let dateComponents = swissCalendar.dateComponents([.year, .month, .day], from: date)
+            let timeComponents = swissCalendar.dateComponents([.hour, .minute], from: time)
             
             var combinedComponents = DateComponents()
             combinedComponents.year = dateComponents.year
             combinedComponents.month = dateComponents.month
             combinedComponents.day = dateComponents.day
-            combinedComponents.hour = timeComponents.hour  // Use the hour/minute user SEES
+            combinedComponents.hour = timeComponents.hour
             combinedComponents.minute = timeComponents.minute
             combinedComponents.second = 0
-            combinedComponents.timeZone = swissTimeZone  // But interpret as Switzerland time
+            combinedComponents.timeZone = swissTimeZone
             
             guard let pickupDatetime = swissCalendar.date(from: combinedComponents) else {
                 throw PricingError.serverError("Failed to create pickup datetime")

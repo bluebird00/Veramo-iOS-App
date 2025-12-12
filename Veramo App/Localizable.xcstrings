@@ -55,6 +55,9 @@
         }
       }
     },
+    "Add flight number" : {
+
+    },
     "Are you sure you want to logout?" : {
       "localizations" : {
         "de" : {
@@ -96,6 +99,9 @@
         }
       }
     },
+    "Book %@" : {
+
+    },
     "Book a Ride" : {
       "localizations" : {
         "de" : {
@@ -105,6 +111,9 @@
           }
         }
       }
+    },
+    "Book Now" : {
+
     },
     "Book your first ride to see it here" : {
       "localizations" : {
@@ -125,6 +134,9 @@
           }
         }
       }
+    },
+    "Booking Error" : {
+
     },
     "Booking Overview" : {
       "extractionState" : "stale",
@@ -326,6 +338,7 @@
 
     },
     "Enter Your Name" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -382,6 +395,9 @@
     "First" : {
 
     },
+    "Flight number (optional)" : {
+
+    },
     "Flight: %@" : {
 
     },
@@ -436,6 +452,7 @@
       }
     },
     "Important Information" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -446,6 +463,7 @@
       }
     },
     "Important information about the transport operator" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -487,6 +505,9 @@
           }
         }
       }
+    },
+    "Log In Again" : {
+
     },
     "Log Out" : {
       "localizations" : {
@@ -582,6 +603,7 @@
       }
     },
     "Payment Failed" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -718,6 +740,7 @@
       }
     },
     "Select %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -770,6 +793,9 @@
         }
       }
     },
+    "Session Expired" : {
+
+    },
     "Skip" : {
       "localizations" : {
         "de" : {
@@ -810,6 +836,7 @@
 
     },
     "The transportation contract is concluded between you and the independent partner.\n\nVeramo itself is not a transportation service provider and acts solely as an intermediary between you and the independent partner." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -958,6 +985,9 @@
           }
         }
       }
+    },
+    "Your session has expired. Please log in again to continue." : {
+
     },
     "Your trip request has been submitted successfully." : {
 

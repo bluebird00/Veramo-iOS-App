@@ -4,20 +4,26 @@
 //
 //  Created by rentamac on 12/9/25.
 //
+//  Country code selection for phone number input during SMS authentication.
+//  Includes comprehensive list of countries with their dial codes and flag emojis.
+//
 
 import Foundation
 
+/// Represents a country with its dial code and flag emoji
 struct CountryCode: Identifiable, Hashable {
     let id = UUID()
-    let country: String
-    let code: String
-    let dialCode: String
-    let flag: String
+    let country: String     // Full country name (e.g., "Switzerland")
+    let code: String        // ISO country code (e.g., "CH")
+    let dialCode: String    // Phone dial code (e.g., "+41")
+    let flag: String        // Flag emoji (e.g., "🇨🇭")
     
+    /// Display name with flag and country (e.g., "🇨🇭 Switzerland")
     var displayName: String {
         "\(flag) \(country)"
     }
     
+    /// Full display with dial code (e.g., "🇨🇭 Switzerland (+41)")
     var fullDisplay: String {
         "\(flag) \(country) (\(dialCode))"
     }
