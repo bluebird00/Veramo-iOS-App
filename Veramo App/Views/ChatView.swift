@@ -178,17 +178,17 @@ struct ChatView: View {
                     // Now connect the new user
                     await fetchAndConnectUser(customer: customer, sessionToken: sessionToken)
                 }
-            } else if !chatManager.isConnected && currentChatUserId == nil {
-                // Only connect if not currently connected AND no user is set
-                // This prevents duplicate connections on tab switches
-                print("🔌 [CHAT] No connection exists, initiating connection...")
+            } else if chatManager.isConnected && currentChatUserId == newUserId {
+                // Already connected as the correct user, nothing to do
+                print("✅ [CHAT] Already connected as correct user: \(newUserId)")
+            } else if !chatManager.isConnected {
+                // Not connected (regardless of whether userId is set), so connect
+                print("🔌 [CHAT] Not connected, initiating connection...")
                 Task {
                     await fetchAndConnectUser(customer: customer, sessionToken: sessionToken)
                 }
-            } else if chatManager.isConnected && currentChatUserId == newUserId {
-                print("✅ [CHAT] Already connected as correct user: \(newUserId)")
             } else {
-                print("⏳ [CHAT] Connection in progress or waiting, skipping...")
+                print("⏳ [CHAT] Unexpected state - currentUserId: \(currentChatUserId ?? "nil"), isConnected: \(chatManager.isConnected)")
             }
         }
     }

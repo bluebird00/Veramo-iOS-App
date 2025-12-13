@@ -21,6 +21,7 @@ struct Veramo_AppApp: App {
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var hasSeenWelcome = AuthenticationManager.shared.hasSeenWelcome
+    @State private var welcomeScreenOpacity: Double = 1.0
     
     init() {
         // Debug: Log initial state
@@ -73,19 +74,13 @@ struct Veramo_AppApp: App {
                 // 2. User is NOT authenticated
                 if shouldShowWelcome {
                     WelcomeScreen(hasSeenWelcome: $hasSeenWelcome)
-                        .transition(.opacity)
+                        .opacity(welcomeScreenOpacity)
                         .zIndex(1)
                         .onAppear {
                             print("⚠️ Welcome screen IS showing!")
                             print("   hasSeenWelcome: \(hasSeenWelcome)")
                             print("   appState.isAuthenticated: \(appState.isAuthenticated)")
                         }
-                } else {
-                    Color.clear.onAppear {
-                        print("✅ Welcome screen NOT showing")
-                        print("   hasSeenWelcome: \(hasSeenWelcome)")
-                        print("   appState.isAuthenticated: \(appState.isAuthenticated)")
-                    }
                 }
                 
                
@@ -93,8 +88,27 @@ struct Veramo_AppApp: App {
             .onChange(of: hasSeenWelcome) { oldValue, newValue in
                 // Save the preference when it changes
                 print("👀 hasSeenWelcome changed from \(oldValue) to \(newValue)")
-                AuthenticationManager.shared.hasSeenWelcome = newValue
-                print("💾 Saved to UserDefaults: \(AuthenticationManager.shared.hasSeenWelcome)")
+                
+                if newValue {
+                    // Animate the welcome screen out
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        welcomeScreenOpacity = 0
+                    }
+                    
+                    // Remove it after animation completes
+                    Task {
+                        try? await Task.sleep(for: .milliseconds(300))
+                        await MainActor.run {
+                            AuthenticationManager.shared.hasSeenWelcome = newValue
+                            print("💾 Saved to UserDefaults: \(AuthenticationManager.shared.hasSeenWelcome)")
+                        }
+                    }
+                } else {
+                    // Show welcome screen immediately
+                    welcomeScreenOpacity = 1.0
+                    AuthenticationManager.shared.hasSeenWelcome = newValue
+                    print("💾 Saved to UserDefaults: \(AuthenticationManager.shared.hasSeenWelcome)")
+                }
             }
             .onOpenURL { url in
                 print("📨 onOpenURL triggered with: \(url)")

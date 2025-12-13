@@ -20,7 +20,9 @@ struct VehicleOptionCard: View {
                         .aspectRatio(contentMode: .fit)
                 }
             }
-            .frame(width: 90, height: 90)
+            .frame(width: 90, height: 70)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
             
             // Right side: Two rows of content
             VStack(alignment: .leading, spacing: 8) {
@@ -64,7 +66,7 @@ struct VehicleOptionCard: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(isSelected ? Color.black : Color.gray.opacity(0.3), lineWidth: isSelected ? 3 : 1)
+                .stroke(isSelected ? Color.primary : Color.gray.opacity(0.3), lineWidth: isSelected ? 3 : 1)
         )
         .contentShape(Rectangle())
         .onTapGesture {

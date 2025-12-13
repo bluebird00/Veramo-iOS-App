@@ -662,13 +662,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Geben Sie Ihre Nummer ein um fortzufahren"
+            "value" : "Geben Sie Ihre Nummer ein, um Fahrten zu buchen und zu verwalten"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enter your phone number to continue"
+            "value" : "Enter your phone number to book and manage trips"
           }
         }
       }
@@ -865,7 +865,14 @@
       }
     },
     "Loading suggestions..." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorschläge werden geladen"
+          }
+        }
+      }
     },
     "Loading your trips..." : {
       "localizations" : {
@@ -1924,23 +1931,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unable to Verify Status"
-          }
-        }
-      }
-    },
-    "Up to %lld passengers" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bis zu %lld Passagiere"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Up to %lld passengers"
           }
         }
       }

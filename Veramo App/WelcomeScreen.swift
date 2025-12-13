@@ -95,9 +95,8 @@ struct WelcomeScreen: View {
                                 currentPage += 1
                             }
                         } else {
-                            withAnimation {
-                                hasSeenWelcome = true
-                            }
+                            // No animation wrapper - prevents animation bleed to HomeView
+                            hasSeenWelcome = true
                         }
                     }) {
                         HStack(spacing: 12) {
@@ -125,9 +124,8 @@ struct WelcomeScreen: View {
                     // Skip button
                     if currentPage < pages.count - 1 {
                         Button {
-                            withAnimation {
-                                hasSeenWelcome = true
-                            }
+                            // No animation wrapper - prevents animation bleed to HomeView
+                            hasSeenWelcome = true
                         } label: {
                             // TRANSLATE: Button to skip the welcome/onboarding screens
                             Text("welcome.button.skip", comment: "Button to skip onboarding and go directly to the app")
