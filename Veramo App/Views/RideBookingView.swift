@@ -63,6 +63,12 @@ struct RideBookingView: View {
     @State private var lastFocusedField: Field? = nil
     @State private var isDragging: Bool = false
     
+    // Location suggestions state
+    @State private var pickupSuggestions: [LocationSuggestion] = []
+    @State private var destinationSuggestions: [LocationSuggestion] = []
+    @State private var isLoadingPickupSuggestions = false
+    @State private var isLoadingDestinationSuggestions = false
+    
     enum Field {
         case pickup
         case destination
@@ -87,6 +93,11 @@ struct RideBookingView: View {
         .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .tabBar)
             .onAppear {
+                // Preload pickup suggestions so they're ready immediately
+                Task {
+                    await preloadPickupSuggestions()
+                }
+                
                 if autoFocusPickup {
                     // Small delay to ensure view is fully loaded
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -98,6 +109,11 @@ struct RideBookingView: View {
                 // Track the last focused field
                 if let newValue = newValue {
                     lastFocusedField = newValue
+                    
+                    // Load suggestions when field gains focus
+                    Task {
+                        await loadSuggestionsForField(newValue)
+                    }
                 }
                 
                 // Only reset sheet offset if not currently dragging
@@ -286,12 +302,12 @@ struct RideBookingView: View {
                 .padding(.bottom, 8)
             
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: 16) {
                     locationInputsView
                     dateTimePickersView
                     searchButtonView
                 }
-                .padding(.top, 16)
+                .padding(.top, 8)
                 .padding(.bottom, 20)
             }
             .scrollDismissesKeyboard(.interactively)
@@ -327,103 +343,177 @@ struct RideBookingView: View {
     }
     
     private var pickupLocationField: some View {
-        AutocompleteLocationField(
-            icon: "circle.fill",
-            iconColor: .black,
-            placeholder: "Pickup location",
-            text: $pickupLocation,
-            placesService: pickupPlacesService,
-            isFocused: focusedField == .pickup,
-            onFocus: { focusedField = .pickup },
-            onSelect: { suggestion in
-                pickupLocation = suggestion.fullText
-                pickupLocationEnglish = suggestion.fullTextEnglish
-                pickupPlaceId = suggestion.placeId
-                pickupPlacesService.clearSuggestions()
-                
-                // Only auto-focus destination if it's empty
-                if destination.isEmpty {
-                    focusedField = .destination
-                } else {
-                    focusedField = nil
+        VStack(alignment: .leading, spacing: 0) {
+            AutocompleteLocationField(
+                icon: "circle.fill",
+                iconColor: .black,
+                placeholder: "Pickup location",
+                text: $pickupLocation,
+                placesService: pickupPlacesService,
+                isFocused: focusedField == .pickup,
+                onFocus: { focusedField = .pickup },
+                onSelect: { suggestion in
+                    pickupLocation = suggestion.fullText
+                    pickupLocationEnglish = suggestion.fullTextEnglish
+                    pickupPlaceId = suggestion.placeId
+                    pickupPlacesService.clearSuggestions()
+                    pickupSuggestions = [] // Clear suggestions after selection
+                    
+                    // Only auto-focus destination if it's empty
+                    if destination.isEmpty {
+                        focusedField = .destination
+                    } else {
+                        focusedField = nil
+                    }
+                    
+                    // Geocode and update map
+                    geocodeLocation(suggestion.fullText) { coordinate in
+                        pickupCoordinate = coordinate
+                        updateMapCamera()
+                        
+                        // Recalculate route if destination already exists
+                        if destinationCoordinate != nil {
+                            calculateRoute()
+                        }
+                    }
+                }
+            )
+            .focused($focusedField, equals: .pickup)
+            .onChange(of: pickupLocation) { oldValue, newValue in
+                // Clear suggestions when user starts typing
+                if !newValue.isEmpty && newValue != oldValue {
+                    pickupSuggestions = []
                 }
                 
-                // Geocode and update map
-                geocodeLocation(suggestion.fullText) { coordinate in
-                    pickupCoordinate = coordinate
-                    updateMapCamera()
+                // If pickup is cleared, reset its coordinate and route
+                if newValue.isEmpty {
+                    pickupCoordinate = nil
+                    pickupLocationEnglish = ""
+                    pickupPlaceId = nil
+                    route = nil
+                    animatedMarkerCoordinate = nil
+                    animationProgress = 0.0
+                    animationTimer?.invalidate()
+                    animationTimer = nil
+                    markerOpacity = 1.0
+                    pickupSuggestions = []
                     
-                    // Recalculate route if destination already exists
+                    // If destination still exists, zoom to it
                     if destinationCoordinate != nil {
-                        calculateRoute()
+                        updateMapCamera()
                     }
                 }
             }
-        )
-        .focused($focusedField, equals: .pickup)
-        .onChange(of: pickupLocation) { oldValue, newValue in
-            // If pickup is cleared, reset its coordinate and route
-            if newValue.isEmpty {
-                pickupCoordinate = nil
-                pickupLocationEnglish = ""
-                pickupPlaceId = nil
-                route = nil
-                animatedMarkerCoordinate = nil
-                animationProgress = 0.0
-                animationTimer?.invalidate()
-                animationTimer = nil
-                markerOpacity = 1.0
-                
-                // If destination still exists, zoom to it
-                if destinationCoordinate != nil {
-                    updateMapCamera()
-                }
+            
+            // Show location suggestions if available and field is focused and text is empty
+            if focusedField == .pickup && pickupLocation.isEmpty && !pickupSuggestions.isEmpty {
+                suggestionsList(
+                    suggestions: pickupSuggestions,
+                    isLoading: isLoadingPickupSuggestions,
+                    onSelect: { suggestion in
+                        pickupLocation = suggestion.description
+                        pickupLocationEnglish = suggestion.description // Use same for now
+                        pickupPlaceId = suggestion.placeId
+                        pickupSuggestions = []
+                        
+                        // Only auto-focus destination if it's empty
+                        if destination.isEmpty {
+                            focusedField = .destination
+                        } else {
+                            focusedField = nil
+                        }
+                        
+                        // Geocode and update map
+                        geocodeLocation(suggestion.description) { coordinate in
+                            pickupCoordinate = coordinate
+                            updateMapCamera()
+                            
+                            // Recalculate route if destination already exists
+                            if destinationCoordinate != nil {
+                                calculateRoute()
+                            }
+                        }
+                    }
+                )
+                .padding(.top, 8)
             }
         }
     }
     
     private var destinationLocationField: some View {
-        AutocompleteLocationField(
-            icon: "circle.fill",
-            iconColor: .black,
-            placeholder: "Destination",
-            text: $destination,
-            placesService: destinationPlacesService,
-            isFocused: focusedField == .destination,
-            onFocus: { focusedField = .destination },
-            onSelect: { suggestion in
-                destination = suggestion.fullText
-                destinationEnglish = suggestion.fullTextEnglish
-                destinationPlaceId = suggestion.placeId
-                destinationPlacesService.clearSuggestions()
-                focusedField = nil
+        VStack(alignment: .leading, spacing: 0) {
+            AutocompleteLocationField(
+                icon: "circle.fill",
+                iconColor: .black,
+                placeholder: "Destination",
+                text: $destination,
+                placesService: destinationPlacesService,
+                isFocused: focusedField == .destination,
+                onFocus: { focusedField = .destination },
+                onSelect: { suggestion in
+                    destination = suggestion.fullText
+                    destinationEnglish = suggestion.fullTextEnglish
+                    destinationPlaceId = suggestion.placeId
+                    destinationPlacesService.clearSuggestions()
+                    destinationSuggestions = [] // Clear suggestions after selection
+                    focusedField = nil
+                    
+                    // Geocode and calculate route
+                    geocodeLocation(suggestion.fullText) { coordinate in
+                        destinationCoordinate = coordinate
+                        updateMapCamera()
+                        calculateRoute()
+                    }
+                }
+            )
+            .focused($focusedField, equals: .destination)
+            .onChange(of: destination) { oldValue, newValue in
+                // Clear suggestions when user starts typing
+                if !newValue.isEmpty && newValue != oldValue {
+                    destinationSuggestions = []
+                }
                 
-                // Geocode and calculate route
-                geocodeLocation(suggestion.fullText) { coordinate in
-                    destinationCoordinate = coordinate
-                    updateMapCamera()
-                    calculateRoute()
+                // If destination is cleared, reset its coordinate and route
+                if newValue.isEmpty {
+                    destinationCoordinate = nil
+                    destinationEnglish = ""
+                    destinationPlaceId = nil
+                    route = nil
+                    animatedMarkerCoordinate = nil
+                    animationProgress = 0.0
+                    animationTimer?.invalidate()
+                    animationTimer = nil
+                    markerOpacity = 1.0
+                    destinationSuggestions = []
+                    
+                    // If pickup still exists, zoom to it
+                    if pickupCoordinate != nil {
+                        updateMapCamera()
+                    }
                 }
             }
-        )
-        .focused($focusedField, equals: .destination)
-        .onChange(of: destination) { oldValue, newValue in
-            // If destination is cleared, reset its coordinate and route
-            if newValue.isEmpty {
-                destinationCoordinate = nil
-                destinationEnglish = ""
-                destinationPlaceId = nil
-                route = nil
-                animatedMarkerCoordinate = nil
-                animationProgress = 0.0
-                animationTimer?.invalidate()
-                animationTimer = nil
-                markerOpacity = 1.0
-                
-                // If pickup still exists, zoom to it
-                if pickupCoordinate != nil {
-                    updateMapCamera()
-                }
+            
+            // Show location suggestions if available and field is focused and text is empty
+            if focusedField == .destination && destination.isEmpty && !destinationSuggestions.isEmpty {
+                suggestionsList(
+                    suggestions: destinationSuggestions,
+                    isLoading: isLoadingDestinationSuggestions,
+                    onSelect: { suggestion in
+                        destination = suggestion.description
+                        destinationEnglish = suggestion.description // Use same for now
+                        destinationPlaceId = suggestion.placeId
+                        destinationSuggestions = []
+                        focusedField = nil
+                        
+                        // Geocode and calculate route
+                        geocodeLocation(suggestion.description) { coordinate in
+                            destinationCoordinate = coordinate
+                            updateMapCamera()
+                            calculateRoute()
+                        }
+                    }
+                )
+                .padding(.top, 8)
             }
         }
     }
@@ -858,6 +948,135 @@ struct RideBookingView: View {
         if let timer = animationTimer {
             RunLoop.current.add(timer, forMode: .common)
         }
+    }
+    
+    // MARK: - Location Suggestions
+    
+    /// Preload pickup suggestions on view appear
+    private func preloadPickupSuggestions() async {
+        // Don't load if pickup already has content
+        guard pickupLocation.isEmpty else { return }
+        
+        do {
+            let suggestions = try await LocationSuggestionsService.shared.fetchPickupSuggestions()
+            await MainActor.run {
+                // Only set suggestions if pickup is still empty
+                if pickupLocation.isEmpty {
+                    pickupSuggestions = suggestions
+                    print("✅ Preloaded \(suggestions.count) pickup suggestions")
+                }
+            }
+        } catch {
+            // Silently fail - not critical
+            print("⚠️ Failed to preload pickup suggestions: \(error)")
+        }
+    }
+    
+    /// Load suggestions when a field gains focus
+    private func loadSuggestionsForField(_ field: Field) async {
+        switch field {
+        case .pickup:
+            // Only load suggestions if pickup field is empty
+            guard pickupLocation.isEmpty else { return }
+            
+            isLoadingPickupSuggestions = true
+            do {
+                let suggestions = try await LocationSuggestionsService.shared.fetchPickupSuggestions()
+                await MainActor.run {
+                    pickupSuggestions = suggestions
+                    isLoadingPickupSuggestions = false
+                }
+            } catch LocationSuggestionsError.unauthorized {
+                // Session expired - handle re-authentication
+                print("⚠️ Session expired while fetching pickup suggestions")
+                await MainActor.run {
+                    isLoadingPickupSuggestions = false
+                }
+            } catch {
+                // Silently fail - user can type normally
+                print("⚠️ Failed to load pickup suggestions: \(error)")
+                await MainActor.run {
+                    isLoadingPickupSuggestions = false
+                }
+            }
+            
+        case .destination:
+            // Only load suggestions if destination field is empty
+            guard destination.isEmpty else { return }
+            
+            isLoadingDestinationSuggestions = true
+            do {
+                // Pass pickup place_id if available for paired suggestions
+                let suggestions = try await LocationSuggestionsService.shared.fetchDestinationSuggestions(
+                    pickupPlaceId: pickupPlaceId
+                )
+                await MainActor.run {
+                    destinationSuggestions = suggestions
+                    isLoadingDestinationSuggestions = false
+                }
+            } catch LocationSuggestionsError.unauthorized {
+                // Session expired - handle re-authentication
+                print("⚠️ Session expired while fetching destination suggestions")
+                await MainActor.run {
+                    isLoadingDestinationSuggestions = false
+                }
+            } catch {
+                // Silently fail - user can type normally
+                print("⚠️ Failed to load destination suggestions: \(error)")
+                await MainActor.run {
+                    isLoadingDestinationSuggestions = false
+                }
+            }
+        }
+    }
+    
+    /// View component for displaying location suggestions
+    @ViewBuilder
+    private func suggestionsList(
+        suggestions: [LocationSuggestion],
+        isLoading: Bool,
+        onSelect: @escaping (LocationSuggestion) -> Void
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if isLoading {
+                HStack {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                    Text("Loading suggestions...")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 12)
+                .padding(.horizontal, 20)
+            } else {
+                ForEach(Array(suggestions.prefix(3))) { suggestion in
+                    Button(action: { onSelect(suggestion) }) {
+                        HStack(spacing: 12) {
+                            Text(suggestion.description)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.primary)
+                                .lineLimit(2)
+                                .multilineTextAlignment(.leading)
+                            
+                            Spacer()
+                        }
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 20)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    if suggestion.id != suggestions.prefix(3).last?.id {
+                        Divider()
+                    }
+                }
+            }
+        }
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
+        .padding(.horizontal, 8)
     }
 }
 
