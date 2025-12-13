@@ -12,6 +12,7 @@ import StreamChatSwiftUI
 // MARK: - Notification Names
 extension Notification.Name {
     static let paymentReturnDetected = Notification.Name("paymentReturnDetected")
+    static let resetWelcomeScreen = Notification.Name("resetWelcomeScreen")
 }
 
 @main
@@ -31,19 +32,9 @@ struct Veramo_AppApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                // Main app content
-                Group {
-                    if appState.isAuthenticated {
-                        MainTabView()
-                            .environment(appState)
-                            .id("authenticated-\(appState.isAuthenticated)")
-                    } else {
-                        SMSLoginView()
-                            .environment(appState)
-                            .id("login-\(appState.isAuthenticated)")
-                    }
-                }
-                .animation(.easeInOut, value: appState.isAuthenticated)
+                // Main app content - always show MainTabView (browsing allowed without auth)
+                MainTabView()
+                    .environment(appState)
                 .alert("Authentication Error", isPresented: $showError) {
                     Button("OK", role: .cancel) {
                         // Force view refresh after alert dismissal
@@ -67,12 +58,21 @@ struct Veramo_AppApp: App {
                         print("🔄 Forcing view refresh after logout")
                     }
                 }
+                .onReceive(NotificationCenter.default.publisher(for: .resetWelcomeScreen)) { _ in
+                    // Handle welcome screen reset notification (DEBUG only)
+                    print("🔔 Received resetWelcomeScreen notification")
+                    Task { @MainActor in
+                        hasSeenWelcome = false
+                        AuthenticationManager.shared.hasSeenWelcome = false
+                        print("🔄 DEBUG: Reset hasSeenWelcome to false")
+                    }
+                }
                 
                 // Welcome screen overlay - only show if BOTH conditions are true:
                 // 1. User hasn't seen welcome before
                 // 2. User is NOT authenticated
                 if shouldShowWelcome {
-                    WelcomeScreenAlternate(hasSeenWelcome: $hasSeenWelcome)
+                    WelcomeScreen(hasSeenWelcome: $hasSeenWelcome)
                         .transition(.opacity)
                         .zIndex(1)
                         .onAppear {
@@ -111,9 +111,10 @@ struct Veramo_AppApp: App {
     }
     
     // Computed property to determine if welcome screen should show
+    // Only show on first launch, regardless of auth status (users can browse without auth)
     private var shouldShowWelcome: Bool {
-        let show = !hasSeenWelcome && !appState.isAuthenticated
-        print("🤔 Checking shouldShowWelcome: \(show) (hasSeenWelcome: \(hasSeenWelcome), isAuth: \(appState.isAuthenticated))")
+        let show = !hasSeenWelcome
+        print("🤔 Checking shouldShowWelcome: \(show) (hasSeenWelcome: \(hasSeenWelcome))")
         return show
     }
     

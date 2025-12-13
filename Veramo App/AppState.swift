@@ -18,7 +18,9 @@ class AppState {
     }
     
     func login() {
-        isAuthenticated = true
+        // Refresh authentication state from persistent storage
+        isAuthenticated = AuthenticationManager.shared.isAuthenticated
+        print("🔐 [AppState] login() called - isAuthenticated refreshed: \(isAuthenticated)")
     }
     
     func logout() {

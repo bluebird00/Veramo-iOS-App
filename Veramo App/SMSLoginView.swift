@@ -10,6 +10,7 @@ import Combine
 
 struct SMSLoginView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedCountry = CountryCodeData.shared.getDefaultCountryCode()
     @State private var phoneNumber: String = ""
     @State private var verificationCode: String = ""
@@ -43,11 +44,9 @@ struct SMSLoginView: View {
             
             // Logo/Header
             VStack(spacing: 16) {
-                Image(systemName: "car.fill")
-                    .font(.system(size: 60))
-                    .foregroundColor(.black)
                 
-                Text("Welcome to Veramo")
+                
+                Text("Veramo")
                     .font(.title)
                     .fontWeight(.bold)
                 
@@ -214,16 +213,17 @@ struct SMSLoginView: View {
         Task {
             do {
                 print("🔑 [UI] Calling verifySMSCode API...")
-                let (customer, sessionToken) = try await VeramoAuthService.shared.verifySMSCode(
+                let (customer, sessionToken, isNewUser) = try await VeramoAuthService.shared.verifySMSCode(
                     phone: fullPhoneNumber,
                     code: verificationCode
                 )
                 
                 await MainActor.run {
                     print("✅ [UI] Successfully authenticated via SMS!")
-                    print("✅ [UI] Customer name: \(customer.name)")
+                    print("✅ [UI] Customer name: \(customer.name ?? "nil")")
                     print("✅ [UI] Customer ID: \(customer.id)")
-                    print("✅ [UI] Customer email: \(customer.email)")
+                    print("✅ [UI] Customer email: \(customer.email ?? "nil")")
+                    print("✅ [UI] Is new user: \(isNewUser)")
                     print("✅ [UI] Session token received: \(String(sessionToken.prefix(20)))...")
                     
                     // Save authentication
@@ -241,8 +241,23 @@ struct SMSLoginView: View {
                     print("🎬 [UI] Calling appState.login()...")
                     appState.login()
                     
+                    // TODO: If isNewUser is true, you may want to prompt the user to complete their profile
+                    // For example, you could navigate to a profile completion screen or show an alert
+                    if isNewUser {
+                        print("🆕 [UI] New user detected - consider prompting to complete profile")
+                        // Example: Navigate to profile completion screen
+                        // appState.showProfileCompletion = true
+                    }
+                    
                     print("🎉 [UI] Authentication complete! User logged in.")
                     isLoading = false
+                    
+                    // Give state a moment to propagate before dismissing
+                    Task {
+                        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+                        // Dismiss the login sheet to return to previous screen
+                        dismiss()
+                    }
                 }
             } catch {
                 await MainActor.run {

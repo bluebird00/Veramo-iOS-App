@@ -12,18 +12,26 @@ import StreamChatSwiftUI
 
 struct ChatView: View {
     @StateObject private var chatManager = ChatManager.shared
+    @State private var showLoginSheet = false
+    @Environment(AppState.self) private var appState
     
     var body: some View {
         NavigationStack {
             Group {
-                if chatManager.isConnected, let chatClient = chatManager.chatClient {
+                if !AuthenticationManager.shared.isAuthenticated {
+                    // Show unauthenticated state
+                    unauthenticatedView
+                } else if chatManager.isConnected, let chatClient = chatManager.chatClient {
                     // Show chat interface
                     SimpleChatInterfaceView(chatClient: chatClient)
                 } else if let error = chatManager.connectionError {
                     // Show error state
                     errorView(error: error)
+                } else if chatManager.isConnecting {
+                    // Show connecting state
+                    loadingView
                 } else {
-                    // Show loading state
+                    // Show loading state (fetching token)
                     loadingView
                 }
             }
@@ -36,8 +44,76 @@ struct ChatView: View {
                 }
             }
         }
+        .sheet(isPresented: $showLoginSheet) {
+            SMSLoginView()
+        }
         .onAppear {
             connectUserIfNeeded()
+        }
+        .onChange(of: appState.isAuthenticated) { _, isAuthenticated in
+            if isAuthenticated {
+                // User just logged in, try to connect to chat
+                connectUserIfNeeded()
+            } else {
+                // User logged out, disconnect and reset chat
+                Task {
+                    await chatManager.resetAndClearData()
+                }
+            }
+        }
+    }
+    
+    private var unauthenticatedView: some View {
+        VStack(spacing: 24) {
+            Spacer()
+            
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(Color(.systemGray6))
+                    .frame(width: 100, height: 100)
+                
+                Image(systemName: "message.fill")
+                    .font(.system(size: 40))
+                    .foregroundColor(.black)
+            }
+            
+            // Title and description
+            VStack(spacing: 12) {
+                Text("Chat with Customer Support")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .multilineTextAlignment(.center)
+                
+                Text("chat.login.message", comment: "Message prompting users to log in before accessing customer support chat")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+            }
+            
+            // Login button
+            Button {
+                showLoginSheet = true
+            } label: {
+                Text("Log In")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 12)
+                    .background(
+                        LinearGradient(
+                            colors: [.black, Color(.darkGray)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(10)
+            }
+            .padding(.top, 32)
+            
+            Spacer()
         }
     }
     
@@ -75,36 +151,64 @@ struct ChatView: View {
     }
     
     private func connectUserIfNeeded() {
-        guard !chatManager.isConnected else { return }
+        // Don't attempt connection if not authenticated
+        guard AuthenticationManager.shared.isAuthenticated else {
+            return
+        }
+        
+        // Don't attempt if already connecting
+        guard !chatManager.isConnecting else {
+            print("⏳ [CHAT VIEW] Connection already in progress, skipping...")
+            return
+        }
         
         // Try to connect with authenticated customer
         if let customer = AuthenticationManager.shared.currentCustomer,
            let sessionToken = AuthenticationManager.shared.sessionToken {
             
-            // Fetch Stream token from backend
-            Task {
-                do {
-                    let streamToken = try await StreamChatTokenService.shared.fetchStreamToken(
-                        customerId: customer.id,
-                        sessionToken: sessionToken
-                    )
-                    
-                    // Connect with proper authentication
-                    await MainActor.run {
-                        chatManager.connectUser(customer: customer, token: streamToken)
-                    }
-                } catch {
-                    
-                    
-                    // Show error
-                    await MainActor.run {
-                        chatManager.connectionError = "Failed to connect to chat. Please try again."
-                    }
+            let currentChatUserId = chatManager.chatClient?.currentUserId
+            let newUserId = "customer-\(customer.id)"
+            
+            // Check if we're trying to connect a different user
+            if currentChatUserId != nil && currentChatUserId != newUserId {
+                print("⚠️ [CHAT] Detected user change from \(currentChatUserId ?? "nil") to \(newUserId)")
+                // Disconnect the old user and reset
+                Task {
+                    await chatManager.resetAndClearData()
+                    // Now connect the new user
+                    await fetchAndConnectUser(customer: customer, sessionToken: sessionToken)
                 }
+            } else if !chatManager.isConnected && currentChatUserId == nil {
+                // Only connect if not currently connected AND no user is set
+                // This prevents duplicate connections on tab switches
+                print("🔌 [CHAT] No connection exists, initiating connection...")
+                Task {
+                    await fetchAndConnectUser(customer: customer, sessionToken: sessionToken)
+                }
+            } else if chatManager.isConnected && currentChatUserId == newUserId {
+                print("✅ [CHAT] Already connected as correct user: \(newUserId)")
+            } else {
+                print("⏳ [CHAT] Connection in progress or waiting, skipping...")
             }
-        } else {
-            // No authenticated customer - show error
-            chatManager.connectionError = "Please log in to use chat"
+        }
+    }
+    
+    private func fetchAndConnectUser(customer: AuthenticatedCustomer, sessionToken: String) async {
+        do {
+            let streamToken = try await StreamChatTokenService.shared.fetchStreamToken(
+                customerId: customer.id,
+                sessionToken: sessionToken
+            )
+            
+            // Connect with proper authentication
+            await MainActor.run {
+                chatManager.connectUser(customer: customer, token: streamToken)
+            }
+        } catch {
+            // Show error
+            await MainActor.run {
+                chatManager.connectionError = "Failed to connect to chat. Please try again."
+            }
         }
     }
 }
@@ -342,11 +446,7 @@ class CustomChannelViewModel: ObservableObject {
             channelController?.synchronize { [weak self] syncError in
                 DispatchQueue.main.async {
                     self?.isLoading = false
-                    if let syncError = syncError {
-                        self?.error = "Unable to connect to support chat. Please try again later."
-                    } else {
-                        self?.loadMessages()
-                    }
+                   
                 }
             }
         } catch {
@@ -370,8 +470,7 @@ class CustomChannelViewModel: ObservableObject {
         messageText = ""
         
         channelController?.createNewMessage(text: text) { result in
-            if case .failure(let error) = result {
-            }
+            
         }
     }
 }
@@ -385,4 +484,5 @@ extension CustomChannelViewModel: ChatChannelControllerDelegate {
 
 #Preview {
     ChatView()
+        .environment(AppState())
 }

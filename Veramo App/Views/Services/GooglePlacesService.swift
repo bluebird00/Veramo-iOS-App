@@ -164,4 +164,49 @@ class GooglePlacesService: ObservableObject {
         suggestions = []
         cancellable?.cancel()
     }
+    
+    // MARK: - Place Details
+    
+    struct PlaceDetails: Codable {
+        let location: Location
+        
+        struct Location: Codable {
+            let latitude: Double
+            let longitude: Double
+        }
+    }
+    
+    func fetchPlaceDetails(placeId: String) async throws -> PlaceDetails {
+        guard let url = URL(string: "https://places.googleapis.com/v1/places/\(placeId)") else {
+            throw URLError(.badURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue(apiKey, forHTTPHeaderField: "X-Goog-Api-Key")
+        request.setValue("location", forHTTPHeaderField: "X-Goog-FieldMask")
+        
+        print("🗺️ Fetching place details for placeId: \(placeId)")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        // Print response for debugging
+        if let httpResponse = response as? HTTPURLResponse {
+            print("🗺️ HTTP Status: \(httpResponse.statusCode)")
+        }
+        
+        if let jsonString = String(data: data, encoding: .utf8) {
+            print("🗺️ Response JSON: \(jsonString)")
+        }
+        
+        let decoder = JSONDecoder()
+        do {
+            let placeDetails = try decoder.decode(PlaceDetails.self, from: data)
+            print("✅ Successfully decoded place details: \(placeDetails.location.latitude), \(placeDetails.location.longitude)")
+            return placeDetails
+        } catch {
+            print("❌ Failed to decode place details: \(error)")
+            throw error
+        }
+    }
 }

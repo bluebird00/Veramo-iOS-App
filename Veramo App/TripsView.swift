@@ -27,40 +27,7 @@ struct TripsView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Tab Picker
-                Picker("Trip Type", selection: $selectedTab) {
-                    Text("Upcoming (\(upcomingTrips.count))").tag(TripTab.upcoming)
-                    Text("Past (\(pastTrips.count))").tag(TripTab.past)
-                }
-                .pickerStyle(.segmented)
-                .padding()
-                
-                if isLoading {
-                    Spacer()
-                    ProgressView()
-                        .scaleEffect(1.5)
-                    Text("Loading your trips...")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .padding(.top, 16)
-                    Spacer()
-                } else {
-                    // Trip List
-                    ScrollView {
-                        LazyVStack(spacing: 16) {
-                            let trips = selectedTab == .upcoming ? upcomingTrips : pastTrips
-                            
-                            if trips.isEmpty {
-                                emptyStateView
-                            } else {
-                                ForEach(trips) { trip in
-                                    TripCard(trip: trip)
-                                }
-                            }
-                        }
-                        .padding()
-                    }
-                }
+                authenticatedContentView
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -77,24 +44,31 @@ struct TripsView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button(action: loadTrips) {
-                            Label("Refresh", systemImage: "arrow.clockwise")
+                // Only show menu if authenticated
+                if appState.isAuthenticated {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Menu {
+                            Button(action: loadTrips) {
+                                Label("Refresh", systemImage: "arrow.clockwise")
+                            }
+                            
+                            Divider()
+                            
+                            Button(role: .destructive, action: logout) {
+                                Label("Log Out", systemImage: "arrow.right.square")
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
                         }
-                        
-                        Divider()
-                        
-                        Button(role: .destructive, action: logout) {
-                            Label("Log Out", systemImage: "arrow.right.square")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
                     }
                 }
             }
             .task {
-                await loadTripsAsync()
+                if appState.isAuthenticated {
+                    await loadTripsAsync()
+                } else {
+                    isLoading = false
+                }
             }
             .alert("Error", isPresented: $showErrorAlert) {
                 Button("OK", role: .cancel) { }
@@ -106,6 +80,47 @@ struct TripsView: View {
                 }
             } message: {
                 Text(errorMessage)
+            }
+        }
+    }
+    
+    // MARK: - View Components
+    
+    private var authenticatedContentView: some View {
+        VStack(spacing: 0) {
+            // Tab Picker
+            Picker("Trip Type", selection: $selectedTab) {
+                Text("Upcoming (\(upcomingTrips.count))").tag(TripTab.upcoming)
+                Text("Past (\(pastTrips.count))").tag(TripTab.past)
+            }
+            .pickerStyle(.segmented)
+            .padding()
+            
+            if isLoading {
+                Spacer()
+                ProgressView()
+                    .scaleEffect(1.5)
+                Text("Loading your trips...")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 16)
+                Spacer()
+            } else {
+                // Trip List
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        let trips = selectedTab == .upcoming ? upcomingTrips : pastTrips
+                        
+                        if trips.isEmpty {
+                            emptyStateView
+                        } else {
+                            ForEach(trips) { trip in
+                                TripCard(trip: trip)
+                            }
+                        }
+                    }
+                    .padding()
+                }
             }
         }
     }

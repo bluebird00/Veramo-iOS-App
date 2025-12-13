@@ -50,8 +50,6 @@ struct AuthenticationChoiceView: View {
             Group {
                 if selectedMethod == .sms {
                     SMSLoginView()
-                } else {
-                    LoginView()
                 }
             }
             .transition(.opacity)

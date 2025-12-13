@@ -34,6 +34,7 @@ struct RideBookingView: View {
     @State private var showVehicleSelection = false
     @State private var showingTimePicker = false  // Track time picker modal state
     @State private var showingDatePicker = false  // Unused, but needed for DatePickerCard signature
+    @State private var isVehicleListCompact = false  // Track compact mode for vehicle list
     
     var autoFocusPickup: Bool = false  // New parameter for auto-focus
     
@@ -75,10 +76,11 @@ struct RideBookingView: View {
                 
                 // Bottom sheet content that switches between booking form and vehicle selection
                 bottomSheetContent
-                    .frame(maxWidth: .infinity, maxHeight: keyboardHeight > 0 ? geometry.size.height * 0.84 : geometry.size.height * 0.54)
+                    .frame(maxWidth: .infinity, maxHeight: sheetMaxHeight(for: geometry))
                     .background(bottomSheetBackground)
                     .offset(y: sheetOffset)
                     .animation(.spring(response: 0.3, dampingFraction: 0.8), value: keyboardHeight)
+                    .animation(.spring(response: 0.25, dampingFraction: 0.9), value: isVehicleListCompact)
                     .gesture(sheetDragGesture)
             }
         }
@@ -452,9 +454,7 @@ struct RideBookingView: View {
     private var searchButtonView: some View {
         Button(action: searchRides) {
             HStack {
-                Image(systemName: "magnifyingglass")
-                    .font(.headline)
-                Text("Search Rides")
+                Text("Select Vehicle")
                     .font(.headline)
                     .fontWeight(.semibold)
             }
@@ -486,7 +486,8 @@ struct RideBookingView: View {
             passengers: passengerCount,
             pickupPlaceId: pickupPlaceId,
             destinationPlaceId: destinationPlaceId,
-            showVehicleSelection: $showVehicleSelection
+            showVehicleSelection: $showVehicleSelection,
+            isCompactMode: $isVehicleListCompact
         )
     }
     
@@ -521,32 +522,47 @@ struct RideBookingView: View {
                 
                 withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
                     if translation > 50 {
-                        // Dragged down - close
-                        sheetOffset = 0
-                        lastSheetOffset = 0
-                        focusedField = nil
+                        // Dragged down
+                        if showVehicleSelection && !isVehicleListCompact {
+                            // In vehicle selection, collapse to compact mode first
+                            isVehicleListCompact = true
+                            sheetOffset = 0
+                            lastSheetOffset = 0
+                        } else {
+                            // Either in booking form, or already compact - close/reset
+                            sheetOffset = 0
+                            lastSheetOffset = 0
+                            focusedField = nil
+                            if showVehicleSelection && isVehicleListCompact {
+                                // Reset compact mode when closing
+                                isVehicleListCompact = false
+                            }
+                        }
                     } else if translation < -20 {
-                        // Dragged up - expand and focus (very easy threshold!)
+                        // Dragged up - expand
                         sheetOffset = 0
                         lastSheetOffset = 0
+                        
+                        if showVehicleSelection && isVehicleListCompact {
+                            // In vehicle selection compact mode - expand to show all vehicles
+                            isVehicleListCompact = false
+                        } else if !showVehicleSelection {
+                            // In booking form - focus field
+                            // Focus the last used field or default intelligently
+                            if let lastField = lastFocusedField {
+                                focusedField = lastField
+                            } else if pickupLocation.isEmpty {
+                                focusedField = .pickup
+                            } else if destination.isEmpty {
+                                focusedField = .destination
+                            } else {
+                                focusedField = .destination
+                            }
+                        }
                     } else {
                         // Snap back to previous position
                         sheetOffset = 0
                         lastSheetOffset = 0
-                    }
-                }
-                
-                // Trigger focus immediately after animation starts for swipe up
-                if translation < -20 {
-                    // Focus the last used field or default intelligently
-                    if let lastField = lastFocusedField {
-                        focusedField = lastField
-                    } else if pickupLocation.isEmpty {
-                        focusedField = .pickup
-                    } else if destination.isEmpty {
-                        focusedField = .destination
-                    } else {
-                        focusedField = .destination
                     }
                 }
             }
@@ -554,7 +570,31 @@ struct RideBookingView: View {
     
     // MARK: - Actions
     
+    private func sheetMaxHeight(for geometry: GeometryProxy) -> CGFloat {
+        if keyboardHeight > 0 {
+            // Keyboard is visible - expand to 84% of screen
+            return geometry.size.height * 0.84
+        } else if showVehicleSelection && isVehicleListCompact {
+            // Compact mode - just enough for one vehicle card
+            // Breakdown:
+            // - Trip summary card: 16 (top padding) + 16 (padding) + ~60 (content + padding) = ~92pt
+            // - Vehicle card: 12 (spacing) + 24 (vertical padding) + ~90 (content) = ~126pt
+            // - Book button area: 8 (top padding) + 18 (button vertical) + 5 (bottom) = ~31pt
+            // - Additional spacing: ~30pt
+            // Total: ~280pt
+            return 300
+        } else if showVehicleSelection {
+            // Vehicle selection expanded - 54% of screen
+            return geometry.size.height * 0.54
+        } else {
+            // Booking form - 54% of screen
+            return geometry.size.height * 0.54
+        }
+    }
+    
     private func searchRides() {
+        print("🔍 User clicked Search Rides - showing vehicle selection")
+        isVehicleListCompact = false  // Reset compact mode when showing vehicle selection
         showVehicleSelection = true
     }
     

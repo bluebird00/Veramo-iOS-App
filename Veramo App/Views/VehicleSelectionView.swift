@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import SafariServices
+import MapKit
 
 struct VehicleSelectionView: View {
     let pickup: String
@@ -22,16 +24,23 @@ struct VehicleSelectionView: View {
     
     @State private var selectedVehicle: VehicleType?
     @State private var showBookingDetails = false
-    @State private var isLoadingPricing = false
+    @State private var isLoadingPricing = true
     @State private var pricingError: String?
     @State private var pricingResponse: PricingResponse?
+    @State private var sheetHeight: CGFloat = 0
     
     @Binding var showVehicleSelection: Bool  // To control parent view state
+    @Binding var isCompactMode: Bool  // Controlled by parent sheet drag gesture
+    
+    // Authentication state
+    @Environment(AppState.self) private var appState
+    @State private var showLoginSheet = false
     
     // Booking state
     @State private var isProcessingBooking = false
     @State private var checkoutUrl: URL?
     @State private var bookingReference: String?
+    @State private var quoteToken: String?  // Token for checking payment status
     @State private var showErrorAlert = false
     @State private var errorMessage: String = ""
     @State private var showSessionExpiredAlert = false
@@ -44,28 +53,28 @@ struct VehicleSelectionView: View {
     private let vehicleTypes: [VehicleType] = [
         VehicleType(
             name: "Business",
-            description: "Mercedes E-Class or similar",
+            description: String(localized: "Mercedes E-Class or similar", comment: "Description for Business vehicle class"),
             maxPassengers: 3,
             imageName: "business-car",
             useSystemImage: false
         ),
         VehicleType(
             name: "First Class",
-            description: "Mercedes S-Class or similar",
+            description: String(localized: "Mercedes S-Class or similar", comment: "Description for First Class vehicle"),
             maxPassengers: 3,
             imageName: "first-car",
             useSystemImage: false
         ),
         VehicleType(
             name: "XL",
-            description: "Mercedes V-Class or similar",
+            description: String(localized: "Mercedes V-Class or similar", comment: "Description for XL vehicle class"),
             maxPassengers: 6,
             imageName: "xl-car",
             useSystemImage: false
         )
     ]
     
-    init(pickup: String, destination: String, pickupEnglish: String, destinationEnglish: String, date: Date, time: Date, passengers: Int, pickupPlaceId: String? = nil, destinationPlaceId: String? = nil, showVehicleSelection: Binding<Bool>) {
+    init(pickup: String, destination: String, pickupEnglish: String, destinationEnglish: String, date: Date, time: Date, passengers: Int, pickupPlaceId: String? = nil, destinationPlaceId: String? = nil, showVehicleSelection: Binding<Bool>, isCompactMode: Binding<Bool>) {
         self.pickup = pickup
         self.destination = destination
         self.pickupEnglish = pickupEnglish
@@ -76,6 +85,7 @@ struct VehicleSelectionView: View {
         self.pickupPlaceId = pickupPlaceId
         self.destinationPlaceId = destinationPlaceId
         self._showVehicleSelection = showVehicleSelection
+        self._isCompactMode = isCompactMode
     }
     
     // Swiss timezone constant
@@ -127,6 +137,16 @@ struct VehicleSelectionView: View {
         }
     }
     
+    // Vehicles to display based on sheet state
+    private var displayedVehicles: [VehicleType] {
+        // When in compact mode and a vehicle is selected, show only that one
+        if isCompactMode, let selected = selectedVehicle {
+            return availableVehicles.filter { $0.name == selected.name }
+        }
+        // Otherwise show all available vehicles
+        return availableVehicles
+    }
+    
     // Dynamic button text based on selected vehicle
     private var buttonText: String {
         if isProcessingBooking {
@@ -140,142 +160,137 @@ struct VehicleSelectionView: View {
     
     var body: some View {
         // Vehicle Selection
-        VStack(spacing: 0) {
-            // Trip summary - only date and time
-            HStack {
-                Label(formattedDate, systemImage: "calendar")
-                Spacer()
-                Label(formattedTime, systemImage: "clock")
-            }
-            .font(.subheadline)
-            .foregroundColor(.secondary)
-            .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(16)
-            .padding()
-            
-            // Vehicle options
-            ScrollView {
-                VStack(spacing: 12) {
-                    if isLoadingPricing {
-                        // Loading state
-                        VStack(spacing: 16) {
-                            ProgressView()
-                                .scaleEffect(1.5)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 40)
-                    } else if let error = pricingError {
-                        // Error state
-                        VStack(spacing: 16) {
-                            Image(systemName: "exclamationmark.triangle")
-                                .font(.system(size: 48))
-                                .foregroundColor(.orange)
-                            Text("Failed to load pricing")
-                                .font(.headline)
-                            Text(error)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
-                            Button("Retry") {
-                                Task {
-                                    await fetchPricing()
-                                }
-                            }
-                            .buttonStyle(.bordered)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 40)
-                        .padding(.horizontal)
-                    } else {
-                        // Vehicle cards
-                        ForEach(availableVehicles) { vehicle in
-                            VehicleOptionCard(
-                                vehicle: vehicle,
-                                isSelected: selectedVehicle?.id == vehicle.id,
-                                onSelect: { selectedVehicle = vehicle }
-                            )
-                        }
-                    }
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                // Trip summary - only date and time
+                HStack {
+                    Label(formattedDate, systemImage: "calendar")
+                    Spacer()
+                    Label(formattedTime, systemImage: "clock")
                 }
-                .padding(.horizontal)
-            }
-            
-            Spacer()
-            
-            // Optional flight number input
-            if showFlightNumberInput {
-                HStack(spacing: 8) {
-                    Image(systemName: "airplane")
-                        .foregroundColor(.gray)
-                        .frame(width: 20)
-                    
-                    TextField("Flight number (optional)", text: $flightNumber)
-                        .textInputAutocapitalization(.characters)
-                        .autocorrectionDisabled()
-                }
-                .padding(16)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(.systemGray6))
-                )
-                .padding(.horizontal, 28)
-                .padding(.bottom, 8)
-            } else {
-                Button(action: { showFlightNumberInput = true }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "airplane")
-                            .font(.footnote)
-                        Text("Add flight number")
-                            .font(.footnote)
-                    }
-                    .foregroundColor(.blue)
-                }
-                .padding(.horizontal, 28)
-                .padding(.bottom, 8)
-            }
-            
-            // Book now button
-            VStack(spacing: 8) {
-                Button(action: createBooking) {
-                    HStack(spacing: 8) {
-                        if isProcessingBooking {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        }
-                        Text(buttonText)
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 18)
-                    .background(
-                        LinearGradient(
-                            colors: [.black, Color(.darkGray)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-                .disabled(selectedVehicle == nil || isProcessingBooking)
-                .opacity(selectedVehicle != nil && !isProcessingBooking ? 1 : 0.5)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(16)
+                .padding()
                 
-                #if DEBUG
-                // Debug button to test confirmation view without payment
-                Button(action: testBookingConfirmation) {
-                    Text("🧪 Test Confirmation (Debug)")
-                        .font(.caption)
-                        .foregroundColor(.orange)
+                // Vehicle options
+                ScrollView {
+                    VStack(spacing: 12) {
+                        if isLoadingPricing {
+                            // Loading state
+                            VStack(spacing: 16) {
+                                ProgressView()
+                                    .scaleEffect(1.5)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 40)
+                        } else if let error = pricingError {
+                            // Error state
+                            VStack(spacing: 16) {
+                                Image(systemName: "exclamationmark.triangle")
+                                    .font(.system(size: 48))
+                                    .foregroundColor(.orange)
+                                Text("Failed to load pricing")
+                                    .font(.headline)
+                                Text(error)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                                Button("Retry") {
+                                    Task {
+                                        await fetchPricing()
+                                    }
+                                }
+                                .buttonStyle(.bordered)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 40)
+                            .padding(.horizontal)
+                        } else {
+                            // Vehicle cards
+                            ForEach(displayedVehicles) { vehicle in
+                                VehicleOptionCard(
+                                    vehicle: vehicle,
+                                    isSelected: selectedVehicle?.name == vehicle.name,
+                                    onSelect: { 
+                                        withAnimation(.linear(duration: 0.15)) {
+                                            selectedVehicle = vehicle
+                                        }
+                                    }
+                                )
+                                .simultaneousGesture(
+                                    TapGesture()
+                                        .onEnded { _ in
+                                            withAnimation(.linear(duration: 0.15)) {
+                                                selectedVehicle = vehicle
+                                            }
+                                        }
+                                )
+                                .id(vehicle.name) // Add ID for smooth transitions
+                                .transition(.scale(scale: 0.98).combined(with: .opacity))
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.top, 4)
+                    .padding(.bottom, 4)
+                    .background(
+                        GeometryReader { scrollGeometry in
+                            Color.clear
+                                .preference(
+                                    key: ViewHeightKey.self,
+                                    value: scrollGeometry.size.height
+                                )
+                        }
+                    )
                 }
-                .disabled(selectedVehicle == nil)
-                .opacity(selectedVehicle != nil ? 1 : 0.5)
-                #endif
+                .scrollIndicators(.hidden)
+                .animation(.linear(duration: 0.2), value: displayedVehicles.count)
+                
+               
+                
+                
+                // Book now button
+                VStack(spacing: 8) {
+                    Button(action: createBooking) {
+                        HStack(spacing: 8) {
+                            if isProcessingBooking {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            }
+                            Text(buttonText)
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 18)
+                        .background(
+                            LinearGradient(
+                                colors: [.black, Color(.darkGray)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    }
+                    .disabled(selectedVehicle == nil || isProcessingBooking)
+                    .opacity(selectedVehicle != nil && !isProcessingBooking ? 1 : 0.5)
+                    
+                    
+                }
+                .padding(.horizontal, 28)
+                .padding(.top, 8)
+                .padding(.bottom, 5)
             }
-            .padding(.horizontal, 28)
-            .padding(.top, 8)
-            .padding(.bottom, 5)
+            .onAppear {
+                sheetHeight = geometry.size.height
+            }
+            .onChange(of: geometry.size.height) { oldValue, newValue in
+                sheetHeight = newValue
+            }
         }
         .task {
             await fetchPricing()
@@ -327,6 +342,7 @@ struct VehicleSelectionView: View {
             if let reference = bookingReference {
                 BookingConfirmedViewContent(
                     reference: reference,
+                    quoteToken: quoteToken,
                     onDismiss: {
                         showBookingConfirmed = false
                         showVehicleSelection = false
@@ -334,6 +350,7 @@ struct VehicleSelectionView: View {
                 )
                 .onAppear {
                     print("✅ [DEBUG] BookingConfirmedViewContent appeared with reference: \(reference)")
+                    print("✅ [DEBUG] Quote Token: \(quoteToken ?? "N/A")")
                 }
             } else {
                 // Fallback if reference is nil
@@ -356,6 +373,18 @@ struct VehicleSelectionView: View {
                 }
             }
         }
+        .sheet(isPresented: $showLoginSheet) {
+            SMSLoginView()
+                .environment(appState)
+                .onDisappear {
+                    // After successful login, automatically proceed with booking
+                    if appState.isAuthenticated {
+                        print("✅ User logged in successfully - proceeding with booking")
+                        performBooking()
+                    }
+                }
+        }
+        
     }
     
     // Helper struct for identifiable URL with reference
@@ -368,6 +397,32 @@ struct VehicleSelectionView: View {
     // MARK: - Booking Action
     
     private func createBooking() {
+        // Validate we have selected a vehicle
+        guard selectedVehicle != nil else {
+            errorMessage = "Please select a vehicle to continue."
+            showErrorAlert = true
+            return
+        }
+        
+        // Validate we have place IDs
+        guard pickupPlaceId != nil, destinationPlaceId != nil else {
+            errorMessage = "Location information is missing. Please go back and select locations again."
+            showErrorAlert = true
+            return
+        }
+        
+        // Check authentication BEFORE booking
+        if !appState.isAuthenticated {
+            print("⚠️ User not authenticated - showing login sheet")
+            showLoginSheet = true
+            return
+        }
+        
+        // User is authenticated, proceed with booking
+        performBooking()
+    }
+    
+    private func performBooking() {
         guard let selectedVehicle = selectedVehicle else {
             return
         }
@@ -462,13 +517,17 @@ struct VehicleSelectionView: View {
                     
                     if let checkoutUrlString = response.checkoutUrl,
                        let url = URL(string: checkoutUrlString) {
-                        // Save the booking reference
+                        // Save the booking reference and quote token
                         let reference = response.quoteReference ?? "UNKNOWN"
+                        let token = response.quoteToken
+                        
                         bookingReference = reference
+                        quoteToken = token
                         checkoutUrl = url
                         
                         print("✅ [BOOKING] Booking created successfully!")
                         print("   • Reference: \(reference)")
+                        print("   • Quote Token: \(token ?? "N/A")")
                         print("   • Opening checkout URL...")
                     } else {
                         errorMessage = "Booking created but no payment URL was provided"
@@ -497,38 +556,14 @@ struct VehicleSelectionView: View {
         }
     }
     
-    // MARK: - Debug Testing
-    
-    #if DEBUG
-    /// Test function to simulate a successful booking without actual payment
-    private func testBookingConfirmation() {
-        // Generate a fake booking reference
-        let testReference = "TEST-\(Int.random(in: 1000...9999))-\(Int.random(in: 1000...9999))"
-        
-        print("🧪 [DEBUG] Simulating booking confirmation with reference: \(testReference)")
-        
-        // Set the reference and show confirmation
-        bookingReference = testReference
-        
-        // Small delay to ensure state is set
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            print("🧪 [DEBUG] bookingReference is now: \(self.bookingReference ?? "nil")")
-            print("🧪 [DEBUG] About to show booking confirmed sheet")
-            self.showBookingConfirmed = true
-        }
-    }
-    #endif
+    // MARK: - Pricing
     
     private func fetchPricing() async {
         isLoadingPricing = true
         pricingError = nil
         
         do {
-            // Use Switzerland timezone for the final datetime
             let swissTimeZone = TimeZone(identifier: "Europe/Zurich")!
-            
-            // IMPORTANT: Extract date components in SWISS timezone, not local device timezone
-            // This ensures the user's selected date/time is interpreted correctly
             var swissCalendar = Calendar.current
             swissCalendar.timeZone = swissTimeZone
             
@@ -548,26 +583,109 @@ struct VehicleSelectionView: View {
                 throw PricingError.serverError("Failed to create pickup datetime")
             }
             
-            // Try to use place IDs first, if available
             if let pickupId = pickupPlaceId, let destinationId = destinationPlaceId {
                 pricingResponse = try await PricingService.shared.fetchPricing(
                     originPlaceId: pickupId,
                     destinationPlaceId: destinationId,
                     pickupDatetime: pickupDatetime
                 )
+                
+                await MainActor.run {
+                    isLoadingPricing = false
+                    
+                    // Auto-select Business class after pricing loads
+                    selectedVehicle = availableVehicles.first { $0.name == "Business" }
+                }
             } else {
-                // Fallback: Show error since we need place IDs or coordinates
                 throw PricingError.missingLocationData
             }
-            
-            isLoadingPricing = false
         } catch {
-            isLoadingPricing = false
-            pricingError = error.localizedDescription
+            await MainActor.run {
+                isLoadingPricing = false
+                pricingError = error.localizedDescription
+            }
         }
     }
     
 }
 
+// MARK: - Operator Information Sheet
 
+struct OperatorInformationSheet: View {
+    let selectedVehicle: VehicleType?
+    let pickup: String
+    let destination: String
+    let date: Date
+    let time: Date
+    let passengers: Int
+    let onConfirm: () -> Void
+    let onCancel: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            Spacer()
+            
+            // Content
+            VStack(spacing: 24) {
+                // Icon
+                Image(systemName: "info.circle.fill")
+                    .font(.system(size: 60))
+                    .foregroundStyle(.blue)
+                
+                // Title
+                Text("Important information about the transport operator")
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+                
+                // Description
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("The transportation contract is concluded between you and the independent partner.")
+                        .font(.body)
+                        .foregroundStyle(.primary)
+                    
+                    Text("Veramo itself is not a transportation service provider and acts solely as an intermediary between you and the independent partner.")
+                        .font(.body)
+                        .foregroundStyle(.primary)
+                }
+                .padding(.horizontal, 32)
+                .multilineTextAlignment(.leading)
+            }
+            
+            Spacer()
+            
+            // Continue Button
+            Button(action: onConfirm) {
+                Text("Continue")
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        LinearGradient(
+                            colors: [.black, Color(.darkGray)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(12)
+            }
+            .padding(.horizontal, 32)
+            .padding(.bottom, 40)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemBackground))
+    }
+}
 
+// MARK: - View Height Preference Key
+
+struct ViewHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}

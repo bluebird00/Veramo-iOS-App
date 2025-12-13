@@ -9,32 +9,35 @@
 
 import SwiftUI
 
-struct WelcomeScreenAlternate: View {
+struct WelcomeScreen: View {
     @Binding var hasSeenWelcome: Bool
     @State private var currentPage = 0
     @State private var opacity: Double = 0
     
     let pages: [WelcomeFeature] = [
         WelcomeFeature(
-            title: "Welcome to Veramo",
-            subtitle: "Premium Chauffeur Service",
-            description: "Experience Swiss luxury transportation at its finest. Professional drivers, premium vehicles, impeccable service.",
-            icon: "star.fill",
-            systemImage: "car.side.fill"
+            // TRANSLATE: Main welcome screen title - introduces the Veramo brand
+            title: String(localized: "welcome.page1.title"),
+            // TRANSLATE: Subtitle describing the service type (chauffeur/luxury transportation)
+            subtitle: String(localized: "welcome.page1.subtitle"),
+            // TRANSLATE: Description of the premium service features
+            description: String(localized: "welcome.page1.description")
         ),
         WelcomeFeature(
-            title: "Effortless Booking",
-            subtitle: "Book in Seconds",
-            description: "Reserve your ride with just a few taps. Select your vehicle class, pickup time, and destination.",
-            icon: "calendar.badge.checkmark",
-            systemImage: "iphone.gen3"
+            // TRANSLATE: Title for the booking feature page
+            title: String(localized: "welcome.page2.title"),
+            // TRANSLATE: Subtitle emphasizing booking speed/ease
+            subtitle: String(localized: "welcome.page2.subtitle"),
+            // TRANSLATE: Description of how the booking process works
+            description: String(localized: "welcome.page2.description")
         ),
         WelcomeFeature(
-            title: "Your Journey History",
-            subtitle: "Always Organized",
-            description: "Track upcoming trips and review past journeys. All your bookings in one convenient place.",
-            icon: "clock.arrow.circlepath",
-            systemImage: "list.bullet.clipboard.fill"
+            // TRANSLATE: Title for the trip history feature page
+            title: String(localized: "welcome.page3.title"),
+            // TRANSLATE: Subtitle emphasizing organization/convenience
+            subtitle: String(localized: "welcome.page3.subtitle"),
+            // TRANSLATE: Description of trip tracking features
+            description: String(localized: "welcome.page3.description")
         )
     ]
     
@@ -47,14 +50,14 @@ struct WelcomeScreenAlternate: View {
             VStack(spacing: 0) {
                 // Logo/Brand area
                 VStack(spacing: 8) {
-                    Text("VERAMO")
-                        .font(.system(size: 36, weight: .light, design: .serif))
+                    // TRANSLATE: Brand name - consider keeping as "Veramo" in all languages if it's a brand name
+                    Text("welcome.brand.name", comment: "App brand name displayed on welcome screen")
+                        .font(.custom("SF Pro", size: 36))
+                        .fontWeight(.bold)
                         .foregroundColor(.white)
                         .tracking(4)
                     
-                    Rectangle()
-                        .fill(Color.white.opacity(0.6))
-                        .frame(width: 60, height: 1)
+
                 }
                 .padding(.top, 60)
                 .opacity(opacity)
@@ -98,7 +101,12 @@ struct WelcomeScreenAlternate: View {
                         }
                     }) {
                         HStack(spacing: 12) {
-                            Text(currentPage == pages.count - 1 ? "Get Started" : "Continue")
+                            // TRANSLATE: Button text - "Get Started" for last page, "Continue" for others
+                            Text(currentPage == pages.count - 1 ? 
+                                 // TRANSLATE: Final call-to-action button on last welcome page
+                                 String(localized: "welcome.button.getStarted", comment: "Button to finish onboarding and start using the app") : 
+                                 // TRANSLATE: Button to advance to next welcome page
+                                 String(localized: "welcome.button.continue", comment: "Button to go to next onboarding page"))
                                 .font(.system(size: 18, weight: .medium))
                             
                             Image(systemName: currentPage == pages.count - 1 ? "arrow.right.circle.fill" : "arrow.right")
@@ -116,10 +124,13 @@ struct WelcomeScreenAlternate: View {
                     
                     // Skip button
                     if currentPage < pages.count - 1 {
-                        Button("Skip") {
+                        Button {
                             withAnimation {
                                 hasSeenWelcome = true
                             }
+                        } label: {
+                            // TRANSLATE: Button to skip the welcome/onboarding screens
+                            Text("welcome.button.skip", comment: "Button to skip onboarding and go directly to the app")
                         }
                         .font(.system(size: 16))
                         .foregroundColor(.white.opacity(0.6))
@@ -142,8 +153,8 @@ struct WelcomeFeature {
     let title: String
     let subtitle: String
     let description: String
-    let icon: String
-    let systemImage: String
+    
+    
 }
 
 // MARK: - Welcome Feature View
@@ -151,6 +162,7 @@ struct WelcomeFeature {
 struct WelcomeFeatureView: View {
     let feature: WelcomeFeature
     @State private var animate = false
+    @State private var pulsate = false
     
     var body: some View {
         VStack(spacing: 32) {
@@ -174,20 +186,19 @@ struct WelcomeFeatureView: View {
                     .fill(Color.white.opacity(0.1))
                     .frame(width: 140, height: 140)
                 
-                // Icon
-                Image(systemName: feature.systemImage)
-                    .font(.system(size: 70, weight: .light))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [.white, .white.opacity(0.8)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                // Small pulsating center circle
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 40, height: 40)
+                    .scaleEffect(pulsate ? 1.3 : 1.0)
+                    .opacity(pulsate ? 0.6 : 1.0)
             }
             .onAppear {
                 withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
                     animate = true
+                }
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    pulsate = true
                 }
             }
             
@@ -221,5 +232,5 @@ struct WelcomeFeatureView: View {
 // MARK: - Preview
 
 #Preview {
-    WelcomeScreenAlternate(hasSeenWelcome: .constant(false))
+    WelcomeScreen(hasSeenWelcome: .constant(false))
 }

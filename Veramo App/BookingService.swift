@@ -39,6 +39,7 @@ struct BookingResponse: Codable {
     let success: Bool
     let tripRequestId: Int?
     let quoteReference: String?
+    let quoteToken: String?  // Token for checking payment status via quote-public endpoint
     let priceCents: Int?
     let priceFormatted: String?
     let distanceKm: Double?
@@ -50,6 +51,7 @@ struct BookingResponse: Codable {
         case success
         case tripRequestId
         case quoteReference
+        case quoteToken
         case priceCents
         case priceFormatted
         case distanceKm
@@ -236,6 +238,7 @@ class BookingService {
                     print("\n✅ BOOKING SUCCESSFUL!")
                     print("   • Trip Request ID: \(bookingResponse.tripRequestId ?? 0)")
                     print("   • Quote Reference: \(bookingResponse.quoteReference ?? "N/A")")
+                    print("   • Quote Token: \(bookingResponse.quoteToken ?? "N/A")")
                     print("   • Price: \(bookingResponse.priceFormatted ?? "N/A")")
                     print("   • Distance: \(bookingResponse.distanceKm ?? 0) km")
                     print("   • Duration: \(bookingResponse.durationMinutes ?? 0) minutes")

@@ -57,13 +57,13 @@ class AuthenticationManager {
                 return nil
             }
             let customer = try? JSONDecoder().decode(AuthenticatedCustomer.self, from: data)
-            print("🔍 Getting currentCustomer from UserDefaults: \(customer?.name ?? "decode failed")")
+            print("🔍 Getting currentCustomer from UserDefaults: \(customer?.name ?? "decode failed or nil")")
             return customer
         }
         set {
             if let customer = newValue,
                let data = try? JSONEncoder().encode(customer) {
-                print("💾 Setting currentCustomer in UserDefaults: \(customer.name)")
+                print("💾 Setting currentCustomer in UserDefaults: \(customer.name ?? "nil")")
                 UserDefaults.standard.set(data, forKey: customerKey)
                 UserDefaults.standard.synchronize() // Force immediate save
                 print("✅ Customer saved and synchronized")
@@ -105,22 +105,38 @@ class AuthenticationManager {
     
     func saveAuthentication(customer: AuthenticatedCustomer, sessionToken: String) {
         print("💾 Saving authentication...")
-        print("   Customer: \(customer.name)")
+        print("   Customer: \(customer.name ?? "nil")")
         print("   Token: \(String(sessionToken.prefix(20)))...")
         
         self.sessionToken = sessionToken
         self.currentCustomer = customer
         
-        // Verify it was saved
+        // Force UserDefaults to save immediately
+        UserDefaults.standard.synchronize()
+        
+        // Verify it was saved by reading back
         print("✅ Saved! Verifying...")
         print("   sessionToken in UserDefaults: \(self.sessionToken != nil)")
         print("   currentCustomer in UserDefaults: \(self.currentCustomer != nil)")
+        print("   isAuthenticated check: \(self.isAuthenticated)")
+        
+        if let savedToken = self.sessionToken {
+            print("   ✅ Token verified: \(String(savedToken.prefix(20)))...")
+        }
+        if let savedCustomer = self.currentCustomer {
+            print("   ✅ Customer verified: \(savedCustomer.name ?? "nil")")
+        }
     }
     
     func logout() {
         print("🚪 [AUTH] Logging out user...")
         print("   Previous token: \(sessionToken != nil ? "existed" : "none")")
         print("   Previous customer: \(currentCustomer?.name ?? "none")")
+        
+        // Disconnect from chat before clearing credentials
+        Task {
+            await ChatManager.shared.disconnect()
+        }
         
         sessionToken = nil
         currentCustomer = nil

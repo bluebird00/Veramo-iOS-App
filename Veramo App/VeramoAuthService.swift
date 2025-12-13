@@ -35,8 +35,8 @@ enum AuthError: Error, LocalizedError {
 
 struct AuthenticatedCustomer: Codable {
     let id: Int
-    let name: String
-    let email: String
+    let name: String?  // Optional - null for new users
+    let email: String?  // Optional - null for new users
     let phone: String?  // Optional phone number
     
     enum CodingKeys: String, CodingKey {
@@ -84,6 +84,7 @@ struct SMSCodeVerifyRequest: Codable {
 struct SMSCodeVerifyResponse: Codable {
     let success: Bool
     let sessionToken: String?
+    let isNewUser: Bool?
     let customer: AuthenticatedCustomer?
     let error: String?
 }
@@ -125,8 +126,6 @@ class VeramoAuthService {
             return try decoder.decode(MagicLinkSendResponse.self, from: data)
         } catch let error as AuthError {
             throw error
-        } catch let error as DecodingError {
-            throw AuthError.decodingError
         } catch {
             throw AuthError.networkError(error)
         }
@@ -175,8 +174,6 @@ class VeramoAuthService {
             }
         } catch let error as AuthError {
             throw error
-        } catch let error as DecodingError {
-            throw AuthError.decodingError
         } catch {
             throw AuthError.networkError(error)
         }
@@ -252,8 +249,8 @@ class VeramoAuthService {
         }
     }
     
-    /// Verifies an SMS code and returns the authenticated customer and session token
-    func verifySMSCode(phone: String, code: String) async throws -> (customer: AuthenticatedCustomer, sessionToken: String) {
+    /// Verifies an SMS code and returns the authenticated customer, session token, and whether the user is new
+    func verifySMSCode(phone: String, code: String) async throws -> (customer: AuthenticatedCustomer, sessionToken: String, isNewUser: Bool) {
         print("🔐 [SMS-VERIFY] Starting SMS code verification")
         print("🔐 [SMS-VERIFY] Phone number: \(phone)")
         print("🔐 [SMS-VERIFY] Code: \(code)")
@@ -309,12 +306,14 @@ class VeramoAuthService {
             if verifyResponse.success,
                let customer = verifyResponse.customer,
                let sessionToken = verifyResponse.sessionToken {
+                let isNewUser = verifyResponse.isNewUser ?? false
                 print("✅ [SMS-VERIFY] Success!")
-                print("✅ [SMS-VERIFY] Customer: \(customer.name) (ID: \(customer.id))")
-                print("✅ [SMS-VERIFY] Email: \(customer.email)")
+                print("✅ [SMS-VERIFY] Customer: \(customer.name ?? "nil") (ID: \(customer.id))")
+                print("✅ [SMS-VERIFY] Email: \(customer.email ?? "nil")")
                 print("✅ [SMS-VERIFY] Phone: \(customer.phone ?? "N/A")")
+                print("✅ [SMS-VERIFY] Is new user: \(isNewUser)")
                 print("✅ [SMS-VERIFY] Session token: \(String(sessionToken.prefix(20)))...")
-                return (customer: customer, sessionToken: sessionToken)
+                return (customer: customer, sessionToken: sessionToken, isNewUser: isNewUser)
             } else {
                 let errorMsg = verifyResponse.error ?? "Invalid verification code"
                 print("❌ [SMS-VERIFY] Verification failed: \(errorMsg)")
@@ -332,4 +331,158 @@ class VeramoAuthService {
         }
     }
     
+    // MARK: - Profile Management
+    
+    /// Retrieves the current user's profile
+    func getProfile(sessionToken: String) async throws -> AuthenticatedCustomer {
+        print("👤 [PROFILE-GET] Starting profile retrieval")
+        
+        guard let url = URL(string: "\(baseURL)/app-profile") else {
+            print("❌ [PROFILE-GET] Invalid URL")
+            throw AuthError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(sessionToken)", forHTTPHeaderField: "Authorization")
+        
+        do {
+            print("🚀 [PROFILE-GET] Sending request...")
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("❌ [PROFILE-GET] Invalid HTTP response")
+                throw AuthError.networkError(NSError(domain: "", code: -1))
+            }
+            
+            print("📥 [PROFILE-GET] Response status code: \(httpResponse.statusCode)")
+            
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("📥 [PROFILE-GET] Response body: \(responseString)")
+            }
+            
+            if httpResponse.statusCode == 401 {
+                print("❌ [PROFILE-GET] Unauthorized (401)")
+                throw AuthError.unauthorized
+            }
+            
+            guard httpResponse.statusCode == 200 else {
+                print("❌ [PROFILE-GET] Server error: \(httpResponse.statusCode)")
+                throw AuthError.serverError("Server returned status code: \(httpResponse.statusCode)")
+            }
+            
+            let decoder = JSONDecoder()
+            let profileResponse = try decoder.decode(ProfileResponse.self, from: data)
+            
+            if profileResponse.success, let customer = profileResponse.customer {
+                print("✅ [PROFILE-GET] Success!")
+                print("✅ [PROFILE-GET] Customer: \(customer.name ?? "nil") (ID: \(customer.id))")
+                return customer
+            } else {
+                throw AuthError.serverError("Failed to retrieve profile")
+            }
+        } catch let error as AuthError {
+            print("❌ [PROFILE-GET] Auth error: \(error.localizedDescription)")
+            throw error
+        } catch let error as DecodingError {
+            print("❌ [PROFILE-GET] Decoding error: \(error)")
+            throw AuthError.decodingError
+        } catch {
+            print("❌ [PROFILE-GET] Network error: \(error.localizedDescription)")
+            throw AuthError.networkError(error)
+        }
+    }
+    
+    /// Updates the current user's profile
+    func updateProfile(sessionToken: String, name: String?, email: String?) async throws -> AuthenticatedCustomer {
+        print("✏️ [PROFILE-UPDATE] Starting profile update")
+        print("✏️ [PROFILE-UPDATE] Name: \(name ?? "nil")")
+        print("✏️ [PROFILE-UPDATE] Email: \(email ?? "nil")")
+        
+        guard let url = URL(string: "\(baseURL)/app-profile") else {
+            print("❌ [PROFILE-UPDATE] Invalid URL")
+            throw AuthError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("Bearer \(sessionToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body = ProfileUpdateRequest(name: name, email: email)
+        request.httpBody = try JSONEncoder().encode(body)
+        
+        if let bodyData = request.httpBody,
+           let bodyString = String(data: bodyData, encoding: .utf8) {
+            print("📦 [PROFILE-UPDATE] Request body: \(bodyString)")
+        }
+        
+        do {
+            print("🚀 [PROFILE-UPDATE] Sending request...")
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("❌ [PROFILE-UPDATE] Invalid HTTP response")
+                throw AuthError.networkError(NSError(domain: "", code: -1))
+            }
+            
+            print("📥 [PROFILE-UPDATE] Response status code: \(httpResponse.statusCode)")
+            
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("📥 [PROFILE-UPDATE] Response body: \(responseString)")
+            }
+            
+            if httpResponse.statusCode == 401 {
+                print("❌ [PROFILE-UPDATE] Unauthorized (401)")
+                throw AuthError.unauthorized
+            }
+            
+            if httpResponse.statusCode == 409 {
+                print("❌ [PROFILE-UPDATE] Email already in use (409)")
+                throw AuthError.serverError("Email already in use")
+            }
+            
+            guard httpResponse.statusCode == 200 else {
+                print("❌ [PROFILE-UPDATE] Server error: \(httpResponse.statusCode)")
+                throw AuthError.serverError("Server returned status code: \(httpResponse.statusCode)")
+            }
+            
+            let decoder = JSONDecoder()
+            let profileResponse = try decoder.decode(ProfileResponse.self, from: data)
+            
+            if profileResponse.success, let customer = profileResponse.customer {
+                print("✅ [PROFILE-UPDATE] Success!")
+                print("✅ [PROFILE-UPDATE] Updated customer: \(customer.name ?? "nil") (ID: \(customer.id))")
+                
+                // Update local storage
+                AuthenticationManager.shared.currentCustomer = customer
+                
+                return customer
+            } else {
+                throw AuthError.serverError("Failed to update profile")
+            }
+        } catch let error as AuthError {
+            print("❌ [PROFILE-UPDATE] Auth error: \(error.localizedDescription)")
+            throw error
+        } catch let error as DecodingError {
+            print("❌ [PROFILE-UPDATE] Decoding error: \(error)")
+            throw AuthError.decodingError
+        } catch {
+            print("❌ [PROFILE-UPDATE] Network error: \(error.localizedDescription)")
+            throw AuthError.networkError(error)
+        }
+    }
+    
+}
+
+// MARK: - Profile API Models
+
+struct ProfileResponse: Codable {
+    let success: Bool
+    let customer: AuthenticatedCustomer?
+}
+
+struct ProfileUpdateRequest: Codable {
+    let name: String?
+    let email: String?
 }

@@ -11,6 +11,7 @@ struct MainTabView: View {
     @State private var selectedTab: Tab = .home
     @State private var showBookingConfirmation = false
     @State private var bookingReference: String?
+    @State private var quoteToken: String?
     
     enum Tab {
         case home
@@ -52,6 +53,7 @@ struct MainTabView: View {
             if let reference = bookingReference {
                 BookingConfirmedView(
                     reference: reference,
+                    quoteToken: quoteToken,
                     selectedTab: $selectedTab
                 )
             }
@@ -81,7 +83,7 @@ struct MainTabView: View {
     
     private func handleBookingConfirmed(_ url: URL) {
         // Parse query parameters
-        // Example: veramo://booking-confirmed?ref=VRM-1234
+        // Example: veramo://booking-confirmed?ref=VRM-1234&token=abc123
         
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               let queryItems = components.queryItems else {
@@ -93,10 +95,19 @@ struct MainTabView: View {
         if let refItem = queryItems.first(where: { $0.name == "ref" }),
            let reference = refItem.value {
             
+            // Extract quote token (optional)
+            let token = queryItems.first(where: { $0.name == "token" })?.value
+            
             print("✅ Booking confirmed: \(reference)")
+            if let token = token {
+                print("   Quote token: \(String(token.prefix(20)))...")
+            } else {
+                print("   ⚠️ No quote token provided in deep link")
+            }
             
             // Update state to show confirmation
             bookingReference = reference
+            quoteToken = token
             showBookingConfirmation = true
         } else {
             print("❌ No 'ref' parameter in deep link")

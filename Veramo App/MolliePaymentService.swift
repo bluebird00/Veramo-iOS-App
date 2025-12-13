@@ -184,7 +184,7 @@ struct SafariView: UIViewControllerRepresentable {
         
         let safari = SFSafariViewController(url: url, configuration: config)
         safari.delegate = context.coordinator
-        safari.preferredControlTintColor = .black
+        
         return safari
     }
     

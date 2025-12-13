@@ -20,22 +20,7 @@
     "%lld" : {
 
     },
-    "+14155551234" : {
-
-    },
-    "+41791234567" : {
-
-    },
-    "🐛 Debug Options" : {
-
-    },
-    "🧪 Test Confirmation (Debug)" : {
-
-    },
     "1.0.0" : {
-
-    },
-    "111111 - Always valid in dev mode" : {
 
     },
     "About" : {
@@ -44,6 +29,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Über"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
           }
         }
       }
@@ -55,11 +46,14 @@
             "state" : "translated",
             "value" : "Konto"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
         }
       }
-    },
-    "Add flight number" : {
-
     },
     "Are you sure you want to logout?" : {
       "localizations" : {
@@ -67,6 +61,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sind Sie sicher, dass Sie sich abmelden möchten?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to logout?"
           }
         }
       }
@@ -78,6 +78,12 @@
             "state" : "translated",
             "value" : "Authentifizierungsfehler"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication Error"
+          }
         }
       }
     },
@@ -88,22 +94,30 @@
             "state" : "translated",
             "value" : "Authentifizierungsmethode"
           }
-        }
-      }
-    },
-    "Book" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Buchen"
+            "value" : "Authentication Method"
           }
         }
       }
     },
     "Book %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select %@"
+          }
+        }
+      }
     },
     "Book a Ride" : {
       "localizations" : {
@@ -111,6 +125,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Plane deine Fahrt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Book a Ride"
+          }
+        }
+      }
+    },
+    "Book Ride" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrt bestellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Book Ride"
           }
         }
       }
@@ -122,33 +158,44 @@
             "state" : "translated",
             "value" : "Buchen Sie Ihre erste Fahrt, um diese hier zu sehen"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Book your first ride to see it here"
+          }
         }
       }
     },
     "Booking Confirmed!" : {
-
-    },
-    "Booking Details" : {
-      "extractionState" : "stale",
+      "comment" : "Title shown when booking payment is successful",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Buchungsdetails"
+            "value" : "Buchung bestätigt!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Booking Confirmed!"
           }
         }
       }
     },
     "Booking Error" : {
-
-    },
-    "Booking Overview" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Buchungsübersicht"
+            "value" : "Buchungsfehler"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Booking Error"
           }
         }
       }
@@ -160,6 +207,35 @@
             "state" : "translated",
             "value" : "Schließen"
           }
+        },
+        "de-CH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schliessen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "Canceled" : {
+      "comment" : "Navigation title for canceled payment",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgebrochen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canceled"
+          }
         }
       }
     },
@@ -169,6 +245,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nummer ändern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change number"
           }
         }
       }
@@ -183,6 +265,22 @@
         }
       }
     },
+    "Chat with Customer Support" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kundendienst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Customer Support"
+          }
+        }
+      }
+    },
     "Chat with Support" : {
       "localizations" : {
         "de" : {
@@ -190,34 +288,127 @@
             "state" : "translated",
             "value" : "Mit dem Support chatten"
           }
-        }
-      }
-    },
-    "Check your email for the magic link!" : {
-
-    },
-    "Choose how you'd like to sign in" : {
-
-    },
-    "Clear All Data" : {
-      "localizations" : {
-        "de" : {
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle Daten löschen"
+            "value" : "Chat with Support"
           }
         }
       }
     },
-    "Click Me!" : {
+    "chat.login.message" : {
+      "comment" : "Message prompting users to log in before accessing customer support chat",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Melden Sie sich an, um mit unserem Kundendienst zu chatten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In order to chat with our customer service, you need to log in"
+          }
+        }
+      }
+    },
+    "Check Again" : {
+      "comment" : "Button to retry checking payment status",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut versuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check again"
+          }
+        }
+      }
+    },
+    "Checking payment status..." : {
+      "comment" : "Payment status check in progress message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlungsstatus wird geprüft…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking payment status…"
+          }
+        }
+      }
+    },
+    "Choose how you'd like to sign in" : {
 
     },
     "Close" : {
+      "comment" : "Button to close confirmation screen",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Schließen"
+          }
+        },
+        "de-CH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schliessen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "Complete Payment" : {
+      "comment" : "Button to complete pending payment",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung abschließen"
+          }
+        },
+        "de-CH" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung abschliessen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete Payment"
+          }
+        }
+      }
+    },
+    "Complete your profile" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vervollständigen Sie Ihr Profil"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete your profile"
           }
         }
       }
@@ -229,6 +420,12 @@
             "state" : "translated",
             "value" : "Verbindung zum Kundensupport wird hergestellt…"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecting to customer support…"
+          }
         }
       }
     },
@@ -238,6 +435,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verbindungsfehler"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection Error"
           }
         }
       }
@@ -249,6 +452,29 @@
             "state" : "translated",
             "value" : "Kontaktinformationen"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact Information"
+          }
+        }
+      }
+    },
+    "Contact support if you need assistance" : {
+      "comment" : "Message prompting user to contact support",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontaktieren Sie den Kundendienst, wenn Sie Hilfe benötigen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact support if you need assistance"
+          }
         }
       }
     },
@@ -259,16 +485,45 @@
             "state" : "translated",
             "value" : "Weiter"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
         }
       }
     },
-    "Continue to Payment" : {
-      "extractionState" : "stale",
+    "Could not check payment status" : {
+      "comment" : "Message explaining status check failure",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weiter zur Uahlung"
+            "value" : "Zahlungsstatus konnte nicht überprüft werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not check payment status"
+          }
+        }
+      }
+    },
+    "Create New Booking" : {
+      "comment" : "Button to create a new booking",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue Buchung erstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create New Booking"
           }
         }
       }
@@ -280,11 +535,14 @@
             "state" : "translated",
             "value" : "Datum"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
+          }
         }
       }
-    },
-    "Debug Authentication" : {
-
     },
     "Destination" : {
       "localizations" : {
@@ -293,11 +551,63 @@
             "state" : "translated",
             "value" : "Zielort"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destination"
+          }
         }
       }
     },
     "Done" : {
-
+      "comment" : "Button to close confirmation screen after success",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "Easy payment with TWINT" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einfache Bezahlung mit TWINT"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Easy payment with TWINT"
+          }
+        }
+      }
+    },
+    "Edit Profile" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profil bearbeiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Profile"
+          }
+        }
+      }
     },
     "Email" : {
       "localizations" : {
@@ -306,15 +616,11 @@
             "state" : "translated",
             "value" : "Email"
           }
-        }
-      }
-    },
-    "Email Address" : {
-      "localizations" : {
-        "de" : {
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Email-Adresse"
+            "value" : "Email"
           }
         }
       }
@@ -326,6 +632,12 @@
             "state" : "translated",
             "value" : "Abholort eingeben"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter Pickup Location"
+          }
         }
       }
     },
@@ -336,36 +648,30 @@
             "state" : "translated",
             "value" : "Verifizierungscode eingeben"
           }
-        }
-      }
-    },
-    "Enter your email to get started" : {
-
-    },
-    "Enter Your Name" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Geben Sie Ihren Namen ein"
-          }
-        }
-      }
-    },
-    "Enter your phone number" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geben Sie Ihren Telefonnummer ein"
+            "value" : "Enter verification code"
           }
         }
       }
     },
     "Enter your phone number to continue" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geben Sie Ihre Nummer ein um fortzufahren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter your phone number to continue"
+          }
+        }
+      }
     },
     "Error" : {
       "localizations" : {
@@ -373,6 +679,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fehler"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
           }
         }
       }
@@ -384,11 +696,64 @@
             "state" : "translated",
             "value" : "Fehler beim Laden des Chats"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error loading chat"
+          }
         }
       }
     },
     "Error: No booking reference" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler: Keine Buchungsreferenz"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: No booking reference"
+          }
+        }
+      }
+    },
+    "Expired" : {
+      "comment" : "Navigation title for expired payment",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abgelaufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expired"
+          }
+        }
+      }
+    },
+    "Failed" : {
+      "comment" : "Navigation title for failed payment",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehlgeschlagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed"
+          }
+        }
+      }
     },
     "Failed to load pricing" : {
       "localizations" : {
@@ -397,11 +762,14 @@
             "state" : "translated",
             "value" : "Fehler beim Laden der Preise"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to load pricing"
+          }
         }
       }
-    },
-    "Flight number (optional)" : {
-
     },
     "Flight: %@" : {
 
@@ -413,15 +781,11 @@
             "state" : "translated",
             "value" : "Hilfe mit Ihren Buchungen"
           }
-        }
-      }
-    },
-    "Get Started" : {
-      "localizations" : {
-        "de" : {
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jetzt starten"
+            "value" : "Get help with your bookings"
           }
         }
       }
@@ -433,6 +797,12 @@
             "state" : "translated",
             "value" : "Startseite"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
         }
       }
     },
@@ -442,6 +812,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stunde"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hour"
           }
         }
       }
@@ -453,22 +829,16 @@
             "state" : "translated",
             "value" : "Wie können wir Ihnen helfen?"
           }
-        }
-      }
-    },
-    "Important Information" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wichtige Information"
+            "value" : "How can we help?"
           }
         }
       }
     },
     "Important information about the transport operator" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -485,6 +855,12 @@
             "state" : "translated",
             "value" : "Chat wird geladen…"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading chat…"
+          }
         }
       }
     },
@@ -494,6 +870,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ihre Fahrten werden geladen…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading your trips…"
           }
         }
       }
@@ -505,11 +887,30 @@
             "state" : "translated",
             "value" : "Anmelden"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log In"
+          }
         }
       }
     },
     "Log In Again" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut anmelden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log In Again"
+          }
+        }
+      }
     },
     "Log Out" : {
       "localizations" : {
@@ -518,11 +919,14 @@
             "state" : "translated",
             "value" : "Abmelden"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log Out"
+          }
         }
       }
-    },
-    "Login as Test User" : {
-
     },
     "Logout" : {
       "localizations" : {
@@ -531,12 +935,75 @@
             "state" : "translated",
             "value" : "Abmelden"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logout"
+          }
+        }
+      }
+    },
+    "Mercedes E-Class or similar" : {
+      "comment" : "Description for Business vehicle class",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mercedes E-Klasse oder ähnlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mercedes E-Class or similar"
+          }
+        }
+      }
+    },
+    "Mercedes S-Class or similar" : {
+      "comment" : "Description for First Class vehicle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mercedes S-Klasse oder ähnlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mercedes S-Class or similar"
+          }
+        }
+      }
+    },
+    "Mercedes V-Class or similar" : {
+      "comment" : "Description for XL vehicle class",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mercedes V-Klasse oder ähnlich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mercedes V-Class or similar"
+          }
         }
       }
     },
     "Minute" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minute"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Minute"
@@ -551,6 +1018,22 @@
             "state" : "translated",
             "value" : "Meine Fahrten"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My Trips"
+          }
+        }
+      }
+    },
+    "Name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
         }
       }
     },
@@ -560,6 +1043,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keine vergangenen Fahrten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Past Trips"
           }
         }
       }
@@ -571,12 +1060,24 @@
             "state" : "translated",
             "value" : "Keine bevorstehenden Fahrten"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Upcoming Trips"
+          }
         }
       }
     },
     "OK" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -591,6 +1092,12 @@
             "state" : "translated",
             "value" : "Unser Support-Team steht Ihnen bei allen Fragen zu Ihren Buchungen gerne zur Verfügung."
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Our support team is here to assist you with any questions about your bookings."
+          }
         }
       }
     },
@@ -601,16 +1108,197 @@
             "state" : "translated",
             "value" : "Vergangene (%lld)"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Past (%lld)"
+          }
+        }
+      }
+    },
+    "Pay securely and quickly with your TWINT app." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schnell und sicher bezahlen mit Ihrer TWINT app."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pay securely and quickly with your TWINT app."
+          }
+        }
+      }
+    },
+    "Payment Awaiting Action" : {
+      "comment" : "Title shown when payment requires user action",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung ausstehend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment Awaiting Action"
+          }
+        }
+      }
+    },
+    "Payment Canceled" : {
+      "comment" : "Section title for canceled payment\nTitle shown when payment was canceled by user",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung storniert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment Cancelled"
+          }
+        }
+      }
+    },
+    "Payment Expired" : {
+      "comment" : "Section title for expired payment\nTitle shown when payment window expired",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung abgelaufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment Expired"
+          }
         }
       }
     },
     "Payment Failed" : {
-      "extractionState" : "stale",
+      "comment" : "Section title for failed payment\nTitle shown when payment failed",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zahlung fehlgeschlagen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment Failed"
+          }
+        }
+      }
+    },
+    "Payment In Progress" : {
+      "comment" : "Title shown when payment is processing",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung läuft"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment in Progress"
+          }
+        }
+      }
+    },
+    "Payment Not Completed" : {
+      "comment" : "Section title for incomplete payment",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung nicht abgeschlossen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment Not Completed"
+          }
+        }
+      }
+    },
+    "Payment Pending" : {
+      "comment" : "Title shown when payment is still processing or awaiting action",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung ausstehend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment Pending"
+          }
+        }
+      }
+    },
+    "Payment requires your action to complete" : {
+      "comment" : "Message explaining payment needs user action",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Zahlung erfordert Ihre Bestätigung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment requires your action to complete"
+          }
+        }
+      }
+    },
+    "Payment was not completed" : {
+      "comment" : "Generic message for incomplete payment",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zahlung wurde nicht abgeschlossen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Payment was not completed"
+          }
+        }
+      }
+    },
+    "Pending" : {
+      "comment" : "Navigation title for pending payment",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausstehend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pending"
           }
         }
       }
@@ -622,6 +1310,12 @@
             "state" : "translated",
             "value" : "Telefonnummer"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phone Number"
+          }
         }
       }
     },
@@ -631,6 +1325,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Telefonnummer"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phone Number"
           }
         }
       }
@@ -642,6 +1342,29 @@
             "state" : "translated",
             "value" : "Abholort"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pickup location"
+          }
+        }
+      }
+    },
+    "Please create a new booking to try again" : {
+      "comment" : "Message prompting user to create new booking",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bitte erstellen Sie eine neue Buchung, um es erneut zu versuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please create a new booking to try again"
+          }
         }
       }
     },
@@ -651,6 +1374,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "In Bearbeitung…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Processing…"
           }
         }
       }
@@ -662,11 +1391,63 @@
             "state" : "translated",
             "value" : "Profil"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile"
+          }
+        }
+      }
+    },
+    "Profile Information" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profilinformationen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile Information"
+          }
+        }
+      }
+    },
+    "Ready? Book a ride." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereit? Dann los."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ready? Book a ride."
+          }
         }
       }
     },
     "Reference: %@" : {
-
+      "comment" : "Booking reference number label",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Referenz: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reference: %@"
+          }
+        }
+      }
     },
     "Refresh" : {
       "localizations" : {
@@ -675,27 +1456,11 @@
             "state" : "translated",
             "value" : "Aktualisieren"
           }
-        }
-      }
-    },
-    "Request Failed" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anfrage fehlgeschlagen"
-          }
-        }
-      }
-    },
-    "Request Sent!" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anfrage gesendet!"
+            "value" : "Refresh"
           }
         }
       }
@@ -707,6 +1472,12 @@
             "state" : "translated",
             "value" : "Code erneut senden"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resend code"
+          }
         }
       }
     },
@@ -717,11 +1488,46 @@
             "state" : "translated",
             "value" : "Erneut senden in %llds"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resend in %llds"
+          }
         }
       }
     },
     "Retry" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut versuchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
     },
     "Search country" : {
       "localizations" : {
@@ -730,29 +1536,28 @@
             "state" : "translated",
             "value" : "Land suchen"
           }
-        }
-      }
-    },
-    "Search Rides" : {
-      "localizations" : {
-        "de" : {
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fahrten suchen"
+            "value" : "Search country"
           }
         }
       }
     },
     "See Upcoming Trips" : {
-
-    },
-    "Select %@" : {
-      "extractionState" : "stale",
+      "comment" : "Button to view upcoming trips",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ wählen"
+            "value" : "Bevorstehende Fahrten anzeigen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See Upcoming Trips"
           }
         }
       }
@@ -764,6 +1569,12 @@
             "state" : "translated",
             "value" : "Land auswählen"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Country"
+          }
         }
       }
     },
@@ -773,6 +1584,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fahrzeug auswählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Vehicle"
           }
         }
       }
@@ -784,11 +1601,14 @@
             "state" : "translated",
             "value" : "Code senden"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send Code"
+          }
         }
       }
-    },
-    "Send Magic Link" : {
-
     },
     "Sending..." : {
       "localizations" : {
@@ -797,24 +1617,113 @@
             "state" : "translated",
             "value" : "Senden…"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sending..."
+          }
         }
       }
     },
     "Session Expired" : {
-
-    },
-    "Skip" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Überspringen"
+            "value" : "Benutzersitzung abgelaufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sessions Expired"
+          }
+        }
+      }
+    },
+    "Sign In" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmelden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign In"
+          }
+        }
+      }
+    },
+    "Sign in to your account" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Melden Sie sich bei Ihrem Konto an"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in to your account"
+          }
+        }
+      }
+    },
+    "Status" : {
+      "comment" : "Navigation title for unknown payment status",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
+          }
+        }
+      }
+    },
+    "Status Unknown" : {
+      "comment" : "Title shown when payment status cannot be determined",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status unbekannt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status Unknown"
           }
         }
       }
     },
     "Success" : {
-
+      "comment" : "Navigation title for successful payment",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfolg"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Success"
+          }
+        }
+      }
     },
     "Support" : {
       "localizations" : {
@@ -822,6 +1731,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kundendienst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support"
           }
         }
       }
@@ -831,27 +1746,67 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kundendienst-Chat"
+            "value" : "Kundendienst"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Customer Support"
           }
         }
       }
     },
-    "Test API Endpoints" : {
-
-    },
-    "Test Codes" : {
-
-    },
-    "Test Phone Numbers" : {
-
-    },
-    "The transportation contract is concluded between you and the independent partner.\n\nVeramo itself is not a transportation service provider and acts solely as an intermediary between you and the independent partner." : {
-      "extractionState" : "stale",
+    "The payment could not be processed" : {
+      "comment" : "Message explaining payment processing failure",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Beförderungsvertrag wird zwischen Ihnen und dem unabhängigen Partner abgeschlossen.\nVeramo selbst ist kein Transportdienstleister und wird ausschließlich als Vermittler zwischen Ihnen und dem unabhängigen Partner tätig."
+            "value" : "Die Zahlung konnte nicht verarbeitet werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The payment could not be processed"
+          }
+        }
+      }
+    },
+    "The payment window has expired" : {
+      "comment" : "Message explaining payment time expired",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Zahlungsfenster ist abgelaufen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The payment window has expired"
+          }
+        }
+      }
+    },
+    "The transportation contract is concluded between you and the independent partner." : {
+
+    },
+    "This usually takes a few seconds" : {
+      "comment" : "Message about typical processing time",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies dauert in der Regel einige Sekunden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This usually takes a few seconds"
           }
         }
       }
@@ -863,6 +1818,12 @@
             "state" : "translated",
             "value" : "Uhrzeit"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time"
+          }
         }
       }
     },
@@ -873,19 +1834,60 @@
             "state" : "translated",
             "value" : "Gesamtpreis"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total Price"
+          }
         }
       }
     },
-    "Trip Type" : {
-
-    },
-    "Try Again" : {
-      "extractionState" : "stale",
+    "Track your ride on the day of travel" : {
+      "comment" : "Information about tracking ride on travel day",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erneut versuchen"
+            "value" : "Verfolgen Sie Ihre Fahrt am Reisetag"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Track your ride on the day of travel"
+          }
+        }
+      }
+    },
+    "Track your trips, save your preferences, and book rides faster." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verfolgen Sie Ihre Fahrten, speichern Sie Ihre Präferenzen und buchen Sie Fahrten schneller."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Track your trips, save your preferences, and book rides faster."
+          }
+        }
+      }
+    },
+    "Trip Type" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrtentyp"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trip Type"
           }
         }
       }
@@ -897,15 +1899,45 @@
             "state" : "translated",
             "value" : "Eine Nachricht eingeben…"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type a message…"
+          }
+        }
+      }
+    },
+    "Unable to Verify Status" : {
+      "comment" : "Section title when payment status cannot be verified",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status konnte nicht überprüft werden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to Verify Status"
+          }
         }
       }
     },
     "Up to %lld passengers" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bis zu %lld Passagiere"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Up to %lld passengers"
           }
         }
       }
@@ -917,16 +1949,11 @@
             "state" : "translated",
             "value" : "Bevorstehend (%lld)"
           }
-        }
-      }
-    },
-    "User: %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Benutzer: %@"
+            "value" : "Upcoming (%lld)"
           }
         }
       }
@@ -938,18 +1965,17 @@
             "state" : "translated",
             "value" : "Veramo"
           }
-        }
-      }
-    },
-    "VERAMO" : {
-      "localizations" : {
-        "de" : {
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Veramo…"
+            "value" : "Veramo"
           }
         }
       }
+    },
+    "Veramo itself is not a transportation service provider and acts solely as an intermediary between you and the independent partner." : {
+
     },
     "Verifying..." : {
       "localizations" : {
@@ -958,12 +1984,24 @@
             "state" : "translated",
             "value" : "Verifizierung…"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verifying…"
+          }
         }
       }
     },
     "Version" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version"
@@ -978,17 +2016,287 @@
             "state" : "translated",
             "value" : "Der 6-stellige Code wurde gesendet an"
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We sent a 6-digit code to"
+          }
         }
       }
     },
     "Welcome to Veramo" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Willkommen bei Veramo"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to Veramo"
+          }
+        }
+      }
+    },
+    "welcome.brand.name" : {
+      "comment" : "App brand name displayed on welcome screen",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veramo"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veramo"
+          }
+        }
+      }
+    },
+    "welcome.button.continue" : {
+      "comment" : "Button to go to next onboarding page",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        }
+      }
+    },
+    "welcome.button.getStarted" : {
+      "comment" : "Button to finish onboarding and start using the app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los geht’s!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Get Started"
+          }
+        }
+      }
+    },
+    "welcome.button.skip" : {
+      "comment" : "Button to skip onboarding and go directly to the app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überspringen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip"
+          }
+        }
+      }
+    },
+    "welcome.page1.description" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schweizer Qualität trifft auf erstklassigen Transport. Professionelle Chauffeure, Premium-Fahrzeuge, aufmerksamer Kundenservice."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Swiss quality meets first-class transport. Professional chauffeurs, premium vehicles, impeccable service."
+          }
+        }
+      }
+    },
+    "welcome.page1.subtitle" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premium Chauffeur-Service"
+          }
+        }
+      }
+    },
+    "welcome.page1.title" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Willkommen bei Veramo"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to Veramo"
+          }
+        }
+      }
+    },
+    "welcome.page2.description" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buchen Sie Ihre Fahrt in wenigen Schritten. Fahrzeugklasse, Abholzeit und Ziel auswählen – fertig."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Book your journey in just a few steps. Select the vehicle class, pick-up time and destination – done."
+          }
+        }
+      }
+    },
+    "welcome.page2.subtitle" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Sekunden gebucht"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Book in seconds"
+          }
+        }
+      }
+    },
+    "welcome.page2.title" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einfache Buchung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Easy bookings"
+          }
+        }
+      }
+    },
+    "welcome.page3.description" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Behalten Sie kommende Fahrten im Blick und sehen Sie Ihre bisherigen Fahrten ein. Alle Buchungen zentral organisiert."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep track of upcoming journeys and view your previous journeys. All bookings organised in one place."
+          }
+        }
+      }
+    },
+    "welcome.page3.subtitle" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles auf einen Blick"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Everything at a glance"
+          }
+        }
+      }
+    },
+    "welcome.page3.title" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre Fahrten-Historie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your journey history"
+          }
+        }
+      }
     },
     "What's Next?" : {
-
+      "comment" : "Section title for next steps after successful booking",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie geht es weiter?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "What’s Next?"
+          }
+        }
+      }
     },
-    "You clicked: %lld times" : {
-
+    "You canceled the payment" : {
+      "comment" : "Message explaining user canceled payment",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie haben die Zahlung storniert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You cancelled the payment"
+          }
+        }
+      }
+    },
+    "You have not been charged" : {
+      "comment" : "Message confirming no charge was made",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihnen wurden keine Kosten berechnet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have not been charged"
+          }
+        }
+      }
     },
     "Your completed trips will appear here" : {
       "localizations" : {
@@ -997,11 +2305,63 @@
             "state" : "translated",
             "value" : "Ihre abgeschlossenen Fahrten werden hier angezeigt."
           }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your completed trips will appear here"
+          }
+        }
+      }
+    },
+    "Your name and email help us provide better service." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Name und Ihre E-Mail-Adresse helfen uns dabei, Ihnen einen besseren Service zu bieten."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your name and email help us provide better service."
+          }
+        }
+      }
+    },
+    "Your payment is being processed" : {
+      "comment" : "Message explaining payment is processing",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre Zahlung wird bearbeitet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your payment is being processed"
+          }
         }
       }
     },
     "Your session has expired. Please log in again to continue." : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an, um fortzufahren."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your session has expired. Please log in again to continue."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

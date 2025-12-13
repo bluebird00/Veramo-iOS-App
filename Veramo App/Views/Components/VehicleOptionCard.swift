@@ -7,60 +7,68 @@ struct VehicleOptionCard: View {
     let onSelect: () -> Void
     
     var body: some View {
-        Button(action: onSelect) {
-            HStack(spacing: 16) {
-                // Vehicle image - supports both SF Symbols and custom assets
-                Group {
-                    if vehicle.useSystemImage {
-                        Image(systemName: vehicle.imageName)
-                            .font(.system(size: 32))
-                            .foregroundColor(.black)
-                    } else {
-                        Image(vehicle.imageName)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                    }
+        HStack(alignment: .center, spacing: 16) {
+            // Vehicle image - spans both rows
+            Group {
+                if vehicle.useSystemImage {
+                    Image(systemName: vehicle.imageName)
+                        .font(.system(size: 32))
+                        .foregroundColor(.black)
+                } else {
+                    Image(vehicle.imageName)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
                 }
-                .frame(width: 100, height: 100)
-                
-                VStack(alignment: .leading, spacing: 4) {
+            }
+            .frame(width: 90, height: 90)
+            
+            // Right side: Two rows of content
+            VStack(alignment: .leading, spacing: 8) {
+                // First row: Name and Price
+                HStack {
                     Text(vehicle.name)
                         .font(.headline)
+                        .fontWeight(.semibold)
                         .foregroundColor(.primary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    if let priceFormatted = vehicle.priceFormatted {
+                        Text(priceFormatted)
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.primary)
+                    }
+                }
+                
+                // Second row: Passengers and Description
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "person.2.fill")
+                        Text("\(vehicle.maxPassengers)")
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
                     
                     Text(vehicle.description)
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    
-                    Label("Up to \(vehicle.maxPassengers) passengers", systemImage: "person.2.fill")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                VStack(alignment: .trailing, spacing: 4) {
-                    if let priceFormatted = vehicle.priceFormatted {
-                        Text(priceFormatted)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                    }
-                    
-                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                        .font(.title2)
-                        .foregroundColor(isSelected ? .black : .gray)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(.systemBackground))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(isSelected ? Color.black : Color.gray.opacity(0.3), lineWidth: isSelected ? 2 : 1)
-            )
         }
-        .buttonStyle(.plain)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(isSelected ? Color.black : Color.gray.opacity(0.3), lineWidth: isSelected ? 3 : 1)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onSelect()
+        }
     }
 }

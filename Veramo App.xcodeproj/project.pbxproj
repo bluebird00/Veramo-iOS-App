@@ -8,10 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		24721FF02EE84F3D006065C7 /* StreamChatSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 24721FEF2EE84F3D006065C7 /* StreamChatSwiftUI */; };
+		A453C8F82EECAC8A0018BBF2 /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = A453C8F72EECAC8A0018BBF2 /* Secrets.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		240154452EE4A86000284367 /* Veramo App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Veramo App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A453C8F72EECAC8A0018BBF2 /* Secrets.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Secrets.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -37,6 +39,7 @@
 		2401543C2EE4A86000284367 = {
 			isa = PBXGroup;
 			children = (
+				A453C8F72EECAC8A0018BBF2 /* Secrets.plist */,
 				240154472EE4A86000284367 /* Veramo App */,
 				240154462EE4A86000284367 /* Products */,
 			);
@@ -100,6 +103,7 @@
 				de,
 				fr,
 				it,
+				"de-CH",
 			);
 			mainGroup = 2401543C2EE4A86000284367;
 			minimizedProjectReferenceProxies = 1;
@@ -121,6 +125,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A453C8F82EECAC8A0018BBF2 /* Secrets.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,6 +275,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Veramo-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Veramo;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Required by a third-party library but not actively used by this app";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Required by a third-party library but not actively used by this app";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -307,6 +314,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Veramo-App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Veramo;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Required by a third-party library but not actively used by this app";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Required by a third-party library but not actively used by this app";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
