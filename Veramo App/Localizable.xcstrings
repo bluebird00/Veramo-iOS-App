@@ -73,6 +73,9 @@
     "Actions" : {
 
     },
+    "Active Trip" : {
+
+    },
     "Almost there" : {
       "comment" : "Notification title when approaching destination"
     },
@@ -631,6 +634,9 @@
           }
         }
       }
+    },
+    "Driver" : {
+
     },
     "Driver has arrived" : {
       "comment" : "Driver status: arrived"

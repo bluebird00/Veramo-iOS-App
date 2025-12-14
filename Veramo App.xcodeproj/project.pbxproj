@@ -8,18 +8,76 @@
 
 /* Begin PBXBuildFile section */
 		24721FF02EE84F3D006065C7 /* StreamChatSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 24721FEF2EE84F3D006065C7 /* StreamChatSwiftUI */; };
+		A44C6CCC2EEF47380045BFF4 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A44C6CAD2EEF46510045BFF4 /* WidgetKit.framework */; };
+		A44C6CCD2EEF47380045BFF4 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A44C6CAF2EEF46510045BFF4 /* SwiftUI.framework */; };
+		A44C6CDA2EEF47390045BFF4 /* TripWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A44C6CCB2EEF47380045BFF4 /* TripWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A453C8F82EECAC8A0018BBF2 /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = A453C8F72EECAC8A0018BBF2 /* Secrets.plist */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		A44C6CD82EEF47390045BFF4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2401543D2EE4A86000284367 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A44C6CCA2EEF47380045BFF4;
+			remoteInfo = TripWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A44C6CC22EEF46520045BFF4 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A44C6CDA2EEF47390045BFF4 /* TripWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		240154452EE4A86000284367 /* Veramo App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Veramo App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A44C6CAD2EEF46510045BFF4 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		A44C6CAF2EEF46510045BFF4 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		A44C6CCB2EEF47380045BFF4 /* TripWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TripWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A453C8F72EECAC8A0018BBF2 /* Secrets.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Secrets.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A44C6CDB2EEF47390045BFF4 /* Exceptions for "TripWidget" folder in "TripWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A44C6CCA2EEF47380045BFF4 /* TripWidgetExtension */;
+		};
+		A44C6CE02EEF477C0045BFF4 /* Exceptions for "Veramo App" folder in "TripWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Views/TripActivityAttributes.swift,
+			);
+			target = A44C6CCA2EEF47380045BFF4 /* TripWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		240154472EE4A86000284367 /* Veramo App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A44C6CE02EEF477C0045BFF4 /* Exceptions for "Veramo App" folder in "TripWidgetExtension" target */,
+			);
 			path = "Veramo App";
+			sourceTree = "<group>";
+		};
+		A44C6CCE2EEF47380045BFF4 /* TripWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A44C6CDB2EEF47390045BFF4 /* Exceptions for "TripWidget" folder in "TripWidgetExtension" target */,
+			);
+			path = TripWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -33,6 +91,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A44C6CC82EEF47380045BFF4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A44C6CCD2EEF47380045BFF4 /* SwiftUI.framework in Frameworks */,
+				A44C6CCC2EEF47380045BFF4 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -41,6 +108,8 @@
 			children = (
 				A453C8F72EECAC8A0018BBF2 /* Secrets.plist */,
 				240154472EE4A86000284367 /* Veramo App */,
+				A44C6CCE2EEF47380045BFF4 /* TripWidget */,
+				A44C6CAC2EEF46510045BFF4 /* Frameworks */,
 				240154462EE4A86000284367 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -49,8 +118,18 @@
 			isa = PBXGroup;
 			children = (
 				240154452EE4A86000284367 /* Veramo App.app */,
+				A44C6CCB2EEF47380045BFF4 /* TripWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A44C6CAC2EEF46510045BFF4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A44C6CAD2EEF46510045BFF4 /* WidgetKit.framework */,
+				A44C6CAF2EEF46510045BFF4 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -63,10 +142,12 @@
 				240154412EE4A86000284367 /* Sources */,
 				240154422EE4A86000284367 /* Frameworks */,
 				240154432EE4A86000284367 /* Resources */,
+				A44C6CC22EEF46520045BFF4 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A44C6CD92EEF47390045BFF4 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				240154472EE4A86000284367 /* Veramo App */,
@@ -79,6 +160,28 @@
 			productReference = 240154452EE4A86000284367 /* Veramo App.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A44C6CCA2EEF47380045BFF4 /* TripWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A44C6CDC2EEF47390045BFF4 /* Build configuration list for PBXNativeTarget "TripWidgetExtension" */;
+			buildPhases = (
+				A44C6CC72EEF47380045BFF4 /* Sources */,
+				A44C6CC82EEF47380045BFF4 /* Frameworks */,
+				A44C6CC92EEF47380045BFF4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A44C6CCE2EEF47380045BFF4 /* TripWidget */,
+			);
+			name = TripWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = TripWidgetExtension;
+			productReference = A44C6CCB2EEF47380045BFF4 /* TripWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -90,6 +193,9 @@
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					240154442EE4A86000284367 = {
+						CreatedOnToolsVersion = 26.1.1;
+					};
+					A44C6CCA2EEF47380045BFF4 = {
 						CreatedOnToolsVersion = 26.1.1;
 					};
 				};
@@ -116,6 +222,7 @@
 			projectRoot = "";
 			targets = (
 				240154442EE4A86000284367 /* Veramo App */,
+				A44C6CCA2EEF47380045BFF4 /* TripWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -129,6 +236,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A44C6CC92EEF47380045BFF4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -139,7 +253,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A44C6CC72EEF47380045BFF4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A44C6CD92EEF47390045BFF4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A44C6CCA2EEF47380045BFF4 /* TripWidgetExtension */;
+			targetProxy = A44C6CD82EEF47390045BFF4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		2401544E2EE4A86100284367 /* Debug */ = {
@@ -279,6 +408,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Required by a third-party library but not actively used by this app";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Required by a third-party library but not actively used by this app";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -318,6 +448,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Required by a third-party library but not actively used by this app";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Required by a third-party library but not actively used by this app";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -334,6 +465,66 @@
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A44C6CDD2EEF47390045BFF4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A64JY8K7W6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TripWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TripWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.veramo.veramo.TripWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A44C6CDE2EEF47390045BFF4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = A64JY8K7W6;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TripWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = TripWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ch.veramo.veramo.TripWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
@@ -358,6 +549,15 @@
 			buildConfigurations = (
 				240154512EE4A86100284367 /* Debug */,
 				240154522EE4A86100284367 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A44C6CDC2EEF47390045BFF4 /* Build configuration list for PBXNativeTarget "TripWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A44C6CDD2EEF47390045BFF4 /* Debug */,
+				A44C6CDE2EEF47390045BFF4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
