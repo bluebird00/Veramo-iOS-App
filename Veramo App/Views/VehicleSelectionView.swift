@@ -214,7 +214,7 @@ struct VehicleSelectionView: View {
                                 VehicleOptionCard(
                                     vehicle: vehicle,
                                     isSelected: selectedVehicle?.name == vehicle.name,
-                                    onSelect: { 
+                                    onSelect: {
                                         withAnimation(.linear(duration: 0.15)) {
                                             selectedVehicle = vehicle
                                         }
@@ -249,7 +249,7 @@ struct VehicleSelectionView: View {
                 .scrollIndicators(.hidden)
                 .animation(.linear(duration: 0.2), value: displayedVehicles.count)
                 
-               
+                
                 
                 
                 // Book now button
@@ -280,6 +280,7 @@ struct VehicleSelectionView: View {
                     .opacity(selectedVehicle != nil && !isProcessingBooking ? 1 : 0.5)
                     
                     
+                    
                 }
                 .padding(.horizontal, 28)
                 .padding(.top, 8)
@@ -306,6 +307,8 @@ struct VehicleSelectionView: View {
                     }
                 }
             }
+            
+            
         }
         .alert("Booking Error", isPresented: $showErrorAlert) {
             Button("OK", role: .cancel) { }
@@ -321,17 +324,30 @@ struct VehicleSelectionView: View {
             Text("Your session has expired. Please log in again to continue.")
         }
         .fullScreenCover(item: Binding(
-            get: { checkoutUrl.map { CheckoutURL(url: $0, reference: bookingReference) } },
-            set: { checkoutUrl = $0?.url }
+            get: { checkoutUrl.map { CheckoutURL(url: $0, reference: bookingReference, token: quoteToken) } },
+            set: { newValue in
+                // When Safari is dismissed (set to nil), clear the checkout URL
+                if newValue == nil {
+                    print("📱 [BOOKING] Safari fullScreenCover binding set to nil")
+                    checkoutUrl = nil
+                } else {
+                    checkoutUrl = newValue?.url
+                }
+            }
         )) { checkout in
             SafariView(url: checkout.url) {
-                // Called when Safari is dismissed
-                // The booking is confirmed automatically once payment completes
-                print("📱 [BOOKING] Payment browser dismissed")
+                // Called when user manually dismisses Safari (NOT when redirecting)
+                print("📱 [BOOKING] Safari view onDismiss called")
                 print("📱 [BOOKING] Booking reference: \(checkout.reference ?? "N/A")")
+                print("📱 [BOOKING] Quote token: \(checkout.token ?? "N/A")")
                 
-                // Show booking confirmation
-                showBookingConfirmed = true
+                // Preserve the booking data - this is crucial
+                bookingReference = checkout.reference
+                quoteToken = checkout.token
+                
+                // Note: We don't show the confirmation sheet here anymore
+                // The deep link handler will take care of it after Safari is fully dismissed
+                print("📱 [BOOKING] Data preserved, waiting for deep link...")
             }
             .ignoresSafeArea()
         }
@@ -363,6 +379,7 @@ struct VehicleSelectionView: View {
                         .foregroundStyle(.secondary)
                     Button("Close") {
                         showBookingConfirmed = false
+                        showVehicleSelection = false
                     }
                     .buttonStyle(.bordered)
                 }
@@ -384,17 +401,59 @@ struct VehicleSelectionView: View {
                     }
                 }
         }
+        .onOpenURL { url in
+            // Intercept booking-confirmed deep links if they match our booking reference
+            handleBookingConfirmedDeepLink(url)
+        }
         
     }
     
-    // Helper struct for identifiable URL with reference
+    // Helper struct for identifiable URL with reference and token
     private struct CheckoutURL: Identifiable {
         let id = UUID()
         let url: URL
         let reference: String?
+        let token: String?
     }
     
     // MARK: - Booking Action
+    
+    private func handleBookingConfirmedDeepLink(_ url: URL) {
+        // Only handle if it's our booking-confirmed deep link
+        guard url.scheme == "veramo",
+              url.host == "booking-confirmed",
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let queryItems = components.queryItems,
+              let ref = queryItems.first(where: { $0.name == "ref" })?.value else {
+            return
+        }
+        
+        print("📱 [VEHICLE_SELECTION] Intercepted booking-confirmed deep link: \(ref)")
+        
+        // Check if this is OUR booking
+        if let ourReference = bookingReference, ref == ourReference {
+            print("✅ [VEHICLE_SELECTION] Deep link matches our booking - showing confirmation with stored token")
+            print("   • Reference: \(ref)")
+            print("   • Token: \(quoteToken ?? "N/A")")
+            
+            // IMPORTANT: Delay showing the sheet to allow Safari fullScreenCover to fully dismiss
+            // Without this delay, we get "presentation is in progress" error and the sheet auto-dismisses
+            Task { @MainActor in
+                // First, ensure Safari is dismissed by clearing the URL
+                checkoutUrl = nil
+                
+                // Wait for Safari dismissal animation to complete (typically 0.3-0.5s)
+                try? await Task.sleep(for: .milliseconds(600))
+                
+                // Now show the confirmation sheet
+                print("📱 [VEHICLE_SELECTION] Presenting BookingConfirmedView after delay")
+                showBookingConfirmed = true
+            }
+        } else {
+            print("⚠️ [VEHICLE_SELECTION] Deep link reference (\(ref)) doesn't match our booking (\(bookingReference ?? "none"))")
+            // Not our booking, let MainTabView handle it
+        }
+    }
     
     private func createBooking() {
         // Validate we have selected a vehicle
@@ -555,6 +614,8 @@ struct VehicleSelectionView: View {
             }
         }
     }
+
+
     
     // MARK: - Pricing
     
@@ -609,76 +670,7 @@ struct VehicleSelectionView: View {
     
 }
 
-// MARK: - Operator Information Sheet
 
-struct OperatorInformationSheet: View {
-    let selectedVehicle: VehicleType?
-    let pickup: String
-    let destination: String
-    let date: Date
-    let time: Date
-    let passengers: Int
-    let onConfirm: () -> Void
-    let onCancel: () -> Void
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            Spacer()
-            
-            // Content
-            VStack(spacing: 24) {
-                // Icon
-                Image(systemName: "info.circle.fill")
-                    .font(.system(size: 60))
-                    .foregroundStyle(.blue)
-                
-                // Title
-                Text("Important information about the transport operator")
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
-                
-                // Description
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("The transportation contract is concluded between you and the independent partner.")
-                        .font(.body)
-                        .foregroundStyle(.primary)
-                    
-                    Text("Veramo itself is not a transportation service provider and acts solely as an intermediary between you and the independent partner.")
-                        .font(.body)
-                        .foregroundStyle(.primary)
-                }
-                .padding(.horizontal, 32)
-                .multilineTextAlignment(.leading)
-            }
-            
-            Spacer()
-            
-            // Continue Button
-            Button(action: onConfirm) {
-                Text("Continue")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        LinearGradient(
-                            colors: [.black, Color(.darkGray)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(12)
-            }
-            .padding(.horizontal, 32)
-            .padding(.bottom, 40)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemBackground))
-    }
-}
 
 // MARK: - View Height Preference Key
 

@@ -47,6 +47,7 @@ struct BookingConfirmedViewContent: View {
     @State private var paymentStatusResponse: PaymentStatusResponse?
     @State private var checkoutUrl: String?
     @State private var showPaymentSafari = false
+    @State private var showTripTracking = false
     
     var body: some View {
         VStack(spacing: 32) {
@@ -179,20 +180,41 @@ struct BookingConfirmedViewContent: View {
                 .font(.headline)
                 .foregroundStyle(.primary)
             
-            
-           
-            
-            
+            InfoRow(
+                icon: "bell.fill",
+                text: String(localized: "You'll receive notifications about your ride", comment: "Information about receiving notifications")
+            )
             
             InfoRow(
                 icon: "car.fill",
                 text: String(localized: "Track your ride on the day of travel", comment: "Information about tracking ride on travel day")
             )
+            
+            // Track ride button
+            Button {
+                showTripTracking = true
+            } label: {
+                HStack {
+                    Image(systemName: "location.fill")
+                    Text("Track Your Ride", comment: "Button to open trip tracking view")
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                }
+                .font(.subheadline)
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
+                .background(Color.accentColor.opacity(0.1))
+                .foregroundStyle(Color.accentColor)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.systemGray6))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .sheet(isPresented: $showTripTracking) {
+            TripTrackingView(reference: reference)
+        }
     }
     
     private var pendingContent: some View {

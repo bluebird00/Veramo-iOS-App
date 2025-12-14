@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 class AuthenticationManager {
     static let shared = AuthenticationManager()
@@ -49,6 +50,10 @@ class AuthenticationManager {
     }
     
     // MARK: - Customer Info
+    
+    var customerId: Int? {
+        return currentCustomer?.id
+    }
     
     var currentCustomer: AuthenticatedCustomer? {
         get {
@@ -125,6 +130,14 @@ class AuthenticationManager {
         }
         if let savedCustomer = self.currentCustomer {
             print("   ✅ Customer verified: \(savedCustomer.name ?? "nil")")
+        }
+        
+        // Re-register device token for push notifications now that user is authenticated
+        PushNotificationService.shared.reregisterDeviceTokenIfNeeded()
+        
+        // Also trigger a fresh APNs registration in case token hasn't been received yet
+        DispatchQueue.main.async {
+            UIApplication.shared.registerForRemoteNotifications()
         }
     }
     

@@ -9,9 +9,6 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var selectedTab: Tab = .home
-    @State private var showBookingConfirmation = false
-    @State private var bookingReference: String?
-    @State private var quoteToken: String?
     
     enum Tab {
         case home
@@ -49,68 +46,28 @@ struct MainTabView: View {
         .onOpenURL { url in
             handleDeepLink(url)
         }
-        .sheet(isPresented: $showBookingConfirmation) {
-            if let reference = bookingReference {
-                BookingConfirmedView(
-                    reference: reference,
-                    quoteToken: quoteToken,
-                    selectedTab: $selectedTab
-                )
-            }
-        }
     }
     
     // MARK: - Deep Link Handling
     
     private func handleDeepLink(_ url: URL) {
-        print("📱 Received deep link: \(url.absoluteString)")
+        print("📱 [MAINTAB] Received deep link: \(url.absoluteString)")
         
         // Verify it's our app's URL scheme
         guard url.scheme == "veramo" else {
-            print("❌ Unknown URL scheme: \(url.scheme ?? "nil")")
+            print("❌ [MAINTAB] Unknown URL scheme: \(url.scheme ?? "nil")")
             return
         }
         
         // Check the path/host
         switch url.host {
         case "booking-confirmed":
-            handleBookingConfirmed(url)
+            // VehicleSelectionView handles booking-confirmed deep links during payment flow
+            // MainTabView doesn't need to handle these anymore
+            print("📱 [MAINTAB] Booking-confirmed deep link detected - VehicleSelectionView will handle it")
             
         default:
-            print("❌ Unknown deep link host: \(url.host ?? "nil")")
-        }
-    }
-    
-    private func handleBookingConfirmed(_ url: URL) {
-        // Parse query parameters
-        // Example: veramo://booking-confirmed?ref=VRM-1234&token=abc123
-        
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              let queryItems = components.queryItems else {
-            print("❌ No query parameters found in deep link")
-            return
-        }
-        
-        // Extract booking reference
-        if let refItem = queryItems.first(where: { $0.name == "ref" }),
-           let reference = refItem.value {
-            
-            // Extract quote token (optional)
-            let token = queryItems.first(where: { $0.name == "token" })?.value
-            
-            print("✅ Booking confirmed: \(reference)")
-            if let token = token {
-                print("   Quote token: \(String(token.prefix(20)))...")
-            } else {
-                print("   ⚠️ No quote token provided in deep link")
-            }
-            
-            // Update state to show confirmation
-            bookingReference = reference
-            quoteToken = token
-            showBookingConfirmation = true
-        } else {
-            print("❌ No 'ref' parameter in deep link")
+            print("❌ [MAINTAB] Unknown deep link host: \(url.host ?? "nil")")
         }
     }
 }

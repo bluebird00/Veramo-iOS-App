@@ -17,6 +17,8 @@ extension Notification.Name {
 
 @main
 struct Veramo_AppApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     @State private var appState = AppState()
     @State private var showError = false
     @State private var errorMessage = ""

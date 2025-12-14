@@ -17,8 +17,23 @@
         }
       }
     },
+    "%@ is waiting for you" : {
+      "comment" : "Notification body with driver name"
+    },
     "%lld" : {
 
+    },
+    "• APNs hasn't responded yet" : {
+
+    },
+    "• Notification permissions denied" : {
+
+    },
+    "• Running in iOS Simulator" : {
+
+    },
+    "~%lld min" : {
+      "comment" : "Estimated minutes until arrival"
     },
     "1.0.0" : {
 
@@ -55,6 +70,15 @@
         }
       }
     },
+    "Actions" : {
+
+    },
+    "Almost there" : {
+      "comment" : "Notification title when approaching destination"
+    },
+    "Approaching your destination" : {
+      "comment" : "Notification body without destination ETA"
+    },
     "Are you sure you want to logout?" : {
       "localizations" : {
         "de" : {
@@ -70,6 +94,18 @@
           }
         }
       }
+    },
+    "Arriving at destination in %lld minutes" : {
+      "comment" : "Notification body with destination ETA"
+    },
+    "Arriving in approximately %lld minutes" : {
+      "comment" : "Notification body with ETA"
+    },
+    "Authenticated" : {
+
+    },
+    "Authentication" : {
+
     },
     "Authentication Error" : {
       "localizations" : {
@@ -348,6 +384,9 @@
         }
       }
     },
+    "Checking status..." : {
+      "comment" : "Loading message for trip status"
+    },
     "Choose how you'd like to sign in" : {
 
     },
@@ -479,6 +518,7 @@
       }
     },
     "Continue" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -493,6 +533,9 @@
           }
         }
       }
+    },
+    "Copy Token" : {
+
     },
     "Could not check payment status" : {
       "comment" : "Message explaining status check failure",
@@ -528,6 +571,9 @@
         }
       }
     },
+    "Customer ID: %lld" : {
+
+    },
     "Date" : {
       "localizations" : {
         "de" : {
@@ -560,6 +606,15 @@
         }
       }
     },
+    "Developer" : {
+
+    },
+    "Device Token" : {
+
+    },
+    "Device Token:" : {
+
+    },
     "Done" : {
       "comment" : "Button to close confirmation screen after success",
       "localizations" : {
@@ -576,6 +631,24 @@
           }
         }
       }
+    },
+    "Driver has arrived" : {
+      "comment" : "Driver status: arrived"
+    },
+    "Driver Information" : {
+      "comment" : "Section title for driver details"
+    },
+    "Driver Name" : {
+
+    },
+    "Driver on the way" : {
+      "comment" : "Driver status: on the way\nNotification title when driver starts journey"
+    },
+    "Driver Status" : {
+
+    },
+    "Driver waiting" : {
+      "comment" : "Driver status: waiting for passenger\nNotification title when driver is waiting"
     },
     "Easy payment with TWINT" : {
       "localizations" : {
@@ -721,6 +794,12 @@
         }
       }
     },
+    "Estimated Arrival" : {
+      "comment" : "Label for estimated arrival time"
+    },
+    "ETA: %lld min" : {
+
+    },
     "Expired" : {
       "comment" : "Navigation title for expired payment",
       "localizations" : {
@@ -774,6 +853,9 @@
     "Flight: %@" : {
 
     },
+    "Generate New Reference" : {
+
+    },
     "Get help with your bookings" : {
       "localizations" : {
         "de" : {
@@ -789,6 +871,12 @@
           }
         }
       }
+    },
+    "Heading to destination" : {
+      "comment" : "Driver status: going to destination"
+    },
+    "Heading to your destination" : {
+      "comment" : "Notification body when heading to destination"
     },
     "Home" : {
       "localizations" : {
@@ -839,6 +927,7 @@
       }
     },
     "Important information about the transport operator" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -863,6 +952,9 @@
           }
         }
       }
+    },
+    "Loading driver location..." : {
+      "comment" : "Loading message for driver location"
     },
     "Loading suggestions..." : {
       "localizations" : {
@@ -1047,6 +1139,12 @@
         }
       }
     },
+    "Name: %@" : {
+
+    },
+    "No device token registered" : {
+
+    },
     "No Past Trips" : {
       "localizations" : {
         "de" : {
@@ -1079,6 +1177,9 @@
         }
       }
     },
+    "Not authenticated" : {
+
+    },
     "OK" : {
       "localizations" : {
         "de" : {
@@ -1094,6 +1195,12 @@
           }
         }
       }
+    },
+    "On your way!" : {
+      "comment" : "Notification title when trip starts"
+    },
+    "Open Notification Settings" : {
+
     },
     "Our support team is here to assist you with any questions about your bookings." : {
       "localizations" : {
@@ -1345,6 +1452,9 @@
         }
       }
     },
+    "Picked up" : {
+      "comment" : "Driver status: passenger picked up"
+    },
     "Pickup location" : {
       "localizations" : {
         "de" : {
@@ -1377,6 +1487,9 @@
           }
         }
       }
+    },
+    "Please head to your pickup location" : {
+      "comment" : "Notification body prompting passenger to go to pickup"
     },
     "Processing..." : {
       "localizations" : {
@@ -1442,8 +1555,11 @@
         }
       }
     },
+    "Reference:" : {
+
+    },
     "Reference: %@" : {
-      "comment" : "Booking reference number label",
+      "comment" : "Booking reference label\nBooking reference number label",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1474,6 +1590,9 @@
           }
         }
       }
+    },
+    "Request Token Again" : {
+
     },
     "Resend code" : {
       "localizations" : {
@@ -1619,6 +1738,12 @@
           }
         }
       }
+    },
+    "Send Driver Arrived" : {
+
+    },
+    "Send Status Notification" : {
+
     },
     "Sending..." : {
       "localizations" : {
@@ -1767,6 +1892,15 @@
         }
       }
     },
+    "Test Information" : {
+
+    },
+    "Test Notifications" : {
+
+    },
+    "Thank you for riding with us!" : {
+      "comment" : "Notification body for trip completion"
+    },
     "The payment could not be processed" : {
       "comment" : "Message explaining payment processing failure",
       "localizations" : {
@@ -1801,7 +1935,10 @@
         }
       }
     },
-    "The transportation contract is concluded between you and the independent partner." : {
+    "These tools are only available in debug builds." : {
+
+    },
+    "This is normal if:" : {
 
     },
     "This usually takes a few seconds" : {
@@ -1853,6 +1990,9 @@
         }
       }
     },
+    "Track Your Ride" : {
+      "comment" : "Button to open trip tracking view"
+    },
     "Track your ride on the day of travel" : {
       "comment" : "Information about tracking ride on travel day",
       "localizations" : {
@@ -1885,6 +2025,12 @@
           }
         }
       }
+    },
+    "Trip canceled" : {
+      "comment" : "Driver status: canceled\nNotification title when trip is canceled"
+    },
+    "Trip completed" : {
+      "comment" : "Driver status: trip complete\nNotification title when trip is complete"
     },
     "Trip Type" : {
       "localizations" : {
@@ -1966,9 +2112,6 @@
           }
         }
       }
-    },
-    "Veramo itself is not a transportation service provider and acts solely as an intermediary between you and the independent partner." : {
-
     },
     "Verifying..." : {
       "localizations" : {
@@ -2291,6 +2434,9 @@
         }
       }
     },
+    "You'll receive notifications about your ride" : {
+      "comment" : "Information about receiving notifications"
+    },
     "Your completed trips will appear here" : {
       "localizations" : {
         "de" : {
@@ -2306,6 +2452,15 @@
           }
         }
       }
+    },
+    "Your driver has arrived!" : {
+      "comment" : "Notification title when driver arrives"
+    },
+    "Your driver is heading to pick you up" : {
+      "comment" : "Notification body without ETA"
+    },
+    "Your driver is waiting for you" : {
+      "comment" : "Notification body for arrival\nNotification body without driver name"
     },
     "Your name and email help us provide better service." : {
       "localizations" : {
@@ -2355,6 +2510,9 @@
           }
         }
       }
+    },
+    "Your trip has been canceled" : {
+      "comment" : "Notification body for cancellation"
     }
   },
   "version" : "1.1"

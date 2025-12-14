@@ -188,6 +188,21 @@ struct ProfileView: View {
                 } header: {
                     Text("About")
                 }
+                
+                // Developer Tools (Debug builds only)
+                #if DEBUG
+                Section {
+                    NavigationLink {
+                        NotificationTestView()
+                    } label: {
+                        Label("Test Notifications", systemImage: "bell.badge")
+                    }
+                } header: {
+                    Text("Developer")
+                } footer: {
+                    Text("These tools are only available in debug builds.")
+                }
+                #endif
             }
             .navigationTitle("Account")
             .alert("Logout", isPresented: $showLogoutConfirmation) {
