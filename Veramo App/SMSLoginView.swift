@@ -53,6 +53,8 @@ struct SMSLoginView: View {
                 Text(codeSent ? "Enter verification code" : "Enter your phone number to continue")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 16)
             }
             .padding(.bottom, 48)
             

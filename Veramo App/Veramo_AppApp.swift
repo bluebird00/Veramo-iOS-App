@@ -75,6 +75,7 @@ struct Veramo_AppApp: App {
                 if shouldShowWelcome {
                     WelcomeScreen(hasSeenWelcome: $hasSeenWelcome)
                         .opacity(welcomeScreenOpacity)
+                        .animation(.easeOut(duration: 0.3), value: welcomeScreenOpacity)
                         .zIndex(1)
                         .onAppear {
                             print("⚠️ Welcome screen IS showing!")
@@ -90,8 +91,10 @@ struct Veramo_AppApp: App {
                 print("👀 hasSeenWelcome changed from \(oldValue) to \(newValue)")
                 
                 if newValue {
-                    // Animate the welcome screen out
-                    withAnimation(.easeOut(duration: 0.3)) {
+                    // Animate the welcome screen out - use transaction to isolate animation
+                    var transaction = Transaction(animation: .easeOut(duration: 0.3))
+                    transaction.disablesAnimations = false
+                    withTransaction(transaction) {
                         welcomeScreenOpacity = 0
                     }
                     

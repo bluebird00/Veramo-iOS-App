@@ -18,14 +18,19 @@ struct CountryCode: Identifiable, Hashable {
     let dialCode: String    // Phone dial code (e.g., "+41")
     let flag: String        // Flag emoji (e.g., "🇨🇭")
     
-    /// Display name with flag and country (e.g., "🇨🇭 Switzerland")
-    var displayName: String {
-        "\(flag) \(country)"
+    /// Localized country name based on current locale
+    var localizedCountryName: String {
+        Locale.current.localizedString(forRegionCode: code) ?? country
     }
     
-    /// Full display with dial code (e.g., "🇨🇭 Switzerland (+41)")
+    /// Display name with flag and localized country (e.g., "🇨🇭 Schweiz" in German)
+    var displayName: String {
+        "\(flag) \(localizedCountryName)"
+    }
+    
+    /// Full display with dial code (e.g., "🇨🇭 Schweiz (+41)" in German)
     var fullDisplay: String {
-        "\(flag) \(country) (\(dialCode))"
+        "\(flag) \(localizedCountryName) (\(dialCode))"
     }
 }
 
@@ -279,15 +284,12 @@ class CountryCodeData {
     /// Get country code based on device locale
     func getDefaultCountryCode() -> CountryCode {
         let regionCode = Locale.current.region?.identifier ?? "CH"
-        print("🌍 Device region code: \(regionCode)")
         
         if let countryCode = allCountryCodes.first(where: { $0.code == regionCode }) {
-            print("✅ Found matching country: \(countryCode.country) (\(countryCode.dialCode))")
             return countryCode
         }
         
         // Default to Switzerland if not found
-        print("⚠️ Region not found, defaulting to Switzerland")
         return allCountryCodes.first(where: { $0.code == "CH" })!
     }
     
@@ -298,6 +300,7 @@ class CountryCodeData {
         let lowercaseQuery = query.lowercased()
         return allCountryCodes.filter { country in
             country.country.lowercased().contains(lowercaseQuery) ||
+            country.localizedCountryName.lowercased().contains(lowercaseQuery) ||
             country.dialCode.contains(query) ||
             country.code.lowercased().contains(lowercaseQuery)
         }

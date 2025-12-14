@@ -61,6 +61,7 @@ struct WelcomeScreen: View {
                 }
                 .padding(.top, 60)
                 .opacity(opacity)
+                .animation(.easeIn(duration: 0.8), value: opacity)
                 
                 Spacer()
                 
@@ -91,9 +92,7 @@ struct WelcomeScreen: View {
                     // Action button
                     Button(action: {
                         if currentPage < pages.count - 1 {
-                            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                                currentPage += 1
-                            }
+                            currentPage += 1
                         } else {
                             // No animation wrapper - prevents animation bleed to HomeView
                             hasSeenWelcome = true
@@ -138,9 +137,7 @@ struct WelcomeScreen: View {
             }
         }
         .onAppear {
-            withAnimation(.easeIn(duration: 0.8)) {
-                opacity = 1
-            }
+            opacity = 1
         }
     }
 }
@@ -178,6 +175,7 @@ struct WelcomeFeatureView: View {
                     )
                     .frame(width: 200, height: 200)
                     .scaleEffect(animate ? 1.1 : 1.0)
+                    .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: animate)
                 
                 // Inner circle
                 Circle()
@@ -190,14 +188,11 @@ struct WelcomeFeatureView: View {
                     .frame(width: 40, height: 40)
                     .scaleEffect(pulsate ? 1.3 : 1.0)
                     .opacity(pulsate ? 0.6 : 1.0)
+                    .animation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true), value: pulsate)
             }
             .onAppear {
-                withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
-                    animate = true
-                }
-                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
-                    pulsate = true
-                }
+                animate = true
+                pulsate = true
             }
             
             // Content
