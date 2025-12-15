@@ -185,28 +185,14 @@ struct BookingConfirmedViewContent: View {
                 text: String(localized: "You'll receive notifications about your ride", comment: "Information about receiving notifications")
             )
             
+            
             InfoRow(
-                icon: "car.fill",
-                text: String(localized: "Track your ride on the day of travel", comment: "Information about tracking ride on travel day")
+                icon: "questionmark.circle.fill",
+                text: String(localized: "Need help? Contact support anytime", comment: "Information about support availability")
             )
             
-            // Track ride button
-            Button {
-                showTripTracking = true
-            } label: {
-                HStack {
-                    Image(systemName: "location.fill")
-                    Text("Track Your Ride", comment: "Button to open trip tracking view")
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                }
-                .font(.subheadline)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 16)
-                .background(Color.accentColor.opacity(0.1))
-                .foregroundStyle(Color.accentColor)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-            }
+            
+            
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)

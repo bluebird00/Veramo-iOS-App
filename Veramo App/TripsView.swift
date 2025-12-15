@@ -437,7 +437,7 @@ struct TripCard: View {
                     .cornerRadius(12)
                 } else {
                     // Booking status badge (fallback)
-                    Text(trip.bookingStatus.capitalized)
+                    Text(bookingStatusDisplayName(for: trip.bookingStatus))
                         .font(.caption)
                         .fontWeight(.semibold)
                         .foregroundColor(.white)
@@ -487,21 +487,12 @@ struct TripCard: View {
                 
                 Spacer()
                 
-                VStack(alignment: .trailing, spacing: 4) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "car.fill")
-                        Text(trip.vehicleDisplayName)
-                    }
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    
-                    HStack(spacing: 4) {
-                        Image(systemName: "person.fill")
-                        Text("\(trip.passengers)")
-                    }
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                HStack(spacing: 4) {
+                    Image(systemName: "car.fill")
+                    Text(trip.vehicleDisplayName)
                 }
+                .font(.caption)
+                .foregroundColor(.secondary)
             }
             
             // Driver info and ETA (if status is available)
@@ -525,7 +516,8 @@ struct TripCard: View {
                             Spacer()
                             
                             // Call button
-                            if let url = URL(string: "tel://\(driver.phone)") {
+                            if let phone = driver.phone,
+                               let url = URL(string: "tel://\(phone)") {
                                 Button {
                                     UIApplication.shared.open(url)
                                 } label: {
@@ -584,8 +576,15 @@ struct TripCard: View {
             }
         }
         .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(16)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.1), radius: 8, y: 2)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color(.separator), lineWidth: 1)
+        )
         /*
         // Disabled: chevron indicator (card no longer tappable)
         .overlay(
@@ -645,19 +644,32 @@ struct TripCard: View {
     private func statusDisplayName(for status: String) -> String {
         switch status.lowercased() {
         case "assigned":
-            return "Driver Assigned"
+            return String(localized: "trip.status.assigned", defaultValue: "Fahrer zugewiesen", comment: "Status angezeigt, wenn ein Fahrer der Fahrt zugewiesen wurde")
         case "en_route":
-            return "En Route"
+            return String(localized: "trip.status.enRoute", defaultValue: "Unterwegs", comment: "Status angezeigt, wenn der Fahrer zum Abholort unterwegs ist")
         case "nearby":
-            return "Nearby"
+            return String(localized: "trip.status.nearby", defaultValue: "In der Nähe", comment: "Status angezeigt, wenn der Fahrer in der Nähe des Abholorts ist")
         case "arrived":
-            return "Arrived"
+            return String(localized: "trip.status.arrived", defaultValue: "Angekommen", comment: "Status angezeigt, wenn der Fahrer am Abholort angekommen ist")
         case "waiting":
-            return "Waiting"
+            return String(localized: "trip.status.waiting", defaultValue: "Wartet", comment: "Status angezeigt, wenn der Fahrer auf den Fahrgast wartet")
         case "in_progress":
-            return "In Progress"
+            return String(localized: "trip.status.inProgress", defaultValue: "In Fahrt", comment: "Status angezeigt, wenn die Fahrt aktiv läuft")
         case "completed":
-            return "Completed"
+            return String(localized: "trip.status.completed", defaultValue: "Abgeschlossen", comment: "Status angezeigt, wenn die Fahrt abgeschlossen wurde")
+        default:
+            return status.capitalized
+        }
+    }
+    
+    private func bookingStatusDisplayName(for status: String) -> String {
+        switch status.lowercased() {
+        case "confirmed":
+            return String(localized: "trip.bookingStatus.confirmed", defaultValue: "Bestätigt", comment: "Buchungsstatus wenn die Fahrt bestätigt wurde")
+        case "pending":
+            return String(localized: "trip.bookingStatus.pending", defaultValue: "Ausstehend", comment: "Buchungsstatus wenn die Fahrt auf Bestätigung wartet")
+        case "cancelled":
+            return String(localized: "trip.bookingStatus.cancelled", defaultValue: "Storniert", comment: "Buchungsstatus wenn die Fahrt storniert wurde")
         default:
             return status.capitalized
         }

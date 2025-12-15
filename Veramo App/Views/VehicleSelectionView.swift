@@ -345,9 +345,17 @@ struct VehicleSelectionView: View {
                 bookingReference = checkout.reference
                 quoteToken = checkout.token
                 
-                // Note: We don't show the confirmation sheet here anymore
-                // The deep link handler will take care of it after Safari is fully dismissed
-                print("📱 [BOOKING] Data preserved, waiting for deep link...")
+                // Show confirmation sheet with a delay to allow Safari to fully dismiss
+                // This handles both cases:
+                // 1. User manually dismisses Safari without paying
+                // 2. Payment completed but deep link didn't fire
+                Task { @MainActor in
+                    // Wait for Safari dismissal animation to complete
+                    try? await Task.sleep(for: .milliseconds(600))
+                    
+                    print("📱 [BOOKING] Showing confirmation sheet after Safari dismissal")
+                    showBookingConfirmed = true
+                }
             }
             .ignoresSafeArea()
         }
@@ -432,9 +440,15 @@ struct VehicleSelectionView: View {
         
         // Check if this is OUR booking
         if let ourReference = bookingReference, ref == ourReference {
-            print("✅ [VEHICLE_SELECTION] Deep link matches our booking - showing confirmation with stored token")
+            print("✅ [VEHICLE_SELECTION] Deep link matches our booking")
             print("   • Reference: \(ref)")
             print("   • Token: \(quoteToken ?? "N/A")")
+            
+            // Check if we're already showing the confirmation sheet
+            if showBookingConfirmed {
+                print("ℹ️ [VEHICLE_SELECTION] Confirmation sheet already showing - ignoring deep link")
+                return
+            }
             
             // IMPORTANT: Delay showing the sheet to allow Safari fullScreenCover to fully dismiss
             // Without this delay, we get "presentation is in progress" error and the sheet auto-dismisses
@@ -445,9 +459,11 @@ struct VehicleSelectionView: View {
                 // Wait for Safari dismissal animation to complete (typically 0.3-0.5s)
                 try? await Task.sleep(for: .milliseconds(600))
                 
-                // Now show the confirmation sheet
-                print("📱 [VEHICLE_SELECTION] Presenting BookingConfirmedView after delay")
-                showBookingConfirmed = true
+                // Only show if not already showing (race condition check)
+                if !showBookingConfirmed {
+                    print("📱 [VEHICLE_SELECTION] Presenting BookingConfirmedView from deep link")
+                    showBookingConfirmed = true
+                }
             }
         } else {
             print("⚠️ [VEHICLE_SELECTION] Deep link reference (\(ref)) doesn't match our booking (\(bookingReference ?? "none"))")
@@ -541,18 +557,14 @@ struct VehicleSelectionView: View {
                 let now = Date()
                 let hoursFromNow = pickupDateTime.timeIntervalSince(now) / 3600
                 
-                print("📅 [BOOKING] DateTime Validation:")
+                print("📅 [BOOKING] DateTime Info:")
                 print("   • Selected date: \(date)")
                 print("   • Selected time: \(time)")
                 print("   • Combined (Swiss): \(swissTimeString)")
                 print("   • Combined (UTC): \(utcTimeString)")
                 print("   • Current time: \(formatter.string(from: now))")
                 print("   • Hours from now: \(String(format: "%.2f", hoursFromNow))")
-                
-                // Validate minimum advance time locally before sending to backend
-                if hoursFromNow < 4 {
-                    throw BookingError.validationError("Booking must be at least 4 hours in the future. Currently \(String(format: "%.1f", hoursFromNow)) hours ahead.")
-                }
+                print("   ℹ️  Minimum advance time validation (dynamic from API) is performed in RideBookingView")
                 
                 // Determine vehicle class
                 let vehicleClass = selectedVehicle.name.toVehicleClass

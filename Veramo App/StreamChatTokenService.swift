@@ -44,16 +44,19 @@ class StreamChatTokenService {
     private init() {}
     
     func fetchStreamToken(customerId: Int, sessionToken: String) async throws -> String {
+        print("🔑 [STREAM TOKEN] Fetching token for customer \(customerId)...")
+        
         // Build URL
         guard let url = URL(string: "\(baseURL)/stream-chat-token") else {
             throw StreamChatTokenError.invalidURL
         }
         
-        // Create request
+        // Create request with timeout
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(sessionToken)", forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = 15 // 15 second timeout
         
         // Request body
         let body = ["customer_id": customerId]
@@ -62,6 +65,7 @@ class StreamChatTokenService {
         do {
             // Make request
             let (data, response) = try await URLSession.shared.data(for: request)
+            print("🔑 [STREAM TOKEN] Received response from server")
             
             // Check HTTP response
             guard let httpResponse = response as? HTTPURLResponse else {

@@ -1,0 +1,106 @@
+{
+  "sourceLanguage" : "de",
+  "strings" : {
+    "%lld" : {
+
+    },
+    "Arrived" : {
+      "comment" : "Trip status: Driver has arrived",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angekommen"
+          }
+        }
+      }
+    },
+    "Call" : {
+      "comment" : "Call driver button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anrufen"
+          }
+        }
+      }
+    },
+    "Emoji:" : {
+
+    },
+    "En Route" : {
+      "comment" : "Trip status: Driver is on the way",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unterwegs"
+          }
+        }
+      }
+    },
+    "ETA" : {
+      "comment" : "ETA (Estimated Time of Arrival) label"
+    },
+    "In Progress" : {
+      "comment" : "Trip status: Trip in progress",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "im Gange"
+          }
+        }
+      }
+    },
+    "m" : {
+      "comment" : "Short minutes label"
+    },
+    "min" : {
+      "comment" : "Minutes label for ETA display"
+    },
+    "My Widget" : {
+
+    },
+    "Nearby" : {
+      "comment" : "Trip status: Driver is nearby",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In der Nähe"
+          }
+        }
+      }
+    },
+    "This is an example widget." : {
+
+    },
+    "Time:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeit:"
+          }
+        }
+      }
+    },
+    "Unknown" : {
+      "comment" : "Unknown trip status"
+    },
+    "Waiting" : {
+      "comment" : "Trip status: Driver is waiting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wartet"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

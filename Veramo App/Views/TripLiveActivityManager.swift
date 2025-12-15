@@ -75,12 +75,17 @@ class TripLiveActivityManager {
             pickupTime: pickupDate
         )
         
+        let vehicleData = formatVehicleInfo(status.vehicle)
         let contentState = TripActivityAttributes.ContentState(
             status: status.status,
             statusDisplayName: statusDisplayName(for: status.status),
             driverName: status.driver?.name,
             driverPhone: status.driver?.phone,
+            vehicleInfo: vehicleData.description,
+            vehicleColor: vehicleData.color,
+            licensePlate: vehicleData.plate,
             etaMinutes: status.eta?.minutes,
+            etaDistanceKm: status.eta?.distanceKm,
             pickupDescription: trip.pickupDescription,
             destinationDescription: trip.destinationDescription,
             lastUpdated: Date()
@@ -119,12 +124,17 @@ class TripLiveActivityManager {
             return
         }
         
+        let vehicleData = formatVehicleInfo(status.vehicle)
         let contentState = TripActivityAttributes.ContentState(
             status: status.status,
             statusDisplayName: statusDisplayName(for: status.status),
             driverName: status.driver?.name,
             driverPhone: status.driver?.phone,
+            vehicleInfo: vehicleData.description,
+            vehicleColor: vehicleData.color,
+            licensePlate: vehicleData.plate,
             etaMinutes: status.eta?.minutes,
+            etaDistanceKm: status.eta?.distanceKm,
             pickupDescription: trip.pickupDescription,
             destinationDescription: trip.destinationDescription,
             lastUpdated: Date()
@@ -208,6 +218,25 @@ class TripLiveActivityManager {
     }
     
     // MARK: - Helpers
+    
+    private func formatVehicleInfo(_ vehicle: TripStatus.VehicleInfo?) -> (description: String?, color: String?, plate: String?) {
+        guard let vehicle = vehicle else { return (nil, nil, nil) }
+        
+        var parts: [String] = []
+        
+        // Add make and model (without color)
+        if let make = vehicle.make, let model = vehicle.model {
+            parts.append("\(make) \(model)")
+        } else if let make = vehicle.make {
+            parts.append(make)
+        } else if let model = vehicle.model {
+            parts.append(model)
+        }
+        
+        let vehicleDescription = parts.isEmpty ? nil : parts.joined(separator: " ")
+        
+        return (vehicleDescription, vehicle.color, vehicle.licensePlate)
+    }
     
     private func statusDisplayName(for status: String) -> String {
         switch status.lowercased() {

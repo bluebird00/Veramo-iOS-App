@@ -40,7 +40,28 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         #endif
     }
     
-    
+    // Called when a remote notification arrives (app in background or foreground)
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        print("📬 [APNs] Received remote notification")
+        print("   UserInfo: \(userInfo)")
+        
+        // Check if this is a Stream Chat notification
+        if userInfo["sender"] as? String != nil || userInfo["channel_id"] as? String != nil {
+            print("💬 [STREAM] Detected Stream Chat notification")
+            
+            // Let Stream SDK handle the notification
+            if let chatClient = ChatManager.shared.chatClient {
+                // Stream will handle updating unread counts, etc.
+                print("✅ [STREAM] Passing notification to Stream SDK")
+            }
+            
+            completionHandler(.newData)
+        } else {
+            // Handle other notifications (driver, etc.)
+            print("📱 [PUSH] Other notification type")
+            completionHandler(.noData)
+        }
+    }
 }
 
 // MARK: - UNUserNotificationCenterDelegate
@@ -59,7 +80,40 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         
         let userInfo = response.notification.request.content.userInfo
         
-        // Check notification type
+        print("👆 [NOTIFICATION] User tapped notification")
+        print("   UserInfo: \(userInfo)")
+        
+        // Check if this is a Stream chat notification (multiple possible keys)
+        let isStreamNotification = userInfo["channel_id"] != nil 
+            || userInfo["sender"] != nil 
+            || userInfo["message_id"] != nil
+            || userInfo["channel_type"] != nil
+        
+        if isStreamNotification {
+            print("💬 [STREAM] Stream chat notification tapped")
+            
+            if let channelId = userInfo["channel_id"] as? String {
+                print("   Channel ID: \(channelId)")
+                // Post notification to open chat
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("OpenChatChannel"),
+                    object: nil,
+                    userInfo: ["channelId": channelId]
+                )
+            } else {
+                print("⚠️ [STREAM] No channel_id found, just opening chat tab")
+                // Just open the chat tab
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("OpenChatTab"),
+                    object: nil
+                )
+            }
+            
+            completionHandler()
+            return
+        }
+        
+        // Check notification type for driver notifications
         if let notificationType = userInfo["type"] as? String {
             switch notificationType {
             case "driver_arrival":
@@ -89,18 +143,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                 }
                 
             default:
+                print("⚠️ Unknown notification type: \(notificationType)")
                 break
             }
-        }
-        
-        // Check if this is a Stream chat notification
-        if let channelId = userInfo["channel_id"] as? String {            
-            // Post notification to open chat
-            NotificationCenter.default.post(
-                name: NSNotification.Name("OpenChatChannel"),
-                object: nil,
-                userInfo: ["channelId": channelId]
-            )
         }
         
         completionHandler()

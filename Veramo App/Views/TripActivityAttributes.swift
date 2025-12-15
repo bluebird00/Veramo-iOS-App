@@ -19,8 +19,14 @@ struct TripActivityAttributes: ActivityAttributes {
         var driverName: String?
         var driverPhone: String?
         
+        // Vehicle info
+        var vehicleInfo: String? // e.g., "Toyota Camry"
+        var vehicleColor: String? // e.g., "Black"
+        var licensePlate: String? // e.g., "ABC-1234"
+        
         // ETA info
         var etaMinutes: Int?
+        var etaDistanceKm: Double? // Distance in km
         
         // Location info
         var pickupDescription: String

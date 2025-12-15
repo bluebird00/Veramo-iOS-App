@@ -47,9 +47,17 @@ class ChatManager: ObservableObject {
             return
         }
         
-        // If already connected, disconnect first to ensure clean state
+        let userId = "customer-\(customer.id)"
+        
+        // Check if we're already connected as this user
+        if isConnected && chatClient.currentUserId == userId {
+            print("✅ [CHAT] Already connected as \(userId), skipping connection")
+            return
+        }
+        
+        // If already connected as a different user, disconnect first to ensure clean state
         if isConnected {
-            print("⚠️ [CHAT] Already connected, disconnecting previous user...")
+            print("⚠️ [CHAT] Already connected as \(chatClient.currentUserId ?? "unknown"), disconnecting previous user...")
             Task {
                 await disconnect()
                 // After disconnect completes, connect the new user
@@ -78,16 +86,33 @@ class ChatManager: ObservableObject {
         )
         
         print("🔌 [CHAT] Connecting user: \(customer.name ?? "Unknown") (ID: customer-\(customer.id))")
+        print("🔑 [CHAT] Token preview: \(String(token.prefix(20)))...")
+        
+        // Create timeout task
+        let timeoutTask = Task {
+            try? await Task.sleep(for: .seconds(30))
+            if isConnecting {
+                print("⏰ [CHAT] Connection timeout after 30 seconds")
+                await MainActor.run {
+                    self.isConnecting = false
+                    self.connectionError = "Connection timeout. Please check your internet connection and try again."
+                }
+            }
+        }
         
         chatClient.connectUser(userInfo: userInfo, token: .init(stringLiteral: token)) { [weak self] error in
+            // Cancel timeout task
+            timeoutTask.cancel()
+            
             DispatchQueue.main.async {
                 // Clear connecting state
                 self?.isConnecting = false
                 
                 if let error = error {
                     print("❌ [CHAT] Connection failed: \(error.localizedDescription)")
+                    print("   Error details: \(error)")
                     self?.isConnected = false
-                    self?.connectionError = error.localizedDescription
+                    self?.connectionError = "Connection failed: \(error.localizedDescription)"
                 } else {
                     print("✅ [CHAT] Connection successful")
                     self?.isConnected = true

@@ -96,7 +96,7 @@ struct ProfileView: View {
                         VStack(alignment: .leading, spacing: 16) {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Sign in to your account")
-                                    .font(.title3)
+                                    .font(.headline)
                                     .fontWeight(.semibold)
                                 
                                 Text("Track your trips, save your preferences, and book rides faster.")

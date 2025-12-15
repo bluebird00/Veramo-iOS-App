@@ -99,7 +99,8 @@ class PushNotificationService {
             return
         }
         
-        chatClient.currentUserController().addDevice(.apn(token: deviceToken)) { error in
+        // Specify the provider name "Apple" to match your Stream configuration
+        chatClient.currentUserController().addDevice(.apn(token: deviceToken, providerName: "Apple")) { error in
             if let error = error {
                 print("❌ Failed to register device token with Stream: \(error)")
             } else {

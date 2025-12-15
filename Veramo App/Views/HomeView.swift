@@ -153,16 +153,7 @@ struct HomeView: View {
                         
                 }
                 
-                // Debug button to show welcome screen
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        // Toggle hasSeenWelcome by resetting it
-                        NotificationCenter.default.post(name: .resetWelcomeScreen, object: nil)
-                    } label: {
-                        Image(systemName: "info.circle")
-                            .foregroundColor(.gray)
-                    }
-                }
+                
             }
             .navigationDestination(isPresented: $navigateToBooking) {
                 RideBookingView(autoFocusPickup: true)

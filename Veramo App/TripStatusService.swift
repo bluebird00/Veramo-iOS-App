@@ -19,31 +19,52 @@ private let logger = Logger(subsystem: "ch.veramo.app", category: "TripStatus")
 struct TripStatus: Codable, Equatable {
     let reference: String
     let status: String
+    let statusDisplayName: String?
+    let scheduledTime: String?
+    let vehicleClass: String?
+    let passengers: Int?
     let driver: DriverInfo?
+    let vehicle: VehicleInfo?
     let driverLocation: DriverLocation?
     let eta: ETA?
     let pickup: LocationInfo?
+    let destination: DestinationInfo?
     
     struct DriverInfo: Codable, Equatable {
         let name: String
         let phone: String?
     }
     
+    struct VehicleInfo: Codable, Equatable {
+        let make: String?
+        let model: String?
+        let color: String?
+        let licensePlate: String?
+        let year: String?
+    }
+    
     struct DriverLocation: Codable, Equatable {
         let latitude: Double
         let longitude: Double
-        let heading: Double
+        let heading: Double?
         let updatedAt: String
     }
     
     struct ETA: Codable, Equatable {
         let minutes: Int
+        let distanceKm: Double?
     }
     
     struct LocationInfo: Codable, Equatable {
         let description: String
-        let latitude: Double
-        let longitude: Double
+        let latitude: Double?
+        let longitude: Double?
+    }
+    
+    struct DestinationInfo: Codable, Equatable {
+        let description: String
+        let latitude: Double?
+        let longitude: Double?
     }
 }
 

@@ -14,6 +14,8 @@ import WidgetKit
 struct TripLiveActivityView: View {
     let context: ActivityViewContext<TripActivityAttributes>
     
+    @Environment(\.colorScheme) private var colorScheme
+    
     var body: some View {
         VStack(spacing: 10) {
             // Header with status and ETA
@@ -21,7 +23,11 @@ struct TripLiveActivityView: View {
                 // Status icon
                 ZStack {
                     Circle()
-                        .fill(statusColor.opacity(0.2))
+                        .fill(
+                            colorScheme == .dark
+                                ? statusColor.opacity(0.3)
+                                : statusColor.opacity(0.12)
+                        )
                         .frame(width: 48, height: 48)
                     
                     Image(systemName: context.state.icon)
@@ -30,7 +36,7 @@ struct TripLiveActivityView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(context.state.statusDisplayName)
+                    Text(TripWidgetLocalizer.localizedStatus(context.state.status))
                         .font(.system(size: 16, weight: .bold))
                         .foregroundColor(statusColor)
                     
@@ -47,27 +53,109 @@ struct TripLiveActivityView: View {
                 
                 Spacer()
                 
-                // ETA Badge
-                if let eta = context.state.etaMinutes {
-                    VStack(spacing: 3) {
-                        Text("\(eta)")
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(statusColor)
-                        Text("MIN")
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundColor(.secondary)
-                            .tracking(0.8)
+                // Vehicle info section (right-aligned)
+                VStack(alignment: .trailing, spacing: 4) {
+                    // License plate on top
+                    if let licensePlate = context.state.licensePlate {
+                        Text(licensePlate)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(colorScheme == .dark ? .white : .black)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background {
+                                if colorScheme == .dark {
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(.ultraThinMaterial)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 6)
+                                                .strokeBorder(Color.white.opacity(0.2), lineWidth: 1)
+                                        )
+                                } else {
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(Color.secondary.opacity(0.08))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 6)
+                                                .strokeBorder(Color.secondary.opacity(0.15), lineWidth: 1)
+                                        )
+                                }
+                            }
                     }
-                    .frame(width: 60)
-                    .padding(.vertical, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(statusColor.opacity(0.15))
-                    )
+                    
+                    // Vehicle make and model
+                    if let vehicleInfo = context.state.vehicleInfo {
+                        Text(vehicleInfo)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.trailing)
+                            .lineLimit(2)
+                    }
+                    
+                    // Vehicle color underneath
+                    if let vehicleColor = context.state.vehicleColor {
+                        Text(vehicleColor)
+                            .font(.system(size: 11, weight: .regular))
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.trailing)
+                    } else if context.state.licensePlate == nil && context.state.vehicleInfo == nil {
+                        // Show vehicle class if no vehicle info
+                        Text(context.attributes.vehicleClass)
+                            .font(.system(size: 12, weight: .regular))
+                            .foregroundColor(.secondary)
+                    }
                 }
             }
             .padding(.horizontal, 14)
             .padding(.top, 14)
+            
+            // ETA Badge (if available, show below header)
+            if let eta = context.state.etaMinutes {
+                HStack {
+                    Spacer()
+                    VStack(spacing: 3) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "clock.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(statusColor)
+                            
+                            Text("\(eta)")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(statusColor)
+                            
+                            Text(TripWidgetLocalizer.minutesLabel)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        // Show distance if available
+                        if let distanceKm = context.state.etaDistanceKm {
+                            Text(String(format: "%.1f km away", distanceKm))
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background {
+                        if colorScheme == .dark {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(.ultraThinMaterial)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .strokeBorder(statusColor.opacity(0.3), lineWidth: 1)
+                                )
+                        } else {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(statusColor.opacity(0.08))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .strokeBorder(statusColor.opacity(0.2), lineWidth: 1)
+                                )
+                        }
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 14)
+            }
             
             // Route information
             VStack(spacing: 8) {
@@ -75,10 +163,17 @@ struct TripLiveActivityView: View {
                 HStack(spacing: 10) {
                     ZStack {
                         Circle()
-                            .fill(Color.green.opacity(0.15))
+                            .fill(
+                                colorScheme == .dark
+                                    ? Color.green.opacity(0.25)
+                                    : Color.green.opacity(0.12)
+                            )
                             .frame(width: 20, height: 20)
                         Circle()
-                            .strokeBorder(Color.green, lineWidth: 2)
+                            .strokeBorder(
+                                Color.green,
+                                lineWidth: 2
+                            )
                             .frame(width: 10, height: 10)
                     }
                     
@@ -94,11 +189,15 @@ struct TripLiveActivityView: View {
                 HStack(spacing: 10) {
                     ZStack {
                         Circle()
-                            .fill(Color.red.opacity(0.15))
+                            .fill(
+                                colorScheme == .dark
+                                    ? Color.red.opacity(0.25)
+                                    : Color.red.opacity(0.12)
+                            )
                             .frame(width: 20, height: 20)
                         Image(systemName: "mappin.circle.fill")
                             .font(.system(size: 11))
-                            .foregroundColor(.red)
+                            .foregroundColor(Color.red)
                     }
                     
                     Text(context.state.destinationDescription)
@@ -112,55 +211,45 @@ struct TripLiveActivityView: View {
             .padding(.horizontal, 14)
             
             // Footer
-            HStack(spacing: 10) {
-                // Trip reference
-                HStack(spacing: 4) {
-                    Image(systemName: "number.circle")
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                    Text(context.attributes.tripReference)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                // Call driver button
-                if let phone = context.state.driverPhone {
+            if let phone = context.state.driverPhone {
+                HStack {
+                    Spacer()
+                    
+                    // Call driver button
                     Link(destination: URL(string: "tel://\(phone)")!) {
                         HStack(spacing: 5) {
                             Image(systemName: "phone.fill")
                                 .font(.system(size: 12))
-                            Text("Call")
+                            Text(TripWidgetLocalizer.callAction)
                                 .font(.system(size: 13, weight: .semibold))
                         }
                         .foregroundColor(.white)
                         .padding(.horizontal, 14)
-                        .padding(.vertical, 7)
+                        .padding(.vertical, 8)
                         .background(
                             Capsule()
                                 .fill(Color.blue)
                         )
                     }
                 }
+                .padding(.horizontal, 14)
+                .padding(.bottom, 14)
             }
-            .padding(.horizontal, 14)
-            .padding(.bottom, 14)
         }
-        .background(Color(.systemBackground))
+        .background(.thinMaterial)
     }
     
     private var statusColor: Color {
         switch context.state.status.lowercased() {
-        case "en_route":
+        case TripWidgetLocalizer.StatusKey.enRoute:
             return .blue
-        case "nearby":
+        case TripWidgetLocalizer.StatusKey.nearby:
             return .orange
-        case "arrived":
+        case TripWidgetLocalizer.StatusKey.arrived:
             return .green
-        case "waiting":
+        case TripWidgetLocalizer.StatusKey.waiting:
             return .orange
-        case "in_progress":
+        case TripWidgetLocalizer.StatusKey.inProgress:
             return .purple
         default:
             return .gray
@@ -198,12 +287,12 @@ struct TripLiveActivity: Widget {
                             Text("\(eta)")
                                 .font(.system(size: 28, weight: .bold))
                                 .foregroundColor(getStatusColor(for: context.state.status))
-                            Text("min")
+                            Text(TripWidgetLocalizer.minutesShort)
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(.secondary)
                                 .offset(y: 4)
                         }
-                        Text("ETA")
+                        Text(TripWidgetLocalizer.etaLabel)
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundColor(.secondary)
                             .tracking(1)
@@ -214,7 +303,7 @@ struct TripLiveActivity: Widget {
             
             DynamicIslandExpandedRegion(.center) {
                 VStack(spacing: 8) {
-                    Text(context.state.statusDisplayName)
+                    Text(TripWidgetLocalizer.localizedStatus(context.state.status))
                         .font(.system(size: 17, weight: .bold))
                         .foregroundColor(getStatusColor(for: context.state.status))
                     
@@ -229,15 +318,40 @@ struct TripLiveActivity: Widget {
                         }
                     }
                     
-                    Text(context.attributes.vehicleClass)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(
-                            Capsule()
-                                .fill(Color.secondary.opacity(0.15))
-                        )
+                    // Vehicle info with license plate
+                    if let licensePlate = context.state.licensePlate {
+                        Text(licensePlate)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.primary)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(Color.secondary.opacity(0.15))
+                            )
+                        
+                        if let vehicleInfo = context.state.vehicleInfo {
+                            Text(vehicleInfo)
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.primary)
+                        }
+                        
+                        if let vehicleColor = context.state.vehicleColor {
+                            Text(vehicleColor)
+                                .font(.system(size: 10, weight: .regular))
+                                .foregroundColor(.secondary)
+                        }
+                    } else {
+                        Text(context.attributes.vehicleClass)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(Color.secondary.opacity(0.15))
+                            )
+                    }
                 }
                 .padding(.top, 4)
             }
@@ -291,7 +405,7 @@ struct TripLiveActivity: Widget {
                                 HStack(spacing: 6) {
                                     Image(systemName: "phone.fill")
                                         .font(.system(size: 12))
-                                    Text("Call")
+                                    Text(TripWidgetLocalizer.callAction)
                                         .font(.system(size: 13, weight: .semibold))
                                 }
                                 .foregroundColor(.white)
@@ -322,7 +436,7 @@ struct TripLiveActivity: Widget {
                     Text("\(eta)")
                         .font(.system(size: 15, weight: .bold))
                         .foregroundColor(getStatusColor(for: context.state.status))
-                    Text("m")
+                    Text(String(TripWidgetLocalizer.minutesShort.prefix(1)))
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(getStatusColor(for: context.state.status).opacity(0.7))
                 }
@@ -349,18 +463,19 @@ struct TripLiveActivity: Widget {
     // Helper function to get status color
     private func getStatusColor(for status: String) -> Color {
         switch status.lowercased() {
-        case "en_route":
+        case TripWidgetLocalizer.StatusKey.enRoute:
             return .blue
-        case "nearby":
+        case TripWidgetLocalizer.StatusKey.nearby:
             return .orange
-        case "arrived":
+        case TripWidgetLocalizer.StatusKey.arrived:
             return .green
-        case "waiting":
+        case TripWidgetLocalizer.StatusKey.waiting:
             return .orange
-        case "in_progress":
+        case TripWidgetLocalizer.StatusKey.inProgress:
             return .purple
         default:
             return .gray
         }
     }
 }
+

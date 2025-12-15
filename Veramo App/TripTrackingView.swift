@@ -76,7 +76,7 @@ struct TripTrackingView: View {
             }
             .task {
                 // Start tracking when view appears
-                await driverService.startTracking(reference: reference, intervalSeconds: 10)
+                driverService.startTracking(reference: reference, intervalSeconds: 10)
             }
             .onDisappear {
                 // Stop tracking when view disappears

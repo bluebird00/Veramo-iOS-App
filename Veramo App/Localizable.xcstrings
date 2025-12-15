@@ -18,7 +18,15 @@
       }
     },
     "%@ is waiting for you" : {
-      "comment" : "Notification body with driver name"
+      "comment" : "Notification body with driver name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wartet auf Sie"
+          }
+        }
+      }
     },
     "%lld" : {
 
@@ -74,13 +82,54 @@
 
     },
     "Active Trip" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelle Fahrt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current Ride"
+          }
+        }
+      }
     },
     "Almost there" : {
-      "comment" : "Notification title when approaching destination"
+      "comment" : "Notification title when approaching destination",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fast angekommen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Almost there"
+          }
+        }
+      }
     },
     "Approaching your destination" : {
-      "comment" : "Notification body without destination ETA"
+      "comment" : "Notification body without destination ETA",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Ziel kommt näher"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Approaching your destination"
+          }
+        }
+      }
     },
     "Are you sure you want to logout?" : {
       "localizations" : {
@@ -102,13 +151,47 @@
       "comment" : "Notification body with destination ETA"
     },
     "Arriving in approximately %lld minutes" : {
-      "comment" : "Notification body with ETA"
+      "comment" : "Notification body with ETA",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ankunft in ca. %lld Minuten"
+          }
+        }
+      }
     },
     "Authenticated" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentifiziert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authenticated"
+          }
+        }
+      }
     },
     "Authentication" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentifizierung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication"
+          }
+        }
+      }
     },
     "Authentication Error" : {
       "localizations" : {
@@ -239,6 +322,40 @@
         }
       }
     },
+    "Booking must be at least %d hours in the future. Currently %.1f hours ahead." : {
+      "comment" : "Error message when booking time is too soon. First number is minimum required hours, second is current hours ahead.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Buchung muss mindestens %1$d Stunden im Voraus erfolgen. Derzeit  %2$.1f Stunden im Voraus."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Booking must be at least %d hours in the future. Currently %.1f hours ahead."
+          }
+        }
+      }
+    },
+    "Booking Too Soon" : {
+      "comment" : "Alert title when user tries to book too close to pickup time",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buchung zu früh"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Booking Too Soon"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "localizations" : {
         "de" : {
@@ -297,6 +414,12 @@
     "Chat" : {
       "localizations" : {
         "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat"
+          }
+        },
+        "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chat"
@@ -388,7 +511,15 @@
       }
     },
     "Checking status..." : {
-      "comment" : "Loading message for trip status"
+      "comment" : "Loading message for trip status",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking status…"
+          }
+        }
+      }
     },
     "Choose how you'd like to sign in" : {
 
@@ -520,23 +651,6 @@
         }
       }
     },
-    "Continue" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weiter"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue"
-          }
-        }
-      }
-    },
     "Copy Token" : {
 
     },
@@ -636,25 +750,114 @@
       }
     },
     "Driver" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrer"
+          }
+        }
+      }
     },
     "Driver has arrived" : {
-      "comment" : "Driver status: arrived"
+      "comment" : "Driver status: arrived",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrer ist angekommen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Driver has arrived"
+          }
+        }
+      }
     },
     "Driver Information" : {
-      "comment" : "Section title for driver details"
+      "comment" : "Section title for driver details",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrerinformationen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Driver Information"
+          }
+        }
+      }
     },
     "Driver Name" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name des Fahrers"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Driver Name"
+          }
+        }
+      }
     },
     "Driver on the way" : {
-      "comment" : "Driver status: on the way\nNotification title when driver starts journey"
+      "comment" : "Driver status: on the way\nNotification title when driver starts journey",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrer ist unterwegs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Driver on the way"
+          }
+        }
+      }
     },
     "Driver Status" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrerstatus"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Driver Status"
+          }
+        }
+      }
     },
     "Driver waiting" : {
-      "comment" : "Driver status: waiting for passenger\nNotification title when driver is waiting"
+      "comment" : "Driver status: waiting for passenger\nNotification title when driver is waiting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrer wartet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Driver waiting"
+          }
+        }
+      }
     },
     "Easy payment with TWINT" : {
       "localizations" : {
@@ -801,7 +1004,21 @@
       }
     },
     "Estimated Arrival" : {
-      "comment" : "Label for estimated arrival time"
+      "comment" : "Label for estimated arrival time",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschätzte Ankunftszeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimated Arrival"
+          }
+        }
+      }
     },
     "ETA: %lld min" : {
 
@@ -879,10 +1096,38 @@
       }
     },
     "Heading to destination" : {
-      "comment" : "Driver status: going to destination"
+      "comment" : "Driver status: going to destination",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf dem Weg zum Ziel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heading to destination"
+          }
+        }
+      }
     },
     "Heading to your destination" : {
-      "comment" : "Notification body when heading to destination"
+      "comment" : "Notification body when heading to destination",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf dem Weg zu Ihrem Ziel"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heading to your destination"
+          }
+        }
+      }
     },
     "Home" : {
       "localizations" : {
@@ -932,13 +1177,19 @@
         }
       }
     },
-    "Important information about the transport operator" : {
-      "extractionState" : "stale",
+    "Invalid date or time selected." : {
+      "comment" : "Error message when date/time parsing fails",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wichtige Information zum Transportunternehmer"
+            "value" : "Ungültiges Datum oder ungültige Uhrzeit ausgewählt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid date or time selected."
           }
         }
       }
@@ -960,7 +1211,21 @@
       }
     },
     "Loading driver location..." : {
-      "comment" : "Loading message for driver location"
+      "comment" : "Loading message for driver location",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrer wird georted…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading driver location…"
+          }
+        }
+      }
     },
     "Loading suggestions..." : {
       "localizations" : {
@@ -968,6 +1233,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vorschläge werden geladen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading suggestions…"
           }
         }
       }
@@ -1148,6 +1419,23 @@
     "Name: %@" : {
 
     },
+    "Need help? Contact support anytime" : {
+      "comment" : "Information about support availability",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benötigen Sie Hilfe? Unser Kundendienst steht Ihnen jederzeit zur Verfügung."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do you require assistance? Our customer service team is always available to help."
+          }
+        }
+      }
+    },
     "No device token registered" : {
 
     },
@@ -1187,6 +1475,7 @@
 
     },
     "OK" : {
+      "comment" : "Dismiss button for booking time validation alert",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1495,7 +1784,21 @@
       }
     },
     "Please head to your pickup location" : {
-      "comment" : "Notification body prompting passenger to go to pickup"
+      "comment" : "Notification body prompting passenger to go to pickup",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begeben Sie sich zum Abholort"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please head to your pickup location"
+          }
+        }
+      }
     },
     "Processing..." : {
       "localizations" : {
@@ -1905,7 +2208,21 @@
 
     },
     "Thank you for riding with us!" : {
-      "comment" : "Notification body for trip completion"
+      "comment" : "Notification body for trip completion",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danke, dass Sie mit uns gefahren sind!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thank you for riding with us!"
+          }
+        }
+      }
     },
     "The payment could not be processed" : {
       "comment" : "Message explaining payment processing failure",
@@ -1997,21 +2314,12 @@
       }
     },
     "Track Your Ride" : {
-      "comment" : "Button to open trip tracking view"
-    },
-    "Track your ride on the day of travel" : {
-      "comment" : "Information about tracking ride on travel day",
+      "comment" : "Button to open trip tracking view",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verfolgen Sie Ihre Fahrt am Reisetag"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Track your ride on the day of travel"
+            "value" : "Ihre Fahrt verfolgen"
           }
         }
       }
@@ -2021,22 +2329,50 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verfolgen Sie Ihre Fahrten, speichern Sie Ihre Präferenzen und buchen Sie Fahrten schneller."
+            "value" : "Greifen Sie auf Ihre Fahrtenhistorie zu und buchen Sie bequem mit Ihrem Konto."
           }
         },
         "en" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Track your trips, save your preferences, and book rides faster."
+            "state" : "needs_review",
+            "value" : "Access your ride history and book conveniently with your account."
           }
         }
       }
     },
     "Trip canceled" : {
-      "comment" : "Driver status: canceled\nNotification title when trip is canceled"
+      "comment" : "Driver status: canceled\nNotification title when trip is canceled",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrt storniert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ride cancelled"
+          }
+        }
+      }
     },
     "Trip completed" : {
-      "comment" : "Driver status: trip complete\nNotification title when trip is complete"
+      "comment" : "Driver status: trip complete\nNotification title when trip is complete",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrt abgeschlossen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ride completed"
+          }
+        }
+      }
     },
     "Trip Type" : {
       "localizations" : {
@@ -2050,6 +2386,186 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trip Type"
+          }
+        }
+      }
+    },
+    "trip.bookingStatus.cancelled" : {
+      "comment" : "Buchungsstatus wenn die Fahrt storniert wurde",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Storniert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelled"
+          }
+        }
+      }
+    },
+    "trip.bookingStatus.confirmed" : {
+      "comment" : "Buchungsstatus wenn die Fahrt bestätigt wurde",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Bestätigt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmed"
+          }
+        }
+      }
+    },
+    "trip.bookingStatus.pending" : {
+      "comment" : "Buchungsstatus wenn die Fahrt auf Bestätigung wartet",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Ausstehend"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pending"
+          }
+        }
+      }
+    },
+    "trip.status.arrived" : {
+      "comment" : "Status angezeigt, wenn der Fahrer am Abholort angekommen ist",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Angekommen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrived"
+          }
+        }
+      }
+    },
+    "trip.status.assigned" : {
+      "comment" : "Status angezeigt, wenn ein Fahrer der Fahrt zugewiesen wurde",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Fahrer zugewiesen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Driver Assigned"
+          }
+        }
+      }
+    },
+    "trip.status.completed" : {
+      "comment" : "Status angezeigt, wenn die Fahrt abgeschlossen wurde",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Abgeschlossen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
+          }
+        }
+      }
+    },
+    "trip.status.enRoute" : {
+      "comment" : "Status angezeigt, wenn der Fahrer zum Abholort unterwegs ist",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unterwegs"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En Route"
+          }
+        }
+      }
+    },
+    "trip.status.inProgress" : {
+      "comment" : "Status angezeigt, wenn die Fahrt aktiv läuft",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "In Fahrt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Progress"
+          }
+        }
+      }
+    },
+    "trip.status.nearby" : {
+      "comment" : "Status angezeigt, wenn der Fahrer in der Nähe des Abholorts ist",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "In der Nähe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nearby"
+          }
+        }
+      }
+    },
+    "trip.status.waiting" : {
+      "comment" : "Status angezeigt, wenn der Fahrer auf den Fahrgast wartet",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Wartet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting"
           }
         }
       }
@@ -2441,7 +2957,21 @@
       }
     },
     "You'll receive notifications about your ride" : {
-      "comment" : "Information about receiving notifications"
+      "comment" : "Information about receiving notifications",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie erhalten Benachrichtigungen zu Ihrer Fahrt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You'll receive notifications about your ride"
+          }
+        }
+      }
     },
     "Your completed trips will appear here" : {
       "localizations" : {
@@ -2460,13 +2990,55 @@
       }
     },
     "Your driver has arrived!" : {
-      "comment" : "Notification title when driver arrives"
+      "comment" : "Notification title when driver arrives",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Fahrer ist angekommen!"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your driver has arrived!"
+          }
+        }
+      }
     },
     "Your driver is heading to pick you up" : {
-      "comment" : "Notification body without ETA"
+      "comment" : "Notification body without ETA",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Fahrer ist unterwegs zu Ihnen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your driver is heading to pick you up"
+          }
+        }
+      }
     },
     "Your driver is waiting for you" : {
-      "comment" : "Notification body for arrival\nNotification body without driver name"
+      "comment" : "Notification body for arrival\nNotification body without driver name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihr Fahrer wartet auf Sie"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your driver is waiting for you"
+          }
+        }
+      }
     },
     "Your name and email help us provide better service." : {
       "localizations" : {
@@ -2518,7 +3090,21 @@
       }
     },
     "Your trip has been canceled" : {
-      "comment" : "Notification body for cancellation"
+      "comment" : "Notification body for cancellation",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre Fahrt wurde storniert"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your ride has been cancelled"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

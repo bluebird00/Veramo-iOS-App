@@ -207,8 +207,6 @@
 				en,
 				Base,
 				de,
-				fr,
-				it,
 				"de-CH",
 			);
 			mainGroup = 2401543C2EE4A86000284367;

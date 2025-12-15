@@ -14,22 +14,8 @@ struct RideBookingView: View {
     @State private var destinationEnglish: String = ""  // For database
     @State private var pickupPlaceId: String? = nil
     @State private var destinationPlaceId: String? = nil
-    @State private var selectedDate: Date = {
-        // Create a date that's 4 hours in the future in Swiss timezone
-        var calendar = Calendar.current
-        calendar.timeZone = swissTimeZone
-        let futureDate = calendar.date(byAdding: .hour, value: 4, to: Date()) ?? Date()
-        print("📅 Default date set to: \(futureDate) (Swiss TZ)")
-        return futureDate
-    }()
-    @State private var selectedTime: Date = {
-        // Create a time that's 4 hours in the future in Swiss timezone
-        var calendar = Calendar.current
-        calendar.timeZone = swissTimeZone
-        let futureTime = calendar.date(byAdding: .hour, value: 4, to: Date()) ?? Date()
-        print("⏰ Default time set to: \(futureTime) (Swiss TZ)")
-        return futureTime
-    }()
+    @State private var selectedDate: Date = Date()
+    @State private var selectedTime: Date = Date()
     @State private var passengerCount: Int = 1
     @State private var showVehicleSelection = false
     @State private var showingTimePicker = false  // Track time picker modal state
@@ -41,7 +27,7 @@ struct RideBookingView: View {
     // Map state
     @State private var cameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 47.3769, longitude: 8.5417), // Zurich
+            center: CLLocationCoordinate2D(latitude: 47.2100, longitude: 8.5417), // Zurich
             span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
         )
     )
@@ -68,6 +54,14 @@ struct RideBookingView: View {
     @State private var destinationSuggestions: [LocationSuggestion] = []
     @State private var isLoadingPickupSuggestions = false
     @State private var isLoadingDestinationSuggestions = false
+    
+    // Time validation state
+    @State private var showTimeValidationAlert = false
+    @State private var timeValidationMessage = ""
+    
+    // Settings state
+    @State private var minBookingHours: Int = 4  // Default to 4, will be updated from API
+    @State private var hasInitializedDefaultTime = false  // Track if we've set initial time
     
     enum Field {
         case pickup
@@ -96,6 +90,11 @@ struct RideBookingView: View {
                 // Preload pickup suggestions so they're ready immediately
                 Task {
                     await preloadPickupSuggestions()
+                }
+                
+                // Fetch app settings to get minimum booking hours
+                Task {
+                    await fetchAppSettings()
                 }
                 
                 if autoFocusPickup {
@@ -563,6 +562,11 @@ struct RideBookingView: View {
         .disabled(pickupLocation.isEmpty || destination.isEmpty)
         .opacity(pickupLocation.isEmpty || destination.isEmpty ? 0.5 : 1)
         .padding(.horizontal, 28)
+        .alert("Booking Too Soon", isPresented: $showTimeValidationAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(timeValidationMessage)
+        }
     }
     
     private var vehicleSelectionView: some View {
@@ -683,7 +687,47 @@ struct RideBookingView: View {
     }
     
     private func searchRides() {
-        print("🔍 User clicked Search Rides - showing vehicle selection")
+        print("🔍 User clicked Search Rides - validating time...")
+        
+        // Validate minimum advance time (dynamic from API)
+        let swissTimeZone = TimeZone(identifier: "Europe/Zurich")!
+        var swissCalendar = Calendar.current
+        swissCalendar.timeZone = swissTimeZone
+        
+        // Combine date and time components
+        let dateComponents = swissCalendar.dateComponents([.year, .month, .day], from: selectedDate)
+        let timeComponents = swissCalendar.dateComponents([.hour, .minute], from: selectedTime)
+        
+        var combinedComponents = DateComponents()
+        combinedComponents.year = dateComponents.year
+        combinedComponents.month = dateComponents.month
+        combinedComponents.day = dateComponents.day
+        combinedComponents.hour = timeComponents.hour
+        combinedComponents.minute = timeComponents.minute
+        combinedComponents.second = 0
+        combinedComponents.timeZone = swissTimeZone
+        
+        guard let pickupDateTime = swissCalendar.date(from: combinedComponents) else {
+            timeValidationMessage = NSLocalizedString("Invalid date or time selected.", comment: "Error message when date/time parsing fails")
+            showTimeValidationAlert = true
+            return
+        }
+        
+        // Calculate hours from now
+        let now = Date()
+        let hoursFromNow = pickupDateTime.timeIntervalSince(now) / 3600
+        
+        // Validate minimum advance time (dynamic from settings API)
+        if hoursFromNow < Double(minBookingHours) {
+            // Format the error message with localization
+            let format = NSLocalizedString("Booking must be at least %d hours in the future. Currently %.1f hours ahead.", comment: "Error message when booking time is too soon. First number is minimum required hours, second is current hours ahead.")
+            timeValidationMessage = String(format: format, minBookingHours, hoursFromNow)
+            showTimeValidationAlert = true
+            return
+        }
+        
+        // Validation passed - show vehicle selection
+        print("✅ Time validation passed - showing vehicle selection")
         isVehicleListCompact = false  // Reset compact mode when showing vehicle selection
         showVehicleSelection = true
     }
@@ -951,6 +995,89 @@ struct RideBookingView: View {
     }
     
     // MARK: - Location Suggestions
+    
+    /// Fetches app settings from the API
+    private func fetchAppSettings() async {
+        do {
+            let settings = try await SettingsService.shared.fetchSettings()
+            await MainActor.run {
+                minBookingHours = settings.minBookingHoursInt
+                print("✅ [SETTINGS] Updated min booking hours to: \(minBookingHours)")
+                
+                // Initialize default date/time on first load
+                if !hasInitializedDefaultTime {
+                    initializeDefaultDateTime()
+                    hasInitializedDefaultTime = true
+                } else {
+                    // Update the default date/time if current values are below the new minimum
+                    updateDefaultDateTime()
+                }
+            }
+        } catch {
+            // Silently fail - use default value (4 hours)
+            print("⚠️ [SETTINGS] Failed to fetch settings: \(error)")
+            print("   Using default min booking hours: \(minBookingHours)")
+            
+            // Still initialize with default if this is the first time
+            await MainActor.run {
+                if !hasInitializedDefaultTime {
+                    initializeDefaultDateTime()
+                    hasInitializedDefaultTime = true
+                }
+            }
+        }
+    }
+    
+    /// Initializes the default date/time to minimum booking hours in the future
+    private func initializeDefaultDateTime() {
+        let swissTimeZone = TimeZone(identifier: "Europe/Zurich")!
+        var swissCalendar = Calendar.current
+        swissCalendar.timeZone = swissTimeZone
+        
+        let now = Date()
+        let futureDateTime = swissCalendar.date(byAdding: .hour, value: minBookingHours, to: now) ?? now
+        
+        selectedDate = futureDateTime
+        selectedTime = futureDateTime
+        
+        print("📅 [SETTINGS] Initialized default date/time to \(minBookingHours) hours in future: \(futureDateTime)")
+    }
+    
+    /// Updates the default date/time to respect the minimum booking hours
+    private func updateDefaultDateTime() {
+        let swissTimeZone = TimeZone(identifier: "Europe/Zurich")!
+        var swissCalendar = Calendar.current
+        swissCalendar.timeZone = swissTimeZone
+        
+        // Combine current date and time
+        let dateComponents = swissCalendar.dateComponents([.year, .month, .day], from: selectedDate)
+        let timeComponents = swissCalendar.dateComponents([.hour, .minute], from: selectedTime)
+        
+        var combinedComponents = DateComponents()
+        combinedComponents.year = dateComponents.year
+        combinedComponents.month = dateComponents.month
+        combinedComponents.day = dateComponents.day
+        combinedComponents.hour = timeComponents.hour
+        combinedComponents.minute = timeComponents.minute
+        combinedComponents.second = 0
+        combinedComponents.timeZone = swissTimeZone
+        
+        guard let currentDateTime = swissCalendar.date(from: combinedComponents) else {
+            return
+        }
+        
+        // Check if current time is less than minimum hours from now
+        let now = Date()
+        let hoursFromNow = currentDateTime.timeIntervalSince(now) / 3600
+        
+        if hoursFromNow < Double(minBookingHours) {
+            // Update to minimum hours in the future
+            let newDateTime = swissCalendar.date(byAdding: .hour, value: minBookingHours, to: now) ?? now
+            selectedDate = newDateTime
+            selectedTime = newDateTime
+            print("📅 [SETTINGS] Updated default date/time to \(minBookingHours) hours in future")
+        }
+    }
     
     /// Preload pickup suggestions on view appear
     private func preloadPickupSuggestions() async {
