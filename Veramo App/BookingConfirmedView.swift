@@ -486,6 +486,27 @@ struct BookingConfirmedViewContent: View {
             print("   • isComplete: \(paymentStatus.isComplete)")
             print("   • canRetry: \(paymentStatus.canRetry)")
             
+            // Track booking confirmed in AppsFlyer when payment is successful
+            if paymentStatus == .paid,
+               let priceCents = response.priceCents,
+               let pickup = response.pickupDescription,
+               let destination = response.destinationDescription,
+               let vehicleClass = response.vehicleClass {
+                
+                print("📊 [AppsFlyer] Tracking ride_booking_confirmed with payment data")
+                
+                AppsFlyerEvents.shared.trackRideBookingConfirmedDetailed(
+                    reference: reference,
+                    priceCents: priceCents,
+                    pickup: pickup,
+                    destination: destination,
+                    vehicleClass: vehicleClass,
+                    passengers: response.passengers ?? 1,
+                    distance: nil, // Not provided by payment status endpoint
+                    paymentMethod: response.paymentMethod
+                )
+            }
+            
         } catch {
             print("❌ [PAYMENT] Status check failed: \(error.localizedDescription)")
             statusCheckError = error.localizedDescription

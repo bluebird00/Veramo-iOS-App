@@ -728,6 +728,13 @@ struct RideBookingView: View {
         
         // Validation passed - show vehicle selection
         print("✅ Time validation passed - showing vehicle selection")
+        
+        // Track route search in AppsFlyer
+        AppsFlyerEvents.shared.trackRouteSearch(
+            pickup: pickupLocation,
+            destination: destination
+        )
+        
         isVehicleListCompact = false  // Reset compact mode when showing vehicle selection
         showVehicleSelection = true
     }

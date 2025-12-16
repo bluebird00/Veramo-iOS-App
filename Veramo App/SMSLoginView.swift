@@ -235,6 +235,23 @@ struct SMSLoginView: View {
                         sessionToken: sessionToken
                     )
                     
+                    // Track in AppsFlyer based on whether this is a new user
+                    if isNewUser {
+                        print("🆕 [AppsFlyer] Tracking new user registration")
+                        AppsFlyerEvents.shared.trackCompleteRegistration(customer: customer)
+                    } else {
+                        print("🔄 [AppsFlyer] Tracking returning user login")
+                        AppsFlyerEvents.shared.trackLogin()
+                    }
+                    
+                    // Set user ID for cross-device tracking
+                    AppsFlyerEvents.shared.setCustomerUserId(String(customer.id))
+                    
+                    // Optionally set email if available
+                    if let email = customer.email {
+                        AppsFlyerEvents.shared.setCustomerEmail(email)
+                    }
+                    
                     // Mark welcome as seen
                     print("👋 [UI] Marking welcome screen as seen...")
                     AuthenticationManager.shared.hasSeenWelcome = true

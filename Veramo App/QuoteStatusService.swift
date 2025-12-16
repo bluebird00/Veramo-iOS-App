@@ -15,6 +15,15 @@ struct PaymentStatusResponse: Codable {
     let paymentStatus: String?
     let checkoutUrl: String?  // Only present if payment status is "open"
     let error: String?
+    
+    // Attribution data (only present when payment is complete)
+    let tripRequestId: Int?
+    let priceCents: Int?
+    let pickupDescription: String?
+    let destinationDescription: String?
+    let vehicleClass: String?
+    let passengers: Int?
+    let paymentMethod: String?
 }
 
 enum PaymentStatus: String {

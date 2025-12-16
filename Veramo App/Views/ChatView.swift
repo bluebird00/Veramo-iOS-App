@@ -428,6 +428,9 @@ class CustomChannelViewModel: ObservableObject {
         // Create unique support channel for this customer with veramo-admin
         let channelId = ChannelId(type: .messaging, id: "support-\(currentUserId)")
         
+        // Track chat opened in AppsFlyer
+        AppsFlyerEvents.shared.trackChatOpened(channelId: channelId.id)
+        
         // Create channel with both customer and veramo-admin as members
         do {
             let channel = try chatClient.channelController(

@@ -8,10 +8,26 @@
 import UIKit
 import UserNotifications
 import StreamChat
+import AppsFlyerLib
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        
+        // MARK: - AppsFlyer Configuration
+        AppsFlyerLib.shared().appsFlyerDevKey = "oadcqb6QLGDMYKUNUT8irJ"
+        AppsFlyerLib.shared().appleAppID = "id6756296416"
+        
+        // Enable debug logs (set to false in production)
+        #if DEBUG
+        AppsFlyerLib.shared().isDebug = true
+        #else
+        AppsFlyerLib.shared().isDebug = false
+        #endif
+        
+        
+        
+        print("✅ [AppsFlyer] SDK configured")
         
         // Request push notification permission
         PushNotificationService.shared.requestAuthorization()
@@ -21,6 +37,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         
         return true
     }
+    
+    // MARK: - AppsFlyer Lifecycle
+    // Note: AppsFlyer.start() is called in Veramo_AppApp.swift via scenePhase observer
+    // applicationDidBecomeActive is not called in SwiftUI apps
     
     // Called when APNs successfully registers the device
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {

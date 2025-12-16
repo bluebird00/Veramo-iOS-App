@@ -1,6 +1,15 @@
 {
-  "originHash" : "079351f32aed5d8d72f2fff20b76bfe63e7f06d2460894a8930931db1b3d3a7d",
+  "originHash" : "94b36dd25cef41ccead27fb110ce4f95ed2d5bc457c9a5e487121251a1a5d369",
   "pins" : [
+    {
+      "identity" : "appsflyerframework-static",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AppsFlyerSDK/AppsFlyerFramework-Static",
+      "state" : {
+        "revision" : "23cebcf2889585a2686ccfcfce988c266c7f364a",
+        "version" : "6.17.8"
+      }
+    },
     {
       "identity" : "stream-chat-swift",
       "kind" : "remoteSourceControl",

@@ -8,6 +8,7 @@
 import SwiftUI
 import StreamChat
 import StreamChatSwiftUI
+import AppsFlyerLib
 
 // MARK: - Notification Names
 extension Notification.Name {
@@ -24,6 +25,9 @@ struct Veramo_AppApp: App {
     @State private var errorMessage = ""
     @State private var hasSeenWelcome = AuthenticationManager.shared.hasSeenWelcome
     @State private var welcomeScreenOpacity: Double = 1.0
+    
+    // Monitor app lifecycle for AppsFlyer
+    @Environment(\.scenePhase) private var scenePhase
     
     init() {
         // Debug: Log initial state
@@ -125,6 +129,25 @@ struct Veramo_AppApp: App {
                     print("   WebpageURL: \(url)")
                     handleIncomingURL(url: url)
                 }
+            }
+        }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            // Handle app lifecycle changes for AppsFlyer
+            switch newPhase {
+            case .active:
+                print("🟢 [ScenePhase] App became ACTIVE")
+                // Start AppsFlyer when app becomes active
+                AppsFlyerLib.shared().start()
+                print("🚀 [AppsFlyer] SDK started (via ScenePhase)")
+                
+            case .inactive:
+                print("🟡 [ScenePhase] App became INACTIVE")
+                
+            case .background:
+                print("🔴 [ScenePhase] App entered BACKGROUND")
+                
+            @unknown default:
+                break
             }
         }
     }
@@ -230,6 +253,9 @@ struct Veramo_AppApp: App {
                         customer: customer,
                         sessionToken: sessionToken
                     )
+                    
+                    // Note: AppsFlyer tracking is handled in SMSLoginView (SMS auth)
+                    // This magic link path is not actively used
                     
                     // Mark welcome screen as seen when successfully authenticated
                     hasSeenWelcome = true

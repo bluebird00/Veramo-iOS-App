@@ -198,6 +198,12 @@ struct TripsView: View {
                 
                 logger.info("✅ [TripsView] Loaded \(self.upcomingTrips.count) upcoming, \(self.pastTrips.count) past trips (after reclassification)")
                 
+                // Track trips viewed in AppsFlyer
+                AppsFlyerEvents.shared.trackTripsViewed(
+                    upcomingCount: self.upcomingTrips.count,
+                    pastCount: self.pastTrips.count
+                )
+                
                 // Start monitoring trips within the monitoring window
                 startMonitoringTrips()
             }

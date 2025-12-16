@@ -295,6 +295,9 @@ struct VehicleSelectionView: View {
         }
         .task {
             await fetchPricing()
+            
+            // Track vehicle selection view shown (once when view appears)
+            AppsFlyerEvents.shared.trackVehicleViewed(vehicleClass: "")
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {
@@ -600,6 +603,15 @@ struct VehicleSelectionView: View {
                         print("   • Reference: \(reference)")
                         print("   • Quote Token: \(token ?? "N/A")")
                         print("   • Opening checkout URL...")
+                        
+                        // Track booking requested in AppsFlyer
+                        AppsFlyerEvents.shared.trackRideBookingRequested(
+                            booking: response,
+                            pickup: pickup,
+                            destination: destination,
+                            vehicleClass: vehicleClass,
+                            distance: response.distanceKm
+                        )
                     } else {
                         errorMessage = "Booking created but no payment URL was provided"
                         showErrorAlert = true
