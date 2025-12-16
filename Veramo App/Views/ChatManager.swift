@@ -21,21 +21,29 @@ class ChatManager: ObservableObject {
     // Track if we're currently connecting to prevent duplicate connections
     @Published private(set) var isConnecting = false
     
-    private let apiKey = "j46xbwqsrzsk"
+    // API key will be set dynamically from backend response
+    private var apiKey: String?
     
     private init() {
-        setupChatClient()
+        // Don't setup client yet - wait for API key from backend
     }
     
-    private func setupChatClient() {
-        var config = ChatClientConfig(apiKey: .init(apiKey))
-        config.isLocalStorageEnabled = true
-        
-        chatClient = ChatClient(config: config)
-        
+    private func setupChatClient(apiKey: String) {
+        // Only setup if we don't have a client or the API key changed
+        if chatClient == nil || self.apiKey != apiKey {
+            self.apiKey = apiKey
+            var config = ChatClientConfig(apiKey: .init(apiKey))
+            config.isLocalStorageEnabled = true
+            
+            chatClient = ChatClient(config: config)
+            print("✅ [CHAT] Chat client initialized with API key: \(String(apiKey.prefix(8)))...")
+        }
     }
     
-    func connectUser(customer: AuthenticatedCustomer, token: String) {
+    func connectUser(customer: AuthenticatedCustomer, token: String, apiKey: String) {
+        // Setup chat client with the provided API key
+        setupChatClient(apiKey: apiKey)
+        
         guard let chatClient = chatClient else {
             connectionError = "Chat client not initialized"
             return
@@ -149,8 +157,9 @@ class ChatManager: ObservableObject {
         
         // Reset the entire client to clear all local data
         await MainActor.run {
-            // Recreate the client from scratch, which clears all cached data
-            setupChatClient()
+            // Clear the client and API key - will be recreated on next connection
+            chatClient = nil
+            apiKey = nil
             print("✅ [CHAT] Chat client reset and data cleared")
         }
     }

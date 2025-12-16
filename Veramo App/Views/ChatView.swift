@@ -195,14 +195,18 @@ struct ChatView: View {
     
     private func fetchAndConnectUser(customer: AuthenticatedCustomer, sessionToken: String) async {
         do {
-            let streamToken = try await StreamChatTokenService.shared.fetchStreamToken(
+            let streamTokenResponse = try await StreamChatTokenService.shared.fetchStreamToken(
                 customerId: customer.id,
                 sessionToken: sessionToken
             )
             
-            // Connect with proper authentication
+            // Connect with proper authentication and API key from backend
             await MainActor.run {
-                chatManager.connectUser(customer: customer, token: streamToken)
+                chatManager.connectUser(
+                    customer: customer,
+                    token: streamTokenResponse.token,
+                    apiKey: streamTokenResponse.apiKey
+                )
             }
         } catch {
             // Show error

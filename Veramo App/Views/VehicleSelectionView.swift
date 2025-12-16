@@ -296,8 +296,7 @@ struct VehicleSelectionView: View {
         .task {
             await fetchPricing()
             
-            // Track vehicle selection view shown (once when view appears)
-            AppsFlyerEvents.shared.trackVehicleViewed(vehicleClass: "")
+            
         }
         .navigationBarBackButtonHidden(true)
         .toolbar {

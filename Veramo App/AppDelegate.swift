@@ -25,7 +25,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         AppsFlyerLib.shared().isDebug = false
         #endif
         
-        
+        // Set customer user ID if user is authenticated
+        // This MUST be set on every app launch according to AppsFlyer docs
+        if let customerId = AuthenticationManager.shared.customerId {
+            AppsFlyerLib.shared().customerUserID = String(customerId)
+            print("👤 [AppsFlyer] Customer User ID set on launch: \(customerId)")
+        } else {
+            print("👤 [AppsFlyer] No authenticated user on launch")
+        }
         
         print("✅ [AppsFlyer] SDK configured")
         

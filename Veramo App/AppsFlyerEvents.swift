@@ -229,6 +229,7 @@ class AppsFlyerEvents {
     
     /// Set customer user ID for cross-device tracking
     /// Call this immediately after successful login/registration
+    /// Note: The customer ID is also automatically set on every app launch in AppDelegate
     func setCustomerUserId(_ customerId: String) {
         AppsFlyerLib.shared().customerUserID = customerId
         print("👤 [AppsFlyer] Set customer user ID: \(customerId)")
@@ -247,6 +248,8 @@ class AppsFlyerEvents {
  
  INTEGRATION GUIDE:
  
+ ⚠️ IMPORTANT: Customer User ID is automatically set on every app launch in AppDelegate.swift
+ 
  1️⃣ AUTHENTICATION (Veramo_AppApp.swift - handleMagicLink):
  
  // After successful auth
@@ -259,9 +262,9 @@ class AppsFlyerEvents {
      AppsFlyerEvents.shared.trackLogin()
  }
  
- // Set user ID
+ // Set user ID (also automatically set on next app launch)
  if let customerId = customer.id {
-     AppsFlyerEvents.shared.setCustomerUserId(customerId)
+     AppsFlyerEvents.shared.setCustomerUserId(String(customerId))
  }
  
  

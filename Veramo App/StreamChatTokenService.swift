@@ -43,7 +43,7 @@ class StreamChatTokenService {
     
     private init() {}
     
-    func fetchStreamToken(customerId: Int, sessionToken: String) async throws -> String {
+    func fetchStreamToken(customerId: Int, sessionToken: String) async throws -> StreamTokenResponse {
         print("🔑 [STREAM TOKEN] Fetching token for customer \(customerId)...")
         
         // Build URL
@@ -87,7 +87,7 @@ class StreamChatTokenService {
                 print("✅ Stream token fetched successfully")
                 print("   User ID: \(tokenResponse.userId)")
                 print("   API Key: \(tokenResponse.apiKey)")
-                return tokenResponse.token
+                return tokenResponse
                 
             case 401:
                 throw StreamChatTokenError.serverError("Authentication failed")
