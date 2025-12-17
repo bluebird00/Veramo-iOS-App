@@ -48,6 +48,8 @@ struct RideBookingView: View {
     @State private var lastSheetOffset: CGFloat = 0
     @State private var lastFocusedField: Field? = nil
     @State private var isDragging: Bool = false
+    @State private var dragTranslation: CGFloat = 0  // Track current drag for smooth expansion
+    @State private var targetHeight: CGFloat? = nil  // Track target height during expansion
     
     // Location suggestions state
     @State private var pickupSuggestions: [LocationSuggestion] = []
@@ -78,14 +80,30 @@ struct RideBookingView: View {
                 bottomSheetContent
                     .frame(maxWidth: .infinity, maxHeight: sheetMaxHeight(for: geometry))
                     .background(bottomSheetBackground)
-                    .offset(y: sheetOffset)
+                    .offset(y: showVehicleSelection && isVehicleListCompact && isDragging ? max(dragTranslation, 0) : sheetOffset)
                     .animation(.spring(response: 0.3, dampingFraction: 0.8), value: keyboardHeight)
                     .animation(.spring(response: 0.25, dampingFraction: 0.9), value: isVehicleListCompact)
-                    .gesture(sheetDragGesture)
+                    .gesture(sheetDragGesture(geometry: geometry))
             }
         }
         .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .tabBar)
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+                // Reset sheet position when app becomes inactive (e.g., during multitasking gesture)
+                // This prevents the sheet from getting stuck in a weird position
+                sheetOffset = 0
+                lastSheetOffset = 0
+                isDragging = false
+                dragTranslation = 0
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                // Reset sheet position when app returns from background
+                // This fixes the bug where the sheet floats in the middle of screen
+                sheetOffset = 0
+                lastSheetOffset = 0
+                isDragging = false
+                dragTranslation = 0
+            }
             .onAppear {
                 // Preload pickup suggestions so they're ready immediately
                 Task {
@@ -129,6 +147,15 @@ struct RideBookingView: View {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                         sheetOffset = 0
                         lastSheetOffset = 0
+                    }
+                }
+            }
+            .onChange(of: isVehicleListCompact) { wasCompact, nowCompact in
+                // When transitioning from compact to expanded, reset dragTranslation after animation
+                if wasCompact && !nowCompact {
+                    // Small delay to let the height animation complete
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        dragTranslation = 0
                     }
                 }
             }
@@ -581,7 +608,8 @@ struct RideBookingView: View {
             pickupPlaceId: pickupPlaceId,
             destinationPlaceId: destinationPlaceId,
             showVehicleSelection: $showVehicleSelection,
-            isCompactMode: $isVehicleListCompact
+            isCompactMode: $isVehicleListCompact,
+            isDragging: isDragging
         )
     }
     
@@ -592,31 +620,46 @@ struct RideBookingView: View {
             .ignoresSafeArea(edges: .bottom)
     }
     
-    private var sheetDragGesture: some Gesture {
+    private func sheetDragGesture(geometry: GeometryProxy) -> some Gesture {
         DragGesture()
             .onChanged { value in
                 isDragging = true
                 let translation = value.translation.height
                 
                 if translation > 0 {
-                    // Dragging down
+                    // Dragging down - always allow
                     sheetOffset = translation
+                    dragTranslation = 0  // Reset expansion drag
                     // Dismiss keyboard when dragging down
                     if translation > 20 {
                         focusedField = nil
                     }
                 } else if translation < 0 {
-                    // Dragging up - no artificial limit, let it follow
-                    sheetOffset = translation
+                    // Dragging up
+                    if showVehicleSelection && isVehicleListCompact {
+                        // In compact mode - track drag for smooth expansion
+                        // Instead of moving the whole sheet up, we'll expand its height
+                        dragTranslation = translation
+                        sheetOffset = 0  // Keep anchored to bottom
+                    } else {
+                        // Otherwise ignore upward drags when already expanded
+                        sheetOffset = 0
+                        dragTranslation = 0
+                    }
+                } else {
+                    dragTranslation = 0
                 }
             }
             .onEnded { value in
                 isDragging = false
                 let translation = value.translation.height
+                let velocity = value.predictedEndTranslation.height - value.translation.height
                 
                 withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
-                    if translation > 50 {
-                        // Dragged down
+                    if translation > 50 || velocity > 200 {
+                        // Dragged down significantly or with high velocity
+                        dragTranslation = 0  // Reset drag translation
+                        
                         if showVehicleSelection && !isVehicleListCompact {
                             // In vehicle selection, collapse to compact mode first
                             isVehicleListCompact = true
@@ -632,29 +675,53 @@ struct RideBookingView: View {
                                 isVehicleListCompact = false
                             }
                         }
-                    } else if translation < -20 {
-                        // Dragged up - expand
-                        sheetOffset = 0
-                        lastSheetOffset = 0
-                        
+                    } else if translation < -30 || velocity < -200 {
+                        // Dragged up significantly or with high velocity - only respond if in compact mode
                         if showVehicleSelection && isVehicleListCompact {
+                            // Calculate final height before state change
+                            let expandedHeight = geometry.size.height * 0.54
+                            targetHeight = expandedHeight
+                            
                             // In vehicle selection compact mode - expand to show all vehicles
                             isVehicleListCompact = false
-                        } else if !showVehicleSelection {
-                            // In booking form - focus field
-                            // Focus the last used field or default intelligently
-                            if let lastField = lastFocusedField {
-                                focusedField = lastField
-                            } else if pickupLocation.isEmpty {
-                                focusedField = .pickup
-                            } else if destination.isEmpty {
-                                focusedField = .destination
-                            } else {
-                                focusedField = .destination
+                            sheetOffset = 0
+                            lastSheetOffset = 0
+                            
+                            // Clear drag and target after animation completes
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                dragTranslation = 0
+                                targetHeight = nil
                             }
+                        } else if !showVehicleSelection {
+                            // In booking form - focus field only if keyboard is not already showing
+                            dragTranslation = 0
+                            if keyboardHeight == 0 {
+                                sheetOffset = 0
+                                lastSheetOffset = 0
+                                // Focus the last used field or default intelligently
+                                if let lastField = lastFocusedField {
+                                    focusedField = lastField
+                                } else if pickupLocation.isEmpty {
+                                    focusedField = .pickup
+                                } else if destination.isEmpty {
+                                    focusedField = .destination
+                                } else {
+                                    focusedField = .destination
+                                }
+                            } else {
+                                // Keyboard already showing, just reset offset
+                                sheetOffset = 0
+                                lastSheetOffset = 0
+                            }
+                        } else {
+                            // Already expanded, just reset offset
+                            dragTranslation = 0
+                            sheetOffset = 0
+                            lastSheetOffset = 0
                         }
                     } else {
-                        // Snap back to previous position
+                        // Small drag that didn't meet threshold - always snap back to bottom
+                        dragTranslation = 0
                         sheetOffset = 0
                         lastSheetOffset = 0
                     }
@@ -670,15 +737,25 @@ struct RideBookingView: View {
             return geometry.size.height * 0.84
         } else if showVehicleSelection && isVehicleListCompact {
             // Compact mode - just enough for one vehicle card
-            // Breakdown:
-            // - Trip summary card: 16 (top padding) + 16 (padding) + ~60 (content + padding) = ~92pt
-            // - Vehicle card: 12 (spacing) + 24 (vertical padding) + ~90 (content) = ~126pt
-            // - Book button area: 8 (top padding) + 18 (button vertical) + 5 (bottom) = ~31pt
-            // - Additional spacing: ~30pt
-            // Total: ~280pt
-            return 300
+            let baseHeight: CGFloat = 300
+            
+            // During drag, smoothly expand the height
+            if isDragging && dragTranslation < 0 {
+                // dragTranslation is negative when dragging up
+                // Interpolate between compact (300) and expanded (54% of screen)
+                let expandedHeight = geometry.size.height * 0.54
+                let maxDrag: CGFloat = -200  // Max drag distance to trigger full expansion
+                let dragProgress = min(abs(dragTranslation) / abs(maxDrag), 1.0)
+                return baseHeight + (expandedHeight - baseHeight) * dragProgress
+            }
+            
+            return baseHeight
         } else if showVehicleSelection {
             // Vehicle selection expanded - 54% of screen
+            // Use targetHeight if set (during expansion animation)
+            if let target = targetHeight {
+                return target
+            }
             return geometry.size.height * 0.54
         } else {
             // Booking form - 54% of screen

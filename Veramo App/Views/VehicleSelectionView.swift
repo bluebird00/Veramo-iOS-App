@@ -28,9 +28,11 @@ struct VehicleSelectionView: View {
     @State private var pricingError: String?
     @State private var pricingResponse: PricingResponse?
     @State private var sheetHeight: CGFloat = 0
+    @State private var renderedVehicles: [VehicleType] = []  // Track what's actually rendered
     
     @Binding var showVehicleSelection: Bool  // To control parent view state
     @Binding var isCompactMode: Bool  // Controlled by parent sheet drag gesture
+    let isDragging: Bool  // Track if parent is currently dragging
     
     // Authentication state
     @Environment(AppState.self) private var appState
@@ -74,7 +76,7 @@ struct VehicleSelectionView: View {
         )
     ]
     
-    init(pickup: String, destination: String, pickupEnglish: String, destinationEnglish: String, date: Date, time: Date, passengers: Int, pickupPlaceId: String? = nil, destinationPlaceId: String? = nil, showVehicleSelection: Binding<Bool>, isCompactMode: Binding<Bool>) {
+    init(pickup: String, destination: String, pickupEnglish: String, destinationEnglish: String, date: Date, time: Date, passengers: Int, pickupPlaceId: String? = nil, destinationPlaceId: String? = nil, showVehicleSelection: Binding<Bool>, isCompactMode: Binding<Bool>, isDragging: Bool = false) {
         self.pickup = pickup
         self.destination = destination
         self.pickupEnglish = pickupEnglish
@@ -86,6 +88,7 @@ struct VehicleSelectionView: View {
         self.destinationPlaceId = destinationPlaceId
         self._showVehicleSelection = showVehicleSelection
         self._isCompactMode = isCompactMode
+        self.isDragging = isDragging
     }
     
     // Swiss timezone constant
@@ -139,10 +142,16 @@ struct VehicleSelectionView: View {
     
     // Vehicles to display based on sheet state
     private var displayedVehicles: [VehicleType] {
-        // When in compact mode and a vehicle is selected, show only that one
+        // During drag, always show all vehicles for smooth expansion
+        if isDragging {
+            return availableVehicles
+        }
+        
+        // When in compact mode (not dragging) and a vehicle is selected, show only that one
         if isCompactMode, let selected = selectedVehicle {
             return availableVehicles.filter { $0.name == selected.name }
         }
+        
         // Otherwise show all available vehicles
         return availableVehicles
     }
@@ -209,27 +218,28 @@ struct VehicleSelectionView: View {
                             .padding(.vertical, 40)
                             .padding(.horizontal)
                         } else {
-                            // Vehicle cards
-                            ForEach(displayedVehicles) { vehicle in
-                                VehicleOptionCard(
-                                    vehicle: vehicle,
-                                    isSelected: selectedVehicle?.name == vehicle.name,
-                                    onSelect: {
-                                        withAnimation(.linear(duration: 0.15)) {
-                                            selectedVehicle = vehicle
-                                        }
-                                    }
-                                )
-                                .simultaneousGesture(
-                                    TapGesture()
-                                        .onEnded { _ in
+                            // Vehicle cards - use renderedVehicles which doesn't change during drag
+                            LazyVStack(spacing: 12) {
+                                ForEach(renderedVehicles) { vehicle in
+                                    VehicleOptionCard(
+                                        vehicle: vehicle,
+                                        isSelected: selectedVehicle?.name == vehicle.name,
+                                        onSelect: {
                                             withAnimation(.linear(duration: 0.15)) {
                                                 selectedVehicle = vehicle
                                             }
                                         }
-                                )
-                                .id(vehicle.name) // Add ID for smooth transitions
-                                .transition(.scale(scale: 0.98).combined(with: .opacity))
+                                    )
+                                    .simultaneousGesture(
+                                        TapGesture()
+                                            .onEnded { _ in
+                                                withAnimation(.linear(duration: 0.15)) {
+                                                    selectedVehicle = vehicle
+                                                }
+                                            }
+                                    )
+                                    .id(vehicle.name) // Add ID for smooth transitions
+                                }
                             }
                         }
                     }
@@ -247,7 +257,6 @@ struct VehicleSelectionView: View {
                     )
                 }
                 .scrollIndicators(.hidden)
-                .animation(.linear(duration: 0.2), value: displayedVehicles.count)
                 
                 
                 
@@ -288,9 +297,27 @@ struct VehicleSelectionView: View {
             }
             .onAppear {
                 sheetHeight = geometry.size.height
+                // Initialize rendered vehicles
+                renderedVehicles = displayedVehicles
             }
             .onChange(of: geometry.size.height) { oldValue, newValue in
                 sheetHeight = newValue
+            }
+            .onChange(of: displayedVehicles.count) { oldCount, newCount in
+                // Only update rendered vehicles when not dragging
+                if !isDragging {
+                    renderedVehicles = displayedVehicles
+                }
+            }
+            .onChange(of: isDragging) { wasDragging, nowDragging in
+                // When drag ends, update rendered vehicles
+                if wasDragging && !nowDragging {
+                    renderedVehicles = displayedVehicles
+                }
+                // When drag starts, ensure all vehicles are shown
+                if !wasDragging && nowDragging {
+                    renderedVehicles = availableVehicles
+                }
             }
         }
         .task {
@@ -679,6 +706,9 @@ struct VehicleSelectionView: View {
                     
                     // Auto-select Business class after pricing loads
                     selectedVehicle = availableVehicles.first { $0.name == "Business" }
+                    
+                    // Initialize rendered vehicles
+                    renderedVehicles = displayedVehicles
                 }
             } else {
                 throw PricingError.missingLocationData
